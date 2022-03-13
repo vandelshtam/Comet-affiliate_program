@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New PersonalData{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Страница регистрации персональных данных</h1>
+
+    {{ include('personal_data/_form.html.twig') }}
+    <a type="submit" class="btn btn-primary" href="{{ path('app_personal_area') }}">back to list</a>
+</div>
+{% endblock %}

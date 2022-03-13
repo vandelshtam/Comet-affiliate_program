@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Страница персоанльных данных</h1>
+    <div class="alert alert-warning" role="alert">
+    Важная информация:
+        <ul>
+            <li>Вы обязательно должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new') }}">перейти к заполнению</a></code></li>
+        </ul>
+    </div>
+    
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Phone</th>
+                <th>State</th>
+                <th>Region</th>
+                <th>City</th>
+                <th>Street</th>
+                <th>House</th>
+                <th>Frame</th>
+                <th>Apartment</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for personal_datum in personal_datas %}
+            <tr>
+                <td>{{ personal_datum.id }}</td>
+                <td>{{ personal_datum.name }}</td>
+                <td>{{ personal_datum.surname }}</td>
+                <td>{{ personal_datum.phone }}</td>
+                <td>{{ personal_datum.state }}</td>
+                <td>{{ personal_datum.region }}</td>
+                <td>{{ personal_datum.city }}</td>
+                <td>{{ personal_datum.street }}</td>
+                <td>{{ personal_datum.house }}</td>
+                <td>{{ personal_datum.frame }}</td>
+                <td>{{ personal_datum.apartment }}</td>
+                <td>
+                    <a href="{{ path('app_personal_data_show', {'id': personal_datum.id}) }}">show</a>
+                    <a href="{{ path('app_personal_data_edit', {'id': personal_datum.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="12">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_personal_data_new') }}">Create new</a>
+</div>
+{% endblock %}
