@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Страница редактирования регистрационных сведений</h1>
+
+    {{ include('user/_form.html.twig', {'button_label': 'Обновить'}) }}
+
+    <a class="btn btn-primary" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
+    <br><br>
+    {{ include('user/_delete_form.html.twig') }}
+</div>
+{% endblock %}

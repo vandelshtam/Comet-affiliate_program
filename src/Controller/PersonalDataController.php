@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\PersonalData;
 use App\Form\PersonalDataType;
-use Doctrine\Persistence\ManagerRegistry;
 
+use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\PersonalDataRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,28 +28,45 @@ class PersonalDataController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_personal_data_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine): Response
+    #[Route('/{user_id}/new', name: 'app_personal_data_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine, int $user_id): Response
     {
+        //dd($user_id);
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $user = $this->getUser();
+        $personal_data_id = $this->getUser()->getPersonalDataId();
+        //dd($personal_data_id);
+        if($personal_data_id != NULL)
+        {
+            $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        }
+
         $personalDatum = new PersonalData();
         $form = $this->createForm(PersonalDataType::class, $personalDatum);
         $form->handleRequest($request);
-        $user = $this->getUser();
-        //dd($user);
+        $entityManager = $doctrine->getManager();
 
         if ($form->isSubmitted() && $form->isValid()) {
             $personalDataRepository->add($personalDatum);
-            $entityManager = $doctrine->getManager();
-            //$personalData = $entityManager->getRepository(PersonalData::class)->find($id);
-           // $product->setName('New product name!');
-            
-            return $this->redirectToRoute('app_personal_data_index', [], Response::HTTP_SEE_OTHER);
+            $personalData = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
+            $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user -> getId()]);
+            $user_table->setPersonalDataId($personalData -> getId());
+            $entityManager->persist($user_table);
+            $entityManager->flush();
+            $this->addFlash(
+                'success',
+                'Вы успешно зарегистрировали персональные данные');
+            // $this->addFlash(
+            //     'info',
+            //     'Чтобы совершать действия в системе Вам необходимо зарегистрировать персональные данные!');  
+            return $this->redirectToRoute('app_personal_data_show', ['personal_user_id' => $user -> getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('personal_data/new.html.twig', [
             'personal_datum' => $personalDatum,
             'form' => $form,
-            'user_id' => $user->getId(),
+            'user_id' => $user_id,
+            'new_user_make' => true,
         ]);
     }
 
@@ -56,14 +74,11 @@ class PersonalDataController extends AbstractController
     #[Route('/{personal_user_id}/show', name: 'app_personal_data_show', methods: ['GET', 'POST'])]
     public function show(ManagerRegistry $doctrine,int $personal_user_id): Response
     {
-        //dd($id);
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
         $repository = $doctrine->getRepository(PersonalData::class);
-        //$user_id = $repository->findOneBy(['user_id' => $user -> getId()])->getUserId();
         //$personal_data_id = $this->getUser()->getPersonalDataId();
-        
-        
+        //dd($personal_user_id);
         if($personal_user_id != NULL)
         {
             if($repository->findOneBy(['user_id' => $user -> getId()])->getUserId() == false)
@@ -72,10 +87,9 @@ class PersonalDataController extends AbstractController
             }
         }
             
-        //dd($this->getUser()->getId());
         $repository = $doctrine->getRepository(PersonalData::class);
         $personalDatum = $doctrine->getRepository(PersonalData::class)->findOneBySomeField($user -> getId());
-        //dd($user_id);
+        //dd($personalDatum);
         return $this->render('personal_data/show.html.twig', [
             'personal_datum' => $personalDatum,
             'user' => $user,
@@ -86,21 +100,24 @@ class PersonalDataController extends AbstractController
     public function edit(Request $request, PersonalData $personalDatum, PersonalDataRepository $personalDataRepository,int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        if($this->getUser()->getId() != $id)
+        if($this->getUser()->getPersonalDataId() != $id)
         {
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
+        $user = $this->getUser();
         $form = $this->createForm(PersonalDataType::class, $personalDatum);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $personalDataRepository->add($personalDatum);
-            return $this->redirectToRoute('app_personal_data_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_personal_data_show', ['personal_user_id' => $id], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('personal_data/edit.html.twig', [
             'personal_datum' => $personalDatum,
             'form' => $form,
+            'new_user_make' => false,
+            'user_id' => $user->getId(),
         ]);
     }
 

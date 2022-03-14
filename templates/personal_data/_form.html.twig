@@ -4,20 +4,99 @@
 </div>
 {% endif %}
 {{ form_start(form) }}
+{# <form class="row g-3 needs-validation" novalidate>
+  <div class="col-md-4">
+    <label for="validationCustom01" class="form-label">First name</label>
+    <input type="text" class="form-control" id="validationCustom01" value="Mark" required>
+    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+    <div class="valid-feedback">
+      Looks good!
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label for="validationCustom02" class="form-label">Last name</label>
+    <input type="text" class="form-control" id="validationCustom02" value="Otto" required>
+    <div class="valid-feedback">
+      Looks good!
+    </div>
+  </div>
+  <div class="col-md-4">
+    <label for="validationCustomUsername" class="form-label">Username</label>
+    <div class="input-group has-validation">
+      <span class="input-group-text" id="inputGroupPrepend">@</span>
+      <input type="text" class="form-control" id="validationCustomUsername" aria-describedby="inputGroupPrepend" required>
+      <div class="invalid-feedback">
+        Please choose a username.
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <label for="validationCustom03" class="form-label">City</label>
+    <input type="text" class="form-control" id="validationCustom03" required>
+    <div class="invalid-feedback">
+      Please provide a valid city.
+    </div>
+  </div>
+  <div class="col-md-3">
+    <label for="validationCustom04" class="form-label">State</label>
+    <select class="form-select" id="validationCustom04" required>
+      <option selected disabled value="">Choose...</option>
+      <option>...</option>
+    </select>
+    <div class="invalid-feedback">
+      Please select a valid state.
+    </div>
+  </div>
+  <div class="col-md-3">
+    <label for="validationCustom05" class="form-label">Zip</label>
+    <input type="text" class="form-control" id="validationCustom05" required>
+    <div class="invalid-feedback">
+      Please provide a valid zip.
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
+      <label class="form-check-label" for="invalidCheck">
+        Agree to terms and conditions
+      </label>
+      <div class="invalid-feedback">
+        You must agree before submitting.
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Submit form</button>
+  </div>
+</form> #}
 <div class="form_box-inner">
-<div class="form_box-left">
-  {# {{ form_widget(form) }} #}
-{{ form_row(form.name) }}  
-<div class="hidden">
-{{ form_row(form.user_id, {'value': user_id }) }}
-</div>
-  <div class="alert alert-info" role="alert">
-    Условия участия в программе:
-        <ul>
-            <li>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Спасибо за понимание! </li>
-        </ul>
-    </div>   
-  <button type="submit" class="btn btn-primary">{{ button_label|default('Save') }}</button>
-</div>
+  <div class="form_box-left">
+    {# {{ form_widget(form) }} #}
+    {{ form_row(form.name) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> 
+    {{ form_row(form.surname) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.phone) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.state) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.region) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.city) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.indexcity) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.street) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.house) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.frame) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.apartment) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {% if new_user_make == true %}
+      <div class="alert alert-info" role="alert">
+        Условия участия в программе:
+            <ul>
+                <li>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Спасибо за понимание! </li>
+            </ul>
+      </div>  
+    {{ form_row(form.agreeTerms) }} 
+    {% endif %}
+      <div class="hidden">
+      {{ form_row(form.user_id, {'value': user_id }) }}
+      </div>
+    
+    <button type="submit" class="btn btn-primary">{{ button_label|default('Сохранить') }}</button>
+  </div>
 </div>
 {{ form_end(form) }}

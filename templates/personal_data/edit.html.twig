@@ -3,11 +3,31 @@
 {% block title %}Edit PersonalData{% endblock %}
 
 {% block body %}
-    <h1>Edit PersonalData</h1>
-
-    {{ include('personal_data/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_personal_data_index') }}">back to list</a>
-
+<div class="container">
+    <h1>Страница редактирования персональных данных</h1>
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-info" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {{ include('personal_data/_form.html.twig', {'button_label': 'Редактировать'}) }}
+    {% if is_granted('ROLE_ADMIN') %}
+    <a class="btn btn-primary" href="{{ path('app_personal_data_index') }}">Назад</a>
+    {% else %}
+    <a class="btn btn-primary" href="{{ path('app_personal_data_show', {'personal_user_id': personal_datum.id}) }}">Назад</a>
+    {% endif %}
+    <br><br>
+    {% if is_granted('ROLE_ADMIN') %}
     {{ include('personal_data/_delete_form.html.twig') }}
+    {% endif %}
+</div>
 {% endblock %}

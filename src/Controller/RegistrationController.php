@@ -45,6 +45,12 @@ class RegistrationController extends AbstractController
             // $user->setRoles($roles);
             $entityManager->persist($user);
             $entityManager->flush();
+            $this->addFlash(
+                'success',
+                'Вы успешно прошли регистрацию, перейдите в указанную вами электронную почту и пройдите верификацию');
+            $this->addFlash(
+                'info',
+                'Чтобы совершать действия в системе Вам необходимо зарегистрировать персональные данные!');     
 
             // generate a signed url and email it to the user
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,

@@ -19,7 +19,7 @@ class PersonalData
     #[ORM\Column(type: 'string', length: 255)]
     private $surname;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', length: 25)]
     private $phone;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -34,10 +34,10 @@ class PersonalData
     #[ORM\Column(type: 'string', length: 255)]
     private $street;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'integer', length: 30)]
     private $house;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'string', length: 255)]
     private $frame;
 
     #[ORM\Column(type: 'integer')]

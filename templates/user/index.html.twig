@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User index{% endblock %}
+
+{% block body %}
+<div class="container-xxl">
+    <h1>Страница пользователей</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Email</th>
+                <th>Roles</th>
+                {# <th>Password</th> #}
+                {# <th>IsVerified</th> #}
+                {# <th>Personal_data_id</th> #}
+                <th>Username</th>
+                <th>Изменить данные безопасности</th>
+                <th>Изменить персональные данные</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+                {# <td>{{ user.password }}</td> #}
+                {# <td>{{ user.isVerified ? 'Yes' : 'No' }}</td> #}
+                {# <td>{{ user.personalDataId }}</td> #}
+                <td>{{ user.username }}</td>
+                <td>
+                    <a class="btn btn-primary" href="{{ path('app_user_show', {'id': user.id}) }}">Открыть</a>
+                    <br><br>
+                    <a class="btn btn-warning" href="{{ path('app_user_edit', {'id': user.id}) }}">Редактировать</a>
+                </td>
+                <td>
+                     <a class="btn btn-primary" href="{{ path('app_personal_data_show', {'personal_user_id': user.id}) }}">Открыть</a>
+                     <br><br>
+                     {% if user.personalDataId == 0 %}
+                     У пользователя нет персональных данных, заполнить?
+                     <a class="btn btn-warning" href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">Заполнить</a>
+                     {% else %}
+                     <a class="btn btn-warning" href="{{ path('app_personal_data_edit', {'id': user.id}) }}">Редактировать</a>
+                     {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-primary" href="{{ path('app_personal_area') }}">Назад</a>
+    <a class="btn btn-success" href="{{ path('app_user_new') }}">Добавить</a>
+</div>
+{% endblock %}
