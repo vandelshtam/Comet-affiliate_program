@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit email{% endblock %}
+
+
+{% block body %}
+{% if form_errors(form) %}
+<div class="alert alert-danger" role="alert">
+    {{ form_errors(form) }}
+</div>
+{% endif %}
+<div class="container">
+    <h1>Страница редактирования имени пользователя</h1>
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+        {% for message in messages %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+        {% for message in messages %}
+            <div class="alert alert-info" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {{ form_start(form) }}
+    <div class="form_box-inner" onsubmit="return confirm('Вы действительно хотите изменить имя?');">   
+        <div class="form_box-left">    
+            {{ form_row(form.username) }}<div id="emailHelp" class="form-text">Введите ваше новое имя в системе</div>
+        <button class="btn btn-warning" onclick="return confirm('Вы действительно хотите поменять имя?')">{{ button_label|default('Сохранить') }}</button>
+        <a class="btn btn-primary" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
+        </div>
+        <div class="hidden">
+        {{ form_row(form.email) }}
+        </div>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

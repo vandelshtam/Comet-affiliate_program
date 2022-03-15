@@ -15,14 +15,14 @@
     {% endif %}
     {% for label, messages in app.flashes(['success', 'notice']) %}
         {% for message in messages %}
-            <div class="flash-{{ label }} notice_message">
+            <div class="alert alert-success" role="alert">
                 {{ message }}
             </div>
         {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['info', 'notice']) %}
         {% for message in messages %}
-            <div class="flash-{{ label }} notice_message">
+            <div class="alert alert-info" role="alert">
                 {{ message }}
             </div>
         {% endfor %}

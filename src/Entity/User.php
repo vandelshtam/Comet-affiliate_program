@@ -30,11 +30,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private $isVerified = false;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $personal_data_id;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $username;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $role;
 
     public function getId(): ?int
     {
@@ -138,6 +141,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUsername(?string $username): self
     {
         $this->username = $username;
+
+        return $this;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(?string $role): self
+    {
+        $this->role = $role;
 
         return $this;
     }

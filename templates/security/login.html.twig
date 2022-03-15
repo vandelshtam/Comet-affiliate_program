@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Страница аутентификации{% endblock %}
 
 {% block body %}
 <form class="container" method="post">
@@ -10,17 +10,17 @@
 
     {% if app.user %}
         <div class="mb-3">
-            You are logged in as {{ app.user.email }}, <a href="{{ path('app_logout') }}">Logout</a>
+            You are logged in as {{ app.user.email }}, <a href="{{ path('app_logout') }}">Выйти</a>
         </div>
     {% endif %}
-
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
+     забыли пароль ?  <a href="{{ path('app_forgot_password_request') }}">перейдите по ссылке</a>
+    <h1 class="h3 mb-3 font-weight-normal">Пожалуйста войдите в систему</h1>
+    <label for="inputEmail">Емайл</label>
     <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-    <label for="inputPassword">Password</label>
+    <div id="emailHelp" class="form-text">Мы никогда не будем делиться вашей электронной почтой с кем-либо еще.</div>
+    <label for="inputPassword">Пароль</label>
     <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-    <div id="emailHelp" class="form-text">Your privacy is protected.</div>
+    <div id="emailHelp" class="form-text">Ваша конфиденциальность защищена.</div>
     <input type="hidden" name="_csrf_token"
            value="{{ csrf_token('authenticate') }}">
 
@@ -36,7 +36,7 @@
     #}
 
     <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
+        Войти
     </button>
 </form>
 {% endblock %}

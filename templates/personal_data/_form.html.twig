@@ -96,7 +96,7 @@
       {{ form_row(form.user_id, {'value': user_id }) }}
       </div>
     
-    <button type="submit" class="btn btn-primary">{{ button_label|default('Сохранить') }}</button>
+    <button type="submit" class="btn btn-primary" onclick="return confirm('Вы действительно хотите поменять персональные данные?')">{{ button_label|default('Сохранить') }}</button>
   </div>
 </div>
 {{ form_end(form) }}

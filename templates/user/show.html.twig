@@ -7,14 +7,14 @@
     <h1>Страница безопасности</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
         {% for message in messages %}
-            <div class="flash-{{ label }} notice_message">
+            <div class="alert alert-success" role="alert">
                 {{ message }}
             </div>
         {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['info', 'notice']) %}
         {% for message in messages %}
-            <div class="flash-{{ label }} notice_message">
+            <div class="alert alert-info" role="alert">
                 {{ message }}
             </div>
         {% endfor %}
@@ -28,7 +28,7 @@
             {% else %}
             <p class="card-text">У вас пока не создан -  username</p>
             {% endif %}
-            <a href="#" class="btn btn-primary">Изменить</a>
+            <a href="{{ path('app_user_change_username', {'id': user.id}) }}" class="btn btn-primary">Изменить</a>
         </div>
     </div>
     <table class="table">
@@ -41,7 +41,7 @@
                 <th>Email</th>
                 <td>{{ user.email }}</td>
                 <td>
-                    <a class="btn btn-warning" href="{{ path('app_user_edit', {'id': user.id}) }}">Изменить email</a>
+                    <a class="btn btn-warning" href="{{ path('app_user_change_email', {'id': user.id}) }}">Изменить email</a>
                 </td>
             </tr>
                 
@@ -55,7 +55,7 @@
                 </td>
                 <td>
                 {% if is_granted('ROLE_ADMIN') %}    
-                    <a class="btn btn-warning" href="{{ path('app_user_edit', {'id': user.id}) }}">Изменить роль пользователя</a>
+                    <a class="btn btn-warning" href="{{ path('app_user_role_edit', {'id': user.id}) }}">Изменить роль пользователя</a>
                 {% endif %}
                 </td>
             </tr>
@@ -66,6 +66,7 @@
             <tr>
                 <th>IsVerified</th>
                 <td>{{ user.isVerified ? 'Yes' : 'No' }}</td>
+                <td></td>
             </tr>
             {# <tr>
                 <th>Personal_data_id</th>
@@ -74,6 +75,7 @@
             <tr>
                 <th>Username</th>
                 <td>{{ user.username }}</td>
+                <td></td>
             </tr>
         </tbody>
     </table>

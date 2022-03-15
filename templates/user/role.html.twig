@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Страница редактирования роли пользователя</h1>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Текущие роли пользователя</th>
+                {% for role in roles %}
+                <td>    
+                    {{ role }} , 
+                </td>
+                {% endfor %}
+        </tbody>
+    </table>
+    {{ form_start(form) }}
+        {# {{ include('user/_form.html.twig', {'button_label': 'Обновить'}) }} #}
+        <select class="form-select" aria-label="Default select example" name="roles">
+            <option selected>Выберите роль пользователя</option>
+            <option value="{{ role_admin }}">{{ role_admin }}</option>
+            <option value="{{ role_super_admin }}">{{ role_super_admin }}</option>
+        </select>
+        <br><br>
+        <a class="btn btn-primary" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
+        <br><br>
+        {# {{ include('user/_delete_form.html.twig') }} #}
+        <button class="btn btn-warning">{{ button_label|default('Сохранить') }}</button>
+    {{ form_end(form) }}    
+</div>
+
+{% endblock %}

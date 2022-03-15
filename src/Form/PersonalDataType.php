@@ -73,7 +73,7 @@ class PersonalDataType extends AbstractType
                 'label' => 'Номер дома',
                 'required' => true,  
             ])
-            ->add('frame', IntegerType::class,[
+            ->add('frame', TextType::class,[
                 'label' => 'Строение, Корпус, Блок',
                 'required' => true,  
             ])

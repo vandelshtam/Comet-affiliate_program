@@ -55,6 +55,12 @@ class PersonalData
     #[ORM\Column(type: 'integer', nullable: true)]
     private $users_id;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $tel;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $block;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -212,6 +218,30 @@ class PersonalData
     public function setUsersId(?int $users_id): self
     {
         $this->users_id = $users_id;
+
+        return $this;
+    }
+
+    public function getTel(): ?int
+    {
+        return $this->tel;
+    }
+
+    public function setTel(?int $tel): self
+    {
+        $this->tel = $tel;
+
+        return $this;
+    }
+
+    public function getBlock(): ?string
+    {
+        return $this->block;
+    }
+
+    public function setBlock(?string $block): self
+    {
+        $this->block = $block;
 
         return $this;
     }

@@ -1,13 +1,23 @@
 {% if form_errors(form) %}
-<div class="my-custom-class-for-errors">
+<div class="alert alert-danger" role="alert">
     {{ form_errors(form) }}
 </div>
 {% endif %}
 {{ form_start(form) }}
-<div class="form_box-inner">
+<div class="form_box-inner">   
     <div class="form_box-left">
-    {{ form_row(form.username) }} 
-    {{ form_row(form.email) }} 
+        {{ form_row(form.username) }}<div id="emailHelp" class="form-text">Пожалуйста введите новое имя длинной от 3 до 50 любых знаков</div>  
+        {{ form_row(form.email) }}<div id="emailHelp" class="form-text">Введите новую почту, если это поле автоматически заполнилось текущей почтой</div>
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Контрольный ввод новой электронной почты</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_email">
+        <div id="emailHelp" class="form-text">Введите новую электронную почту</div>
+    </div>
+    <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Повтор новой электронной почты</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="confirm_email">
+        <div id="emailHelp" class="form-text">Пожалуйста повторите новую электронную почту</div>
+    </div>  
     {# {{ form_row(form.phone) }} 
     {{ form_row(form.state) }} 
     {{ form_row(form.region) }} 

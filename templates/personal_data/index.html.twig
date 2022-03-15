@@ -5,41 +5,45 @@
 {% block body %}
 <div class="container">
     <h1>Страница персоанльных данных</h1>
-    {# <div class="alert alert-warning" role="alert">
-    Важная информация:
-        <ul>
-            <li>Вы обязательно должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new') }}">перейти к заполнению</a></code></li>
-        </ul>
-    </div> #}
     {% for label, messages in app.flashes(['success', 'notice']) %}
         {% for message in messages %}
-            <div class="flash-{{ label }} notice_message">
+            <div class="alert alert-success" role="alert">
                 {{ message }}
             </div>
         {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['info', 'notice']) %}
         {% for message in messages %}
-            <div class="flash-{{ label }} notice_message">
+            <div class="alert alert-info" role="alert">
                 {{ message }}
             </div>
         {% endfor %}
     {% endfor %}
+    {# <div class="alert alert-warning" role="alert">
+    Важная информация:
+        <ul>
+            <li>Вы обязательно должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new') }}">перейти к заполнению</a></code></li>
+        </ul>
+    </div> #}
+    {% if is_granted('ROLE_ADMIN') %}
+    {# <a class="btn btn-success" href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">Добавить</a> #}
+    <a class="btn btn-primary" href="{{ path('app_admin') }}">Назад</a>
+    {% endif %}
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Phone</th>
-                <th>State</th>
-                <th>Region</th>
-                <th>City</th>
-                <th>Street</th>
-                <th>House</th>
-                <th>Frame</th>
-                <th>Apartment</th>
-                <th>actions</th>
+                <th>имя</th>
+                <th>Фамилия</th>
+                <th>Телефон</th>
+                <th>Государство</th>
+                <th>регион/область/провинция</th>
+                <th>Город</th>
+                <th>Улица</th>
+                <th>Номер дома</th>
+                <th>Номер корпуса/блока</th>
+                <th>Квартира</th>
+                <th>Ваши действия</th>
             </tr>
         </thead>
         <tbody>
@@ -68,9 +72,5 @@
         {% endfor %}
         </tbody>
     </table>
-    {% if is_granted('ROLE_ADMIN') %}
-    {# <a class="btn btn-success" href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">Добавить</a> #}
-    <a class="btn btn-primary" href="{{ path('app_admin') }}">Назад</a>
-    {% endif %}
 </div>
 {% endblock %}

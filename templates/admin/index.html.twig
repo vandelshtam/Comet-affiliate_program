@@ -11,15 +11,15 @@
     <div class="example-wrapper">
         <h1>{{ controller_name }}! ✅</h1>
         {% for label, messages in app.flashes(['success', 'notice']) %}
-                {% for message in messages %}
-                    <div class="flash-{{ label }} notice_message">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
             {% endfor %}
             {% for label, messages in app.flashes(['info', 'notice']) %}
                 {% for message in messages %}
-                    <div class="flash-{{ label }} notice_message">
+                    <div class="alert alert-info" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
