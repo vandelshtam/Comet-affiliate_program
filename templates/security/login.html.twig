@@ -13,7 +13,8 @@
             You are logged in as {{ app.user.email }}, <a href="{{ path('app_logout') }}">Выйти</a>
         </div>
     {% endif %}
-     забыли пароль ?  <a href="{{ path('app_forgot_password_request') }}">перейдите по ссылке</a>
+    <p>Забыли пароль?  <a href="{{ path('app_forgot_password_request') }}">перейдите по ссылке</a></p>
+    <p>У вас еще нет аккаунта, хотите пройти регистрацию?  <a href="{{ path('app_register') }}">перейдите по ссылке</a></p>
     <h1 class="h3 mb-3 font-weight-normal">Пожалуйста войдите в систему</h1>
     <label for="inputEmail">Емайл</label>
     <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>

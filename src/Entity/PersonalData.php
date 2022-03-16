@@ -19,7 +19,7 @@ class PersonalData
     #[ORM\Column(type: 'string', length: 255)]
     private $surname;
 
-    #[ORM\Column(type: 'integer', length: 25)]
+    #[ORM\Column(type: 'string', length: 25)]
     private $phone;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -37,7 +37,7 @@ class PersonalData
     #[ORM\Column(type: 'integer', length: 30)]
     private $house;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 25, nullable: true )]
     private $frame;
 
     #[ORM\Column(type: 'integer')]
@@ -60,6 +60,9 @@ class PersonalData
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $block;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $client_code;
 
     public function getId(): ?int
     {
@@ -242,6 +245,18 @@ class PersonalData
     public function setBlock(?string $block): self
     {
         $this->block = $block;
+
+        return $this;
+    }
+
+    public function getClientCode(): ?string
+    {
+        return $this->client_code;
+    }
+
+    public function setClientCode(?string $client_code): self
+    {
+        $this->client_code = $client_code;
 
         return $this;
     }

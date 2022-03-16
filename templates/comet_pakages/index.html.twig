@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+<div class="example-wrapper container-xxl">
+    <h1>Привет! Это -  {{ controller_name }}</h1>
+    <div class="card mb-3" style="max-width: 1140px;">
+    <div class="row g-0">
+        <div class="col-md-4">
+        <img src="{{ asset('asset/img/pakages-cometa-1.jpeg') }}" class="img-fluid rounded-start" alt="...">
+        </div>
+        <div class="col-md-8">
+        <div class="card-body">
+            <h5 class="card-title">Пакеты для участия в программе</h5>
+            <p class="card-text">Ниже приведено описание пакетов, вы сможете подобрать для себя оптимальный пакет.</p>
+            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+        </div>
+    </div>
+    </div>
+    
+</div>
+
+
+{% endblock %}

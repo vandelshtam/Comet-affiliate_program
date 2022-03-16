@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ListReferralNetworks index{% endblock %}
+
+{% block body %}
+    <h1>ListReferralNetworks index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Referral_networks_id</th>
+                <th>Owner_id</th>
+                <th>Owner_name</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for list_referral_network in list_referral_networks %}
+            <tr>
+                <td>{{ list_referral_network.id }}</td>
+                <td>{{ list_referral_network.name }}</td>
+                <td>{{ list_referral_network.referralNetworksId }}</td>
+                <td>{{ list_referral_network.ownerId }}</td>
+                <td>{{ list_referral_network.ownerName }}</td>
+                <td>
+                    <a href="{{ path('app_list_referral_networks_show', {'id': list_referral_network.id}) }}">show</a>
+                    <a href="{{ path('app_list_referral_networks_edit', {'id': list_referral_network.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_list_referral_networks_new') }}">Create new</a>
+{% endblock %}

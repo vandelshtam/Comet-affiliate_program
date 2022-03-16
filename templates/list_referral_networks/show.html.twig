@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ListReferralNetworks{% endblock %}
+
+{% block body %}
+    <h1>ListReferralNetworks</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ list_referral_network.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ list_referral_network.name }}</td>
+            </tr>
+            <tr>
+                <th>Referral_networks_id</th>
+                <td>{{ list_referral_network.referralNetworksId }}</td>
+            </tr>
+            <tr>
+                <th>Owner_id</th>
+                <td>{{ list_referral_network.ownerId }}</td>
+            </tr>
+            <tr>
+                <th>Owner_name</th>
+                <td>{{ list_referral_network.ownerName }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_list_referral_networks_index') }}">back to list</a>
+
+    <a href="{{ path('app_list_referral_networks_edit', {'id': list_referral_network.id}) }}">edit</a>
+
+    {{ include('list_referral_networks/_delete_form.html.twig') }}
+{% endblock %}

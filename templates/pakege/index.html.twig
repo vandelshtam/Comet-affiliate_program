@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pakege index{% endblock %}
+
+{% block body %}
+    <h1>Pakege index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>User_id</th>
+                <th>Price</th>
+                <th>Referral_networks_id</th>
+                <th>Client_code</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for pakege in pakeges %}
+            <tr>
+                <td>{{ pakege.id }}</td>
+                <td>{{ pakege.name }}</td>
+                <td>{{ pakege.userId }}</td>
+                <td>{{ pakege.price }}</td>
+                <td>{{ pakege.referralNetworksId }}</td>
+                <td>{{ pakege.clientCode }}</td>
+                <td>
+                    <a href="{{ path('app_pakege_show', {'id': pakege.id}) }}">show</a>
+                    <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_pakege_new') }}">Create new</a>
+{% endblock %}

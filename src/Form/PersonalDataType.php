@@ -73,13 +73,13 @@ class PersonalDataType extends AbstractType
                 'label' => 'Номер дома',
                 'required' => true,  
             ])
-            ->add('frame', TextType::class,[
+            ->add('block', TextType::class,[
                 'label' => 'Строение, Корпус, Блок',
                 'required' => true,  
             ])
             ->add('apartment', IntegerType::class,[
                 'label' => 'Номер квартиры',
-                'help' => 'Введите простое число',
+                //'help' => 'Введите простое число',
                 'required' => true,  
             ])
             ->add('agreeTerms', CheckboxType::class, [

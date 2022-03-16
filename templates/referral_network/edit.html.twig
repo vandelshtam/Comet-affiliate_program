@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit ReferralNetwork{% endblock %}
+
+{% block body %}
+    <h1>Edit ReferralNetwork</h1>
+
+    {{ include('referral_network/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_referral_network_index') }}">back to list</a>
+
+    {{ include('referral_network/_delete_form.html.twig') }}
+{% endblock %}

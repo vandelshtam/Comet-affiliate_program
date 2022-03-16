@@ -72,17 +72,17 @@
 <div class="form_box-inner">
   <div class="form_box-left">
     {# {{ form_widget(form) }} #}
-    {{ form_row(form.name) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> 
-    {{ form_row(form.surname) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.phone) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.state) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.region) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.city) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.indexcity) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.street) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.house) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.frame) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
-    {{ form_row(form.apartment) }}<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>  
+    {{ form_row(form.name) }}<div id="emailHelp" class="form-text">Введите свое имя как в вашем национальном документе или водительском удостоверении, латинскими буквами.</div> 
+    {{ form_row(form.surname) }}<div id="emailHelp" class="form-text">Введите Вашу фамилию как в вашем национальном документе или водительском удостоверении, латинскими буквами.</div>  
+    {{ form_row(form.phone) }}<div id="emailHelp" class="form-text">Введите ваш номер телефона вместе с национальным префиксом(например +90, +7 и.т.п.)</div>  
+    {{ form_row(form.state) }}<div id="emailHelp" class="form-text">Выберите Вашу страну.</div>  
+    {{ form_row(form.region) }}<div id="emailHelp" class="form-text">Введите название вашего региона в соотвтетсвии с международным написанием на английском языке.</div>  
+    {{ form_row(form.city) }}<div id="emailHelp" class="form-text">Введите название вашего города в соотвтетсвии с международным написанием на английском языке.</div>  
+    {{ form_row(form.indexcity) }}<div id="emailHelp" class="form-text">Введите индекс вашего места жительства.</div>  
+    {{ form_row(form.street) }}<div id="emailHelp" class="form-text">Введите название вашей улицы в соответсвии с международными требованиями написания на английском языке.</div>  
+    {{ form_row(form.house) }}<div id="emailHelp" class="form-text">Введите номер вашего дома.</div>  
+    {{ form_row(form.block) }}<div id="emailHelp" class="form-text">Введите номер или литерное оозначение вашего корпуса/блока если такой имеется.</div>  
+    {{ form_row(form.apartment) }}<div id="emailHelp" class="form-text">Введите номер вашей квартиры.</div>  
     {% if new_user_make == true %}
       <div class="alert alert-info" role="alert">
         Условия участия в программе:

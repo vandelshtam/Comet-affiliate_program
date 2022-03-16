@@ -51,6 +51,9 @@ class PersonalDataController extends AbstractController
             $personalData = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
             $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user -> getId()]);
             $user_table->setPersonalDataId($personalData -> getId());
+            $random_code = mt_rand();
+            $client_code = $user -> getId().$random_code;
+            $user_table->setClientCode($client_code);
             $entityManager->persist($user_table);
             $entityManager->flush();
             $this->addFlash(
