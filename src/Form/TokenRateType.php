@@ -2,28 +2,24 @@
 
 namespace App\Form;
 
-use App\Entity\ListReferralNetworks;
+use App\Entity\TokenRate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ListReferralNetworksType extends AbstractType
+class TokenRateType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('referral_networks_id')
-            ->add('owner_id')
-            ->add('owner_name')
-            ->add('pakege')
+            ->add('exchange_rate')
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ListReferralNetworks::class,
+            'data_class' => TokenRate::class,
         ]);
     }
 }

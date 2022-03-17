@@ -41,12 +41,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $role;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Pakages::class)]
-    private $pakages;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Pakege::class)]
+    private $pakeges;
+
 
     public function __construct()
     {
         $this->pakages = new ArrayCollection();
+        $this->pakeges = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -168,32 +170,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Pakages>
+     * @return Collection<int, Pakege>
      */
-    public function getPakages(): Collection
+    public function getPakeges(): Collection
     {
-        return $this->pakages;
+        return $this->pakeges;
     }
 
-    public function addPakage(Pakages $pakage): self
+    public function addPakege(Pakege $pakege): self
     {
-        if (!$this->pakages->contains($pakage)) {
-            $this->pakages[] = $pakage;
-            $pakage->setUser($this);
+        if (!$this->pakeges->contains($pakege)) {
+            $this->pakeges[] = $pakege;
+            $pakege->setUser($this);
         }
 
         return $this;
     }
 
-    public function removePakage(Pakages $pakage): self
+    public function removePakege(Pakege $pakege): self
     {
-        if ($this->pakages->removeElement($pakage)) {
+        if ($this->pakeges->removeElement($pakege)) {
             // set the owning side to null (unless already changed)
-            if ($pakage->getUser() === $this) {
-                $pakage->setUser(null);
+            if ($pakege->getUser() === $this) {
+                $pakege->setUser(null);
             }
         }
 
         return $this;
     }
+
+    
 }

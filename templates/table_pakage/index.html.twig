@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TablePakage index{% endblock %}
+
+{% block body %}
+    <h1>TablePakage index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price_pakage</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for table_pakage in table_pakages %}
+            <tr>
+                <td>{{ table_pakage.id }}</td>
+                <td>{{ table_pakage.name }}</td>
+                <td>{{ table_pakage.pricePakage }}</td>
+                <td>
+                    <a href="{{ path('app_table_pakage_show', {'id': table_pakage.id}) }}">show</a>
+                    <a href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_table_pakage_new') }}">Create new</a>
+{% endblock %}

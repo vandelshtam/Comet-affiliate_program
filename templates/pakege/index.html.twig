@@ -12,8 +12,12 @@
                 <th>Name</th>
                 <th>User_id</th>
                 <th>Price</th>
+                <th>Токен</th>
+                <th>Реферальная ссылка</th>
+                <th>Активация</th>
                 <th>Referral_networks_id</th>
-                <th>Client_code</th>
+                <th>Уникальный код клиента</th>
+                <th>Уникальный код пакета</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -24,11 +28,20 @@
                 <td>{{ pakege.name }}</td>
                 <td>{{ pakege.userId }}</td>
                 <td>{{ pakege.price }}</td>
+                <td>{{ pakege.token }}</td>
+                <td>{{ pakege.referralLink }}</td>
+                {% if pakege.activation == NULL %}
+                <td>не активен</td>
+                {% else %}
+                <td>{{ pakege.activation }}</td>
+                {% endif %}
                 <td>{{ pakege.referralNetworksId }}</td>
                 <td>{{ pakege.clientCode }}</td>
+                <td>{{ pakege.uniqueCode }}</td>
                 <td>
                     <a href="{{ path('app_pakege_show', {'id': pakege.id}) }}">show</a>
                     <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a>
+                    <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">Активировать</a>
                 </td>
             </tr>
         {% else %}

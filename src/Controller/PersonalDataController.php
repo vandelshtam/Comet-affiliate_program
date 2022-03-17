@@ -53,7 +53,7 @@ class PersonalDataController extends AbstractController
             $user_table->setPersonalDataId($personalData -> getId());
             $random_code = mt_rand();
             $client_code = $user -> getId().$random_code;
-            $user_table->setClientCode($client_code);
+            $personalData->setClientCode($client_code);
             $entityManager->persist($user_table);
             $entityManager->flush();
             $this->addFlash(

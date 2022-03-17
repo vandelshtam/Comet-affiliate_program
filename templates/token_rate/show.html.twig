@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TokenRate{% endblock %}
+
+{% block body %}
+    <h1>TokenRate</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ token_rate.id }}</td>
+            </tr>
+            <tr>
+                <th>Exchange_rate</th>
+                <td>{{ token_rate.exchangeRate }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_token_rate_index') }}">back to list</a>
+
+    <a href="{{ path('app_token_rate_edit', {'id': token_rate.id}) }}">edit</a>
+
+    {{ include('token_rate/_delete_form.html.twig') }}
+{% endblock %}

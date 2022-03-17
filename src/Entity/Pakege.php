@@ -33,9 +33,31 @@ class Pakege
     #[ORM\OneToMany(mappedBy: 'pakege', targetEntity: ReferralNetwork::class)]
     private $referralNetworks;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'pakeges')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $user;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $token;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $activation;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $unique_code;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $referral_link;
+
+    #[ORM\OneToMany(mappedBy: 'pakege', targetEntity: ListReferralNetworks::class)]
+    private $listReferralNetworks;
+
+    
+
     public function __construct()
     {
         $this->referralNetworks = new ArrayCollection();
+        $this->listReferralNetworks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -132,4 +154,100 @@ class Pakege
 
         return $this;
     }
+    public function __toString()
+    {
+      return $this->getId();
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getToken(): ?int
+    {
+        return $this->token;
+    }
+
+    public function setToken(?int $token): self
+    {
+        $this->token = $token;
+
+        return $this;
+    }
+
+    public function getActivation(): ?int
+    {
+        return $this->activation;
+    }
+
+    public function setActivation(?int $activation): self
+    {
+        $this->activation = $activation;
+
+        return $this;
+    }
+
+    public function getUniqueCode(): ?string
+    {
+        return $this->unique_code;
+    }
+
+    public function setUniqueCode(?string $unique_code): self
+    {
+        $this->unique_code = $unique_code;
+
+        return $this;
+    }
+
+    public function getReferralLink(): ?string
+    {
+        return $this->referral_link;
+    }
+
+    public function setReferralLink(?string $referral_link): self
+    {
+        $this->referral_link = $referral_link;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ListReferralNetworks>
+     */
+    public function getListReferralNetworks(): Collection
+    {
+        return $this->listReferralNetworks;
+    }
+
+    public function addListReferralNetwork(ListReferralNetworks $listReferralNetwork): self
+    {
+        if (!$this->listReferralNetworks->contains($listReferralNetwork)) {
+            $this->listReferralNetworks[] = $listReferralNetwork;
+            $listReferralNetwork->setPakege($this);
+        }
+
+        return $this;
+    }
+
+    public function removeListReferralNetwork(ListReferralNetworks $listReferralNetwork): self
+    {
+        if ($this->listReferralNetworks->removeElement($listReferralNetwork)) {
+            // set the owning side to null (unless already changed)
+            if ($listReferralNetwork->getPakege() === $this) {
+                $listReferralNetwork->setPakege(null);
+            }
+        }
+
+        return $this;
+    }
+
+    
 }

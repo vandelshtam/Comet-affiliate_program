@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TokenRate index{% endblock %}
+
+{% block body %}
+    <h1>TokenRate index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Exchange_rate</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for token_rate in token_rates %}
+            <tr>
+                <td>{{ token_rate.id }}</td>
+                <td>{{ token_rate.exchangeRate }}</td>
+                <td>
+                    <a href="{{ path('app_token_rate_show', {'id': token_rate.id}) }}">show</a>
+                    <a href="{{ path('app_token_rate_edit', {'id': token_rate.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_token_rate_new') }}">Create new</a>
+{% endblock %}

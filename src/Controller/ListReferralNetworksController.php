@@ -29,6 +29,8 @@ class ListReferralNetworksController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            //$unique = $form->get('pakege_id')->getData();
+            //dd($form->get('pakege_id'));
             $listReferralNetworksRepository->add($listReferralNetwork);
             return $this->redirectToRoute('app_list_referral_networks_index', [], Response::HTTP_SEE_OTHER);
         }

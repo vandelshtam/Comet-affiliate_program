@@ -25,6 +25,11 @@ class ListReferralNetworks
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $owner_name;
 
+    #[ORM\ManyToOne(targetEntity: Pakege::class, inversedBy: 'listReferralNetworks')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $pakege;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -76,5 +81,21 @@ class ListReferralNetworks
         $this->owner_name = $owner_name;
 
         return $this;
+    }
+
+    public function getPakege(): ?Pakege
+    {
+        return $this->pakege;
+    }
+
+    public function setPakege(?Pakege $pakege): self
+    {
+        $this->pakege = $pakege;
+
+        return $this;
+    }
+    public function __toString()
+    {
+      return $this->getPakege();
     }
 }

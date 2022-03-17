@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New TablePakage{% endblock %}
+
+{% block body %}
+    <h1>Create new TablePakage</h1>
+
+    {{ include('table_pakage/_form.html.twig') }}
+
+    <a href="{{ path('app_table_pakage_index') }}">back to list</a>
+{% endblock %}

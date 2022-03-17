@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit TablePakage{% endblock %}
+
+{% block body %}
+    <h1>Edit TablePakage</h1>
+
+    {{ include('table_pakage/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_table_pakage_index') }}">back to list</a>
+
+    {{ include('table_pakage/_delete_form.html.twig') }}
+{% endblock %}

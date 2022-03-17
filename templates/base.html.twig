@@ -91,6 +91,7 @@
                         <li><a class="dropdown-item" href="#">Business</a></li>
                         <li><a class="dropdown-item" href="#">Trader</a></li>    
                         <li><a class="dropdown-item" href="#">VIP</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_pakege_new') }}">Купить пакет</a></li>
                     </ul>
                 </li>
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
@@ -102,7 +103,8 @@
                         <li><a class="dropdown-item" href="#">Текущий баланс</a></li>
                         <li><a class="dropdown-item" href="#">история транзакций</a></li>
                         <li><a class="dropdown-item" href="{{ path('app_comet_pakages') }}">Покупка пакетов</a></li>
-                        <li><a class="dropdown-item" href="#">Реферальная сеть</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_referral_network_index') }}">Реферальная сеть</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_list_referral_networks_index') }}">список реферальных сетей</a></li>
                         <li><a class="dropdown-item" href="#">Вывод</a></li>
                         <li><a class="dropdown-item" href="#">Статистика</a></li>
                         <li><hr class="dropdown-divider"></li>
