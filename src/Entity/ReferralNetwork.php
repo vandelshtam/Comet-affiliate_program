@@ -25,9 +25,21 @@ class ReferralNetwork
     #[ORM\Column(type: 'integer', nullable: true)]
     private $personal_data_id;
 
-    #[ORM\ManyToOne(targetEntity: Pakege::class, inversedBy: 'referralNetworks')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $pakege;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $balance;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $network_code;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $member_code;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $pakege_id;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $network_id;
 
     public function getId(): ?int
     {
@@ -82,19 +94,69 @@ class ReferralNetwork
         return $this;
     }
 
-    public function getPakege(): ?Pakege
+   
+    // public function __toString()
+    // {
+    //   return $this->getPakege();
+    // }
+
+    public function getBalance(): ?int
     {
-        return $this->pakege;
+        return $this->balance;
     }
 
-    public function setPakege(?Pakege $pakege): self
+    public function setBalance(?int $balance): self
     {
-        $this->pakege = $pakege;
+        $this->balance = $balance;
 
         return $this;
     }
-    public function __toString()
+
+    public function getNetworkCode(): ?string
     {
-      return $this->getPakege();
+        return $this->network_code;
+    }
+
+    public function setNetworkCode(?string $network_code): self
+    {
+        $this->network_code = $network_code;
+
+        return $this;
+    }
+
+    public function getMemberCode(): ?string
+    {
+        return $this->member_code;
+    }
+
+    public function setMemberCode(?string $member_code): self
+    {
+        $this->member_code = $member_code;
+
+        return $this;
+    }
+
+    public function getPakegeId(): ?int
+    {
+        return $this->pakege_id;
+    }
+
+    public function setPakegeId(?int $pakege_id): self
+    {
+        $this->pakege_id = $pakege_id;
+
+        return $this;
+    }
+
+    public function getNetworkId(): ?int
+    {
+        return $this->network_id;
+    }
+
+    public function setNetworkId(?int $network_id): self
+    {
+        $this->network_id = $network_id;
+
+        return $this;
     }
 }

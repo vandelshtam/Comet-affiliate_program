@@ -41,10 +41,10 @@
         <div class="accordion-body">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-              <a class="nav-link" href="{{ path('app_user_show', {'id': user.Id}) }}">Безопасность</a>
+              <a class="nav-link link-secondary" href="{{ path('app_user_show', {'id': user.Id}) }}">Безопасность</a>
               </li>
               <li class="nav-item">
-              <a class="nav-link" href="{{ path('app_personal_data_show', {'personal_user_id': user.PersonalDataId}) }}">Персональные данные</a>
+              <a class="nav-link link-secondary" href="{{ path('app_personal_data_show', {'personal_user_id': user.PersonalDataId}) }}">Персональные данные</a>
               </li>
           </ul> 
         </div>
@@ -60,10 +60,13 @@
         <div class="accordion-body">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-              <a class="nav-link" href="">Информация об операциях</a>
+              <a class="nav-link link-secondary" href="{{ path('app_pakege_new') }}">Купить пакет</a>
               </li>
               <li class="nav-item">
-              <a class="nav-link" href="">история операций</a>
+              <a class="nav-link link-secondary" href="">Информация об операциях</a>
+              </li>
+              <li class="nav-item">
+              <a class="nav-link link-secondary" href="{{ path('app_pakege_index') }}">История операций (мои пакеты)</a>
               </li>
           </ul> 
         </div>
@@ -79,16 +82,16 @@
         <div class="accordion-body">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-              <a class="nav-link" href="">Информация о накопительной системе Cashback</a>
+              <a class="nav-link link-secondary" href="">Информация о накопительной системе Cashback</a>
               </li>
               <li class="nav-item">
-              <a class="nav-link" href="">Формирование накопительной системы  по программе «CoMeta»</a>
+              <a class="nav-link link-secondary" href="">Формирование накопительной системы  по программе «CoMeta»</a>
               </li>
               <li class="nav-item">
-              <a class="nav-link" href="">Ваш Cashback за приглашенных пользователей</a>
+              <a class="nav-link link-secondary" href="">Ваш Cashback за приглашенных пользователей</a>
               </li>
               <li class="nav-item">
-              <a class="nav-link" href="">Реферальная программа</a>
+              <a class="nav-link link-secondary" href="">Реферальная программа</a>
               </li>
           </ul> 
         </div>
@@ -104,10 +107,10 @@
         <div class="accordion-body">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-              <a class="nav-link" href="">резерв</a>
+              <a class="nav-link link-secondary" href="">резерв</a>
               </li>
               <li class="nav-item">
-              <a class="nav-link" href="">резерв</a>
+              <a class="nav-link link-secondary" href="">резерв</a>
               </li>
               <li class="nav-item">
               <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Резерв</a>

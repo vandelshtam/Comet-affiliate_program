@@ -4,16 +4,36 @@
 
 {% block body %}
     <h1>ListReferralNetworks index</h1>
-
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Name</th>
-                <th>Referral_networks_id</th>
-                <th>Owner_id</th>
-                <th>Owner_name</th>
-                <th>actions</th>
+                <th>Название реферальной сети</th>
+                {# <th>Referral_networks_id</th>
+                <th>Owner_id</th> #}
+                <th>Организатор сети</th>
+                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -21,8 +41,8 @@
             <tr>
                 <td>{{ list_referral_network.id }}</td>
                 <td>{{ list_referral_network.name }}</td>
-                <td>{{ list_referral_network.referralNetworksId }}</td>
-                <td>{{ list_referral_network.ownerId }}</td>
+                {# <td>{{ list_referral_network.referralNetworksId }}</td>
+                <td>{{ list_referral_network.ownerId }}</td> #}
                 <td>{{ list_referral_network.ownerName }}</td>
                 <td>
                     <a href="{{ path('app_list_referral_networks_show', {'id': list_referral_network.id}) }}">show</a>
@@ -37,5 +57,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_list_referral_networks_new') }}">Create new</a>
+    {# <a href="{{ path('app_list_referral_networks_new') }}">Create new</a> #}
 {% endblock %}

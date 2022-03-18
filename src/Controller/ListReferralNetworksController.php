@@ -2,13 +2,22 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Entity\Pakege;
+use App\Entity\ReferralNetwork;
 use App\Entity\ListReferralNetworks;
 use App\Form\ListReferralNetworksType;
-use App\Repository\ListReferralNetworksRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
+use App\Repository\ListReferralNetworksRepository;
+use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+
 
 #[Route('/list/referral/networks')]
 class ListReferralNetworksController extends AbstractController
@@ -21,23 +30,35 @@ class ListReferralNetworksController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_list_referral_networks_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository): Response
+    #[Route('/{id}/new', name: 'app_list_referral_networks_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, ManagerRegistry $doctrine, ListReferralNetworksRepository $listReferralNetworksRepository,int $id): Response
     {
-        $listReferralNetwork = new ListReferralNetworks();
-        $form = $this->createForm(ListReferralNetworksType::class, $listReferralNetwork);
-        $form->handleRequest($request);
+        $entityManager = $doctrine->getManager();
+        $pakege = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
+        $referral_link = $pakege -> getReferralLink();//она же код реферальной сети network_code
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            //$unique = $form->get('pakege_id')->getData();
-            //dd($form->get('pakege_id'));
-            $listReferralNetworksRepository->add($listReferralNetwork);
-            return $this->redirectToRoute('app_list_referral_networks_index', [], Response::HTTP_SEE_OTHER);
+        if($referral_link == NULL){
+            $listReferralNetwork = new ListReferralNetworks();
+            $form = $this->createForm(ListReferralNetworksType::class, $listReferralNetwork);
+            $form->handleRequest($request);
+            
+            $this->addFlash(
+                'info',
+                'Вы перешли на страницу активации пакета без реферальной ссылки, это значит вы создаете свою сеть, в которй будете основателем');   
+            if ($form->isSubmitted() && $form->isValid()) {
+                
+                $listReferralNetworksRepository->add($listReferralNetwork);
+                return $this->redirectToRoute('app_list_referral_networks_new_confirm', ['id' => $id], Response::HTTP_SEE_OTHER);
+            }
+        }
+        else{
+            return $this->redirectToRoute('app_referral_network_new', ['referral_link' => $referral_link, 'id' => $id], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('list_referral_networks/new.html.twig', [
             'list_referral_network' => $listReferralNetwork,
             'form' => $form,
+            'pakege_id' => $id,
         ]);
     }
 
@@ -74,5 +95,63 @@ class ListReferralNetworksController extends AbstractController
         }
 
         return $this->redirectToRoute('app_list_referral_networks_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+
+    #[Route('/{id}/new/confirm', name: 'app_list_referral_networks_new_confirm', methods: ['GET', 'POST'])]
+    public function newConfirm(Request $request,  ManagerRegistry $doctrine, ListReferralNetworksRepository $listReferralNetworksRepository, ReferralNetworkRepository $referralNetworkRepository, int $id): Response
+    {
+       
+        $user = $this -> getUser();
+        $user_id = $user -> getId();
+        
+        $entityManager = $doctrine->getManager();
+        $listReferralNetwork = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['pakege' => $id]);
+        $pakege = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);//пакет основателя сети
+        $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user_id]);
+        $owner_name = $user_table -> getUsername();
+        $pakege_id = $pakege -> getId();//id пакета основателя сети
+        //$id переданный по аргументе id пакета пользователя пришедшего для записи в качестве члена сети, в данном случае совпадает с владельцем сети
+
+        $balance = $pakege -> getPrice();
+        $client_code = $pakege -> getClientCode();
+        $unique_code = $pakege -> getUniqueCode();//уникальный код сети генерировался на этапе начального создания 
+        $listReferralNetwork_id = $listReferralNetwork -> getId();// id реферальной сети
+        //$network_code - уникальный код реферальной сети
+        $network_code = $pakege_id.'-'.$unique_code;//первая част до тире "id реферальной сети " - после тире "уникальный код сети" который одинаковый с уникальным кодом пакета unique_code
+
+        $member_code = $listReferralNetwork_id.'-'.$id.'-'.$pakege_id.'-'.$unique_code;//инидивидуальный уникальный код записи члена реферальной сети
+        //dd($member_code);
+        $listReferralNetwork -> setOwnerId($user_id);
+        $listReferralNetwork -> setOwnerName($owner_name);
+        $listReferralNetwork -> setClientCode($client_code);
+        $listReferralNetwork -> setNetworkCode($network_code);
+        $listReferralNetwork -> setUniqueCode($unique_code);
+        $pakege -> setActivation('активирован');
+
+        //запись владельца сети в качестве - члена реферальной сети
+        $referral_network = new ReferralNetwork();
+        $referral_network -> setUserId($user_id);
+        $referral_network -> setUserStatus('left');
+        $referral_network -> setPakegeId($id);
+        $referral_network -> setNetworkId($listReferralNetwork_id);
+        $referral_network -> setBalance($balance);
+        $referral_network -> setNetworkCode($network_code);
+        $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
+        $referralNetworkRepository->add($referral_network);
+        //$manager->persist($referral_network);
+        //$entityManager->persist($referral_network);
+        $entityManager->flush();
+        $this->addFlash(
+            'success',
+            'Поздравляем! Вы успешно активировали пакет и создали новую реферальную сеть.');
+        // $this->addFlash(
+        //     'info',
+        //     'Вы активировали пакет без реферальной ссылки, вы владельц  сети.');    
+        
+            //$unique = $form->get('pakege_id')->getData();
+            //dd($form->get('pakege_id'));
+        $listReferralNetworksRepository->add($listReferralNetwork);
+        return $this->redirectToRoute('app_list_referral_networks_index', [], Response::HTTP_SEE_OTHER);        
     }
 }

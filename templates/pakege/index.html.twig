@@ -4,7 +4,27 @@
 
 {% block body %}
     <h1>Pakege index</h1>
-
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
     <table class="table">
         <thead>
             <tr>
@@ -41,7 +61,7 @@
                 <td>
                     <a href="{{ path('app_pakege_show', {'id': pakege.id}) }}">show</a>
                     <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a>
-                    <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">Активировать</a>
+                    <a href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
                 </td>
             </tr>
         {% else %}

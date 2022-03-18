@@ -22,10 +22,10 @@ class PakegeController extends AbstractController
     #[Route('/', name: 'app_pakege_index', methods: ['GET'])]
     public function index(PakegeRepository $pakegeRepository, ManagerRegistry $doctrine): Response
     {
-        $pakege = $doctrine->getRepository(Pakege::class)->find(8);
-        $user = $doctrine->getRepository(User::class)->find(2);
-        $userUsername = $pakege->getUser();
-        $user_pakeges = $user -> getPakeges();
+        //$pakege = $doctrine->getRepository(Pakege::class)->find(8);
+        //$user = $doctrine->getRepository(User::class)->find(2);
+        //$userUsername = $pakege->getUser();
+        //$user_pakeges = $user -> getPakeges();
         // $collection = new ArrayCollection();
         // $collection = setElements($user_pakeges);
         //dd($user);
@@ -102,6 +102,9 @@ class PakegeController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$pakege->getId(), $request->request->get('_token'))) {
             $pakegeRepository->remove($pakege);
+            $this->addFlash(
+                'danger',
+                'Вы успешно удалили пакет, на электронную почту отправлено подтверждение операции');
         }
 
         return $this->redirectToRoute('app_pakege_index', [], Response::HTTP_SEE_OTHER);
@@ -143,6 +146,12 @@ class PakegeController extends AbstractController
             
             //$entityManager->persist($pakege_comet);
             $entityManager->flush();
+            $this->addFlash(
+                'success',
+                'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');
+            $this->addFlash(
+                'info',
+                'Чтобы пакет начал работать вы должны активировать пакет!');     
             return $this->redirectToRoute('app_pakege_index', [], Response::HTTP_SEE_OTHER);
     }
     public function random_string ($str_length)

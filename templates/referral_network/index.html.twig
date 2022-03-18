@@ -4,7 +4,27 @@
 
 {% block body %}
     <h1>ReferralNetwork index</h1>
-
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}    
     <table class="table">
         <thead>
             <tr>
@@ -37,5 +57,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_referral_network_new') }}">Create new</a>
+    {# <a href="{{ path('app_referral_network_new') }}">Create new</a> #}
 {% endblock %}

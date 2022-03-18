@@ -29,6 +29,15 @@ class ListReferralNetworks
     #[ORM\JoinColumn(nullable: false)]
     private $pakege;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $unique_code;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private $network_code;
+
+    #[ORM\Column(type: 'string',length: 100, nullable: true)]
+    private $client_code;
+
 
     public function getId(): ?int
     {
@@ -97,5 +106,41 @@ class ListReferralNetworks
     public function __toString()
     {
       return $this->getPakege();
+    }
+
+    public function getUniqueCode(): ?string
+    {
+        return $this->unique_code;
+    }
+
+    public function setUniqueCode(?string $unique_code): self
+    {
+        $this->unique_code = $unique_code;
+
+        return $this;
+    }
+
+    public function getNetworkCode(): ?string
+    {
+        return $this->network_code;
+    }
+
+    public function setNetworkCode(?string $network_code): self
+    {
+        $this->network_code = $network_code;
+
+        return $this;
+    }
+
+    public function getClientCode(): ?string
+    {
+        return $this->client_code;
+    }
+
+    public function setClientCode(?string $client_code): self
+    {
+        $this->client_code = $client_code;
+
+        return $this;
     }
 }

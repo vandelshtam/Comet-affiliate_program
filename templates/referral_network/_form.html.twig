@@ -1,4 +1,7 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+    {{ form_row(form.name, {'value': username}) }}<div id="emailHelp" class="form-text">Можете изменить его на любое другое, а так же используя любые символы которые вам нравяться!</div> 
+    <div class="hidden">
+      {{ form_row(form.member_code, {'value': member_code }) }}
+    </div>
     <button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}

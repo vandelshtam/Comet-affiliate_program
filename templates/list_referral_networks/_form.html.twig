@@ -1,4 +1,7 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+    {{ form_row(form.name) }}<div id="emailHelp" class="form-text">Введите любое название на любом языке, а так же используя любые символы которые вам нравяться!</div> 
+    <div class="hidden">
+      {{ form_row(form.pakege, {'value': pakege_id }) }}
+    </div>
     <button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}

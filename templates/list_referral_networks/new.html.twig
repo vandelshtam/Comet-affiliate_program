@@ -4,8 +4,29 @@
 
 {% block body %}
     <h1>Create new ListReferralNetworks</h1>
-
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
     {{ include('list_referral_networks/_form.html.twig') }}
 
-    <a href="{{ path('app_list_referral_networks_index') }}">back to list</a>
+    <a href="{{ path('app_pakege_index') }}">Назад к списку пакетов</a>
+    <a href="{{ path('app_list_referral_networks_index') }}">К списку сетей</a>
 {% endblock %}

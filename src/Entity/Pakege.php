@@ -30,9 +30,6 @@ class Pakege
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $client_code;
 
-    #[ORM\OneToMany(mappedBy: 'pakege', targetEntity: ReferralNetwork::class)]
-    private $referralNetworks;
-
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'pakeges')]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
@@ -40,7 +37,7 @@ class Pakege
     #[ORM\Column(type: 'integer', nullable: true)]
     private $token;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private $activation;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -125,35 +122,7 @@ class Pakege
         return $this;
     }
 
-    /**
-     * @return Collection<int, ReferralNetwork>
-     */
-    public function getReferralNetworks(): Collection
-    {
-        return $this->referralNetworks;
-    }
-
-    public function addReferralNetwork(ReferralNetwork $referralNetwork): self
-    {
-        if (!$this->referralNetworks->contains($referralNetwork)) {
-            $this->referralNetworks[] = $referralNetwork;
-            $referralNetwork->setPakege($this);
-        }
-
-        return $this;
-    }
-
-    public function removeReferralNetwork(ReferralNetwork $referralNetwork): self
-    {
-        if ($this->referralNetworks->removeElement($referralNetwork)) {
-            // set the owning side to null (unless already changed)
-            if ($referralNetwork->getPakege() === $this) {
-                $referralNetwork->setPakege(null);
-            }
-        }
-
-        return $this;
-    }
+    
     public function __toString()
     {
       return $this->getId();
@@ -183,12 +152,12 @@ class Pakege
         return $this;
     }
 
-    public function getActivation(): ?int
+    public function getActivation(): ?string
     {
         return $this->activation;
     }
 
-    public function setActivation(?int $activation): self
+    public function setActivation(?string $activation): self
     {
         $this->activation = $activation;
 
