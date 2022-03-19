@@ -45,22 +45,22 @@ class ReferralNetworkRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
+     */
+    
+    public function findByExampleField()
     {
         return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
-            ->setMaxResults(10)
+            //->andWhere('r.exampleField = :val')
+            //->setParameter('val', $value)
+            ->orderBy ('r.id', 'DESC')
+            ->setMaxResults(2)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+    
 
     /*
     public function findOneBySomeField($value): ?ReferralNetwork

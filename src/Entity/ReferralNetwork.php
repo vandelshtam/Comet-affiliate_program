@@ -41,6 +41,15 @@ class ReferralNetwork
     #[ORM\Column(type: 'integer', nullable: true)]
     private $network_id;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $user_referral_id;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $network_referral_id;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $reward;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -156,6 +165,42 @@ class ReferralNetwork
     public function setNetworkId(?int $network_id): self
     {
         $this->network_id = $network_id;
+
+        return $this;
+    }
+
+    public function getUserReferralId(): ?int
+    {
+        return $this->user_referral_id;
+    }
+
+    public function setUserReferralId(?int $user_referral_id): self
+    {
+        $this->user_referral_id = $user_referral_id;
+
+        return $this;
+    }
+
+    public function getNetworkReferralId(): ?int
+    {
+        return $this->network_referral_id;
+    }
+
+    public function setNetworkReferralId(?int $network_referral_id): self
+    {
+        $this->network_referral_id = $network_referral_id;
+
+        return $this;
+    }
+
+    public function getReward(): ?int
+    {
+        return $this->reward;
+    }
+
+    public function setReward(?int $reward): self
+    {
+        $this->reward = $reward;
 
         return $this;
     }
