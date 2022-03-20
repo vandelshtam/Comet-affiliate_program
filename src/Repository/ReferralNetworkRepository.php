@@ -60,17 +60,130 @@ class ReferralNetworkRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    /**
+     * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
+     */
     
+    public function findByIdLastField()
+    {
+        return $this->createQueryBuilder('r')
+            //->andWhere('r.exampleField = :val')
+            //->setParameter('val', $value)
+            ->orderBy ('r.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
+     */
+    
+    public function findByIdFirstField()
+    {
+        return $this->createQueryBuilder('r')
+            //->andWhere('r.exampleField = :val')
+            //->setParameter('val', $value)
+            ->orderBy ('r.id', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+    
+    /**
+     * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
+     */
+    
+    public function findByLeftField($value)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.user_status = :val')
+            ->setParameter('val', $value)
+            ->orderBy ('r.id', 'ASC')
+            ->setMaxResults(10000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findByBalanceField($value, $balance)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.user_status = :val', 'r.balance > :balance')
+            ->setParameter('val', $value)
+            ->setParameter('balance', $balance)
+            ->orderBy ('r.id', 'ASC')
+            ->setMaxResults(10000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findByBalanceToPointField($value,$balance,$id)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.user_status = :val', 'r.balance > :balance', 'r.id < :id')
+            //->where('r.id = ?40')
+            //->where('r.id = ?42')
+            ->setParameter('val', $value)
+            ->setParameter('balance', $balance)
+            ->orderBy ('r.id', 'ASC')
+            ->setParameter('id', $id) 
+            //->setFirstResult( 40 )
+            ->setMaxResults(1000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findByBalanceFromPointField($value,$balance,$id)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.user_status = :val', 'r.balance > :balance', 'r.id > :id')
+            //->where('r.id = ?40')
+            //->where('r.id = ?42')
+            ->setParameter('val', $value)
+            ->setParameter('balance', $balance)
+            ->orderBy ('r.id', 'ASC')
+            ->setParameter('id', $id) 
+            //->setFirstResult( 40 )
+            ->setMaxResults(1000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     /*
     public function findOneBySomeField($value): ?ReferralNetwork
     {
         return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
+            ->andWhere('r.user_status = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
     */
+
+    /**
+     * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
+     */
+    
+    public function findByCountField()
+    {
+
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT COUNT (r.id)
+            FROM App\Entity\ReferralNetwork r'
+        )->getSingleScalarResult();
+
+        // returns an array of Product objects
+        return $query;
+    }
+    
 }

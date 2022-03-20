@@ -100,8 +100,7 @@ class ListReferralNetworksController extends AbstractController
 
     #[Route('/{id}/new/confirm', name: 'app_list_referral_networks_new_confirm', methods: ['GET', 'POST'])]
     public function newConfirm(Request $request,  ManagerRegistry $doctrine, ListReferralNetworksRepository $listReferralNetworksRepository, ReferralNetworkRepository $referralNetworkRepository, int $id): Response
-    {
-       
+    {  
         $user = $this -> getUser();
         $user_id = $user -> getId();
         
@@ -117,11 +116,11 @@ class ListReferralNetworksController extends AbstractController
         $client_code = $pakege -> getClientCode();
         $unique_code = $pakege -> getUniqueCode();//уникальный код сети генерировался на этапе начального создания 
         $listReferralNetwork_id = $listReferralNetwork -> getId();// id реферальной сети
+
         //$network_code - уникальный код реферальной сети
         $network_code = $pakege_id.'-'.$unique_code;//первая част до тире "id реферальной сети " - после тире "уникальный код сети" который одинаковый с уникальным кодом пакета unique_code
 
         $member_code = $listReferralNetwork_id.'-'.$id.'-'.$pakege_id.'-'.$unique_code;//инидивидуальный уникальный код записи члена реферальной сети
-        //dd($member_code);
         $listReferralNetwork -> setOwnerId($user_id);
         $listReferralNetwork -> setOwnerName($owner_name);
         $listReferralNetwork -> setClientCode($client_code);
@@ -135,6 +134,7 @@ class ListReferralNetworksController extends AbstractController
         $referral_network -> setUserStatus('left');
         $referral_network -> setPakegeId($id);
         $referral_network -> setNetworkId($listReferralNetwork_id);
+        $referral_network -> setUserStatus('owner');
         $referral_network -> setBalance($balance);
         $referral_network -> setNetworkCode($network_code);
         $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
