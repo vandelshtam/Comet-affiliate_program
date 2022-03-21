@@ -102,6 +102,22 @@ class ReferralNetworkRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('r')
             ->andWhere('r.user_status = :val')
             ->setParameter('val', $value)
+            ->orderBy ('r.id', 'DESC')
+            ->setMaxResults(10000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
+     */
+    
+    public function findByRightField($value)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.user_status = :val')
+            ->setParameter('val', $value)
             ->orderBy ('r.id', 'ASC')
             ->setMaxResults(10000)
             ->getQuery()
