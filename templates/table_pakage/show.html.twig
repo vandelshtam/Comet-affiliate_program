@@ -3,28 +3,52 @@
 {% block title %}TablePakage{% endblock %}
 
 {% block body %}
-    <h1>TablePakage</h1>
-
+<div class="example-wrapper container-xxl">
+    <h1>Обзор пакета</h1>
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
+                <th>Номер</th>
                 <td>{{ table_pakage.id }}</td>
             </tr>
             <tr>
-                <th>Name</th>
+                <th>Название</th>
                 <td>{{ table_pakage.name }}</td>
             </tr>
             <tr>
-                <th>Price_pakage</th>
+                <th>Стоимость</th>
                 <td>{{ table_pakage.pricePakage }}</td>
             </tr>
         </tbody>
     </table>
-
-    <a href="{{ path('app_table_pakage_index') }}">back to list</a>
-
-    <a href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">edit</a>
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}   
+    <a class="btn btn-primary" href="{{ path('app_table_pakage_index') }}">Назад</a>
+    {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}   
+    <a class="btn btn-warning" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
 
     {{ include('table_pakage/_delete_form.html.twig') }}
+    {% endif %}
+</div>
 {% endblock %}

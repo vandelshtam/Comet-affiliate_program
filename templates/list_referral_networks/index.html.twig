@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ListReferralNetworks index{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <h1>ListReferralNetworks index</h1>
+    <h1>{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">

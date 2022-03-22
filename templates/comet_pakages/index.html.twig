@@ -5,6 +5,27 @@
 {% block body %}
 
 <div class="example-wrapper container-xxl">
+{% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
     <h1>Привет! Это -  {{ controller_name }}</h1>
     <div class="card mb-3" style="max-width: 1140px;">
     <div class="row g-0">
@@ -20,8 +41,43 @@
         </div>
     </div>
     </div>
-    
-</div>
 
+<h1>Таблица актуальных пакетов</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Название</th>
+                <th>Стоимость</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for table_pakage in table_pakages %}
+            <tr>
+                <td>{{ table_pakage.id }}</td>
+                <td>{{ table_pakage.name }}</td>
+                <td>{{ table_pakage.pricePakage }}</td>
+                <td>
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}   
+                    <a class="btn btn-primary" href="{{ path('app_table_pakage_show', {'id': table_pakage.id}) }}">Посмотреть</a>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') %}   
+                    <a class="btn btn-warning" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">Пока еще нет записей</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if is_granted('ROLE_ADMIN') %}   
+    <a class="btn btn-success" href="{{ path('app_table_pakage_new') }}">Добавить новый пакет</a>
+    {% endif %}
+</div>
 
 {% endblock %}

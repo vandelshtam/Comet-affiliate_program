@@ -45,22 +45,22 @@ class ListReferralNetworksRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return ListReferralNetworks[] Returns an array of ListReferralNetworks objects
-    //  */
-    /*
+    /**
+     * @return ListReferralNetworks[] Returns an array of ListReferralNetworks objects
+     */
+    
     public function findByExampleField($value)
     {
         return $this->createQueryBuilder('l')
-            ->andWhere('l.exampleField = :val')
+            ->andWhere('l.id = :val')
             ->setParameter('val', $value)
             ->orderBy('l.id', 'ASC')
-            ->setMaxResults(10)
+            ->setMaxResults(10000)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+    
 
     /*
     public function findOneBySomeField($value): ?ListReferralNetworks

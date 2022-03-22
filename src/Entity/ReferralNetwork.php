@@ -50,6 +50,9 @@ class ReferralNetwork
     #[ORM\Column(type: 'integer', nullable: true)]
     private $reward;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private $koef;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -201,6 +204,18 @@ class ReferralNetwork
     public function setReward(?int $reward): self
     {
         $this->reward = $reward;
+
+        return $this;
+    }
+
+    public function getKoef(): ?float
+    {
+        return $this->koef;
+    }
+
+    public function setKoef(?float $koef): self
+    {
+        $this->koef = $koef;
 
         return $this;
     }

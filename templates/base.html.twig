@@ -85,12 +85,13 @@
                         Пакеты
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Starter</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_comet_pakages') }}">Обзор пакетов</a></li>
+                        {# <li><a class="dropdown-item" href="#">Starter</a></li>
                         <li><a class="dropdown-item" href="#">Basic</a></li>    
                         <li><a class="dropdown-item" href="#">Networker</a></li>
                         <li><a class="dropdown-item" href="#">Business</a></li>
                         <li><a class="dropdown-item" href="#">Trader</a></li>    
-                        <li><a class="dropdown-item" href="#">VIP</a></li>
+                        <li><a class="dropdown-item" href="#">VIP</a></li> #}
                         <li><a class="dropdown-item" href="{{ path('app_pakege_new') }}">Купить пакет</a></li>
                     </ul>
                 </li>
@@ -101,11 +102,11 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#">Текущий баланс</a></li>
-                        <li><a class="dropdown-item" href="#">история транзакций</a></li>
-                        <li><a class="dropdown-item" href="{{ path('app_comet_pakages') }}">Покупка пакетов</a></li>
-                        <li><a class="dropdown-item" href="{{ path('app_referral_network_index') }}">Участники реферальных сетей</a></li>
-                        <li><a class="dropdown-item" href="{{ path('app_list_referral_networks_index') }}">Реферальные сети</a></li>
-                        <li><a class="dropdown-item" href="#">Вывод</a></li>
+                        {# <li><a class="dropdown-item" href="#">История транзакций</a></li> #}
+                        <li><a class="dropdown-item" href="{{ path('app_comet_pakages') }}">Обзор пакетов</a></li>
+                        {# <li><a class="dropdown-item" href="{{ path('app_referral_network_index') }}">Участники реферальных сетей</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_list_referral_networks_index') }}">Реферальные сети</a></li> #}
+                        {# <li><a class="dropdown-item" href="#">Вывод</a></li> #}
                         <li><a class="dropdown-item" href="#">Статистика</a></li>
                         <li><hr class="dropdown-divider"></li>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}

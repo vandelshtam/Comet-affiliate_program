@@ -1,4 +1,15 @@
+{% if form_errors(form) %}
+<div class="alert alert-danger" role="alert">
+    {{ form_errors(form) }}
+</div>
+{% endif %}
+
 {{ form_start(form) }}
+<div class="form_box-inner">   
+    <div class="form_box-left">
     {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <button class="btn btn-warning">{{ button_label|default('Сохранить') }}</button>
+    </div>
+</div>
 {{ form_end(form) }}
+

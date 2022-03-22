@@ -27,6 +27,34 @@ class ListReferralNetworksController extends AbstractController
     {
         return $this->render('list_referral_networks/index.html.twig', [
             'list_referral_networks' => $listReferralNetworksRepository->findAll(),
+            'controller_name' => 'Список всех реферальных сетей',
+            'title' => 'All network referral list',
+        ]);
+    }
+
+    #[Route('list', name: 'app_list_referral_networks_index_list', methods: ['GET'])]
+    public function indexList(ListReferralNetworksRepository $listReferralNetworksRepository,ReferralNetworkRepository $referralNetworkRepository,ManagerRegistry $doctrine): Response
+    {
+        $user = $this -> getUser();
+        $user_id = $user -> getId();
+        $entityManager = $doctrine->getManager();
+        
+        $referralNetwork = $entityManager->getRepository(ReferralNetwork::class)->findByUserIdField(['user_id' => $user_id]);
+        $network_id =[];
+        foreach($referralNetwork as $network){
+            $network_id[] = $network -> getNetworkId();
+        }
+        //$array_network_id = $referralNetwork -> getNetworkId();
+        $array = array_unique($network_id);
+        
+        foreach($array as $value){
+            $listReferralNetworks[] = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['id' => $value]);
+        }
+        //dd($listReferralNetworks);
+        return $this->render('list_referral_networks/index.html.twig', [
+            'list_referral_networks' => $listReferralNetworks,
+            'controller_name' => 'Список моих реферальных сетей',
+            'title' => 'My network referral list',
         ]);
     }
 

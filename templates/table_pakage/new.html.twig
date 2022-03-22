@@ -3,9 +3,11 @@
 {% block title %}New TablePakage{% endblock %}
 
 {% block body %}
-    <h1>Create new TablePakage</h1>
+<div class="example-wrapper container-xxl">
+    <h1>Создание нового пакета</h1>
 
     {{ include('table_pakage/_form.html.twig') }}
 
-    <a href="{{ path('app_table_pakage_index') }}">back to list</a>
+    <a class="btn btn-primary" href="{{ path('app_table_pakage_index') }}">Назад</a>
+</div>
 {% endblock %}
