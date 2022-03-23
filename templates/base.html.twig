@@ -31,11 +31,12 @@
                 <a class="nav-link" href="tel:">+xx (xxx) xxx-xx-xx</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="mailto:helfopets@gmail.com">comet-ap@gmail.com</a>
+                <a class="nav-link" href="mailto:ficakki48@gmail.com">comet-ap@gmail.com</a>
                 </li>
-                <li class="nav-item">
+                {# <li class="nav-item">
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Fast consultation</a>
-                </li>
+                </li> #}
+                
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <li><a class="nav-link" href="{{ path('app_logout') }}">Выйти</a></li>
                 {% else %}
@@ -47,6 +48,9 @@
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true" href="{{ path('app_admin') }}">Вы Администратор</a>
                 </li>
                 {% endif %}
+                <li class="nav-item">
+                <a class="btn btn-warning" href="#" tabindex="-1" aria-disabled="true">Быстрая консультация</a>
+                </li>
             </ul>
             <form class="d-flex">
                 <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search">
@@ -85,7 +89,7 @@
                         Пакеты
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="{{ path('app_comet_pakages') }}">Обзор пакетов</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_table_pakage_index') }}">Обзор пакетов</a></li>
                         {# <li><a class="dropdown-item" href="#">Starter</a></li>
                         <li><a class="dropdown-item" href="#">Basic</a></li>    
                         <li><a class="dropdown-item" href="#">Networker</a></li>
@@ -101,13 +105,13 @@
                         Кабинет пользователя
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Текущий баланс</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_current_balance') }}">Текущий баланс</a></li>
                         {# <li><a class="dropdown-item" href="#">История транзакций</a></li> #}
-                        <li><a class="dropdown-item" href="{{ path('app_comet_pakages') }}">Обзор пакетов</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_table_pakage_index') }}">Обзор пакетов</a></li>
                         {# <li><a class="dropdown-item" href="{{ path('app_referral_network_index') }}">Участники реферальных сетей</a></li>
                         <li><a class="dropdown-item" href="{{ path('app_list_referral_networks_index') }}">Реферальные сети</a></li> #}
                         {# <li><a class="dropdown-item" href="#">Вывод</a></li> #}
-                        <li><a class="dropdown-item" href="#">Статистика</a></li>
+                        <li><a class="dropdown-item" href="#">Статистика (не активно)</a></li>
                         <li><hr class="dropdown-divider"></li>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         {% if app.user.username == null %}
@@ -120,7 +124,7 @@
                         <li><a class="dropdown-item" href="#">No login</a></li>
                         {% endif %} 
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                        <li><a class="dropdown-item" href="#">Поддержка</a></li>
+                        <li><a class="dropdown-item" href="#">Поддержка (не активно)</a></li>
                         {% if is_granted('ROLE_ADMIN') %}   
                         <li><a class="dropdown-item" href="{{ path('app_admin') }}">Кабинет админа</a></li>
                         {% endif %} 

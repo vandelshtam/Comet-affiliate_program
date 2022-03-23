@@ -3,7 +3,7 @@
 {% block title %}ReferralNetwork index{% endblock %}
 
 {% block body %}
-    <h1>ReferralNetwork index</h1>
+    <h1>Список всех участников реферальных сетей</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -24,16 +24,18 @@
                         {{ message }}
                     </div>
                 {% endfor %}
-    {% endfor %}    
+    {% endfor %}
+    <a  class="btn btn-secondary mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
+    {# <a class="btn btn-success mb-3" href="{{ path('app_referral_network_new') }}">Добавить</a>    #}
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Name</th>
-                <th>User_id</th>
-                <th>User_status</th>
-                <th>Personal_data_id</th>
-                <th>actions</th>
+                <th>Имя пользователя</th>
+                <th>id пользователя</th>
+                <th>Статус пользователя</th>
+                <th>id записи персональных данных</th>
+                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -45,13 +47,13 @@
                 <td>{{ referral_network.userStatus }}</td>
                 <td>{{ referral_network.personalDataId }}</td>
                 <td>
-                    <a href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">show</a>
-                    <a href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a>
+                    <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">Подробности</a>
+                    {# <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="6">нет записей</td>
             </tr>
         {% endfor %}
         </tbody>

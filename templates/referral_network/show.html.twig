@@ -3,7 +3,8 @@
 {% block title %}ReferralNetwork{% endblock %}
 
 {% block body %}
-    <h1>ReferralNetwork</h1>
+<div class="container-xxl">
+    <h1>Информация об участнике сети</h1>
 
     <table class="table">
         <tbody>
@@ -12,27 +13,28 @@
                 <td>{{ referral_network.id }}</td>
             </tr>
             <tr>
-                <th>Name</th>
+                <th>Имя пользователя</th>
                 <td>{{ referral_network.name }}</td>
             </tr>
             <tr>
-                <th>User_id</th>
+                <th>id пользователя</th>
                 <td>{{ referral_network.userId }}</td>
             </tr>
             <tr>
-                <th>User_status</th>
+                <th>Статус пользователя</th>
                 <td>{{ referral_network.userStatus }}</td>
             </tr>
             <tr>
-                <th>Personal_data_id</th>
+                <th>id записи персональных данных</th>
                 <td>{{ referral_network.personalDataId }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_referral_network_index') }}">back to list</a>
+    <a  class="btn btn-secondary mb-3" href="{{ path('app_referral_network_index') }}">Назад</a>
 
-    <a href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a>
+    {# <a href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}
 
-    {{ include('referral_network/_delete_form.html.twig') }}
+    {# {{ include('referral_network/_delete_form.html.twig') }} #}
+</div>
 {% endblock %}

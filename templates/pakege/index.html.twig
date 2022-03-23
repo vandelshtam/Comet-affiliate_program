@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pakege index{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <h1>Pakege index</h1>
+    <h1>{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -25,6 +25,7 @@
                     </div>
                 {% endfor %}
     {% endfor %}
+    <a class="btn btn-success" href="{{ path('app_pakege_new') }}">Добавить новый пакет</a>
     <table class="table">
         <thead>
             <tr>
@@ -59,18 +60,20 @@
                 <td>{{ pakege.clientCode }}</td>
                 <td>{{ pakege.uniqueCode }}</td>
                 <td>
-                    <a href="{{ path('app_pakege_show', {'id': pakege.id}) }}">show</a>
-                    <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a>
+                    <a class="btn btn-secondary" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
+                    {# <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a> #}
+                    {% if pakege.activation == NULL %}
                     <a href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
+                     {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="7">no records found</td>
+                <td colspan="7">нет записей</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_pakege_new') }}">Create new</a>
+    
 {% endblock %}

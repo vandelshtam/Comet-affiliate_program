@@ -3,9 +3,31 @@
 {% block title %}New Pakege{% endblock %}
 
 {% block body %}
-    <h1>Create new Pakege</h1>
-
+<div class="container-xxl">
+    <h1>Приобретение нового  пакета</h1>
+{% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
     {{ include('pakege/_form.html.twig') }}
 
-    <a href="{{ path('app_pakege_index') }}">back to list</a>
+    <a class="btn btn-secondary" href="{{ path('app_pakege_index') }}">назад</a>
+<div>
 {% endblock %}

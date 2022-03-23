@@ -4,13 +4,17 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Pakege;
-use App\Entity\PersonalData;
-use App\Entity\TablePakage;
-use App\Entity\TokenRate;
 use App\Form\PakegeType;
+use App\Entity\TokenRate;
+use App\Entity\TablePakage;
+use App\Entity\PersonalData;
+use App\Entity\ReferralNetwork;
+use App\Controller\MailerController;
 use App\Repository\PakegeRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -31,11 +35,13 @@ class PakegeController extends AbstractController
         //dd($user);
         return $this->render('pakege/index.html.twig', [
             'pakeges' => $pakegeRepository->findAll(),
+            'controller_name' => 'Список всех приобретенных пакетов в сети',
+            'title' => 'Pakages',
         ]);
     }
 
     #[Route('/new', name: 'app_pakege_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PakegeRepository $pakegeRepository, ManagerRegistry $doctrine): Response
+    public function new(Request $request, PakegeRepository $pakegeRepository, ManagerRegistry $doctrine,ReferralNetworkRepository $referralNetworkRepository): Response
     {
         $pakege = new Pakege();
         $form = $this->createForm(PakegeType::class, $pakege);
@@ -43,7 +49,7 @@ class PakegeController extends AbstractController
         
         // $user = $this -> getUser();
         // $user_id = $user -> getId();
-        // $entityManager = $doctrine->getManager();
+         $entityManager = $doctrine->getManager();
         // $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user_id]);
         // $personal_data_table = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
         $unique_code1 = $this->random_string(10);
@@ -53,7 +59,15 @@ class PakegeController extends AbstractController
         $collection -> add($unique_code);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //dd($request);
+            $form_referral_link = $form->get('referral_link')->getData();
+            if($network_referral_link_data = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $form_referral_link]) == NULL){
+                $this->addFlash(
+                    'danger',
+                    'Вы ошиблись при введении ссылки или ввели устаревшую ссылку, пожалуйста попробуйте еще раз');
+                return $this->redirectToRoute('app_pakege_new', [], Response::HTTP_SEE_OTHER);
+            }
+            
+            //dd($network_referral_link_data);
             $pakegeRepository->add($pakege);
             $unique = $form->get('unique_code')->getData();
         
@@ -111,7 +125,7 @@ class PakegeController extends AbstractController
     }
 
     #[Route('/new/{unique}/choice', name: 'app_pakege_new_choice', methods: ['GET', 'POST'])]
-    public function newChoice (Request $request, PakegeRepository $pakegeRepository, ManagerRegistry $doctrine, string $unique): Response
+    public function newChoice (Request $request, PakegeRepository $pakegeRepository,MailerInterface $mailer, ManagerRegistry $doctrine,MailerController $mailerController, string $unique): Response
     {
         //dd($unique);
         $user = $this -> getUser();
@@ -146,6 +160,8 @@ class PakegeController extends AbstractController
             
             //$entityManager->persist($pakege_comet);
             $entityManager->flush();
+            //$email = new Email();
+            $mailerController->sendEmail($mailer);
             $this->addFlash(
                 'success',
                 'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');

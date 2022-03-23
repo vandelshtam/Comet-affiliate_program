@@ -39,6 +39,8 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_ADMIN]
 
     access_control:
+         - { path: ^/pakege, roles: ROLE_USER }
+         - { path: ^/list/referral/networks, roles: ROLE_USER }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
         #- { path: '/show', roles: [ROLE_ADMIN] }

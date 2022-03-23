@@ -1,8 +1,23 @@
+
+{% if form_errors(form) %}
+<div class="alert alert-danger" role="alert">
+    {{ form_errors(form) }}
+</div>
+{% endif %}
+{# {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+{% endif %} #}
+  
 {{ form_start(form) }}
-    {{ form_row(form.name) }}<div id="emailHelp" class="form-text">если у вас нет реферальной ссылки или кода клиента, то пожалуйста не заполняйте это поле!</div> 
-    {{ form_row(form.referral_link) }}<div id="emailHelp" class="form-text">если у вас нет реферальной ссылки или кода клиента, то пожалуйста не заполняйте это поле!</div> 
+<div class="form_box-inner">   
+    <div class="form_box-left">
+    {{ form_row(form.name) }}<div id="emailHelp" class="form-text">Eсли у вас нет реферальной ссылки или кода клиента, то пожалуйста не заполняйте это поле!</div> 
+    {{ form_row(form.referral_link) }}<div id="emailHelp" class="form-text">Eсли у вас нет реферальной ссылки или кода клиента, то пожалуйста не заполняйте это поле!</div> 
     <div class="hidden">
       {{ form_row(form.unique_code, {'value': unique_code }) }}
     </div>
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <button class="btn btn-success">{{ button_label|default('сохранить') }}</button>
+    </div>
+</div>
 {{ form_end(form) }}
+

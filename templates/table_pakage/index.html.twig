@@ -1,17 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TablePakage index{% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <h1>TablePakage index</h1>
+
+<div class="example-wrapper container-xxl">
+{% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    <h1>Привет! Это -  {{ controller_name }}</h1>
+    <div class="card mb-3" style="max-width: 1140px;">
+    <div class="row g-0">
+        <div class="col-md-4">
+        <img src="{{ asset('asset/img/pakages-cometa-1.jpeg') }}" class="img-fluid rounded-start" alt="...">
+        </div>
+        <div class="col-md-8">
+        <div class="card-body">
+            <h5 class="card-title">Пакеты для участия в программе</h5>
+            <p class="card-text">Ниже приведено описание пакетов, вы сможете подобрать для себя оптимальный пакет.</p>
+            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        </div>
+        </div>
+    </div>
+    </div>
+
+<h1>Таблица актуальных пакетов</h1>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Name</th>
-                <th>Price_pakage</th>
-                <th>actions</th>
+                <th>Название</th>
+                <th>Стоимость</th>
+                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -21,17 +61,23 @@
                 <td>{{ table_pakage.name }}</td>
                 <td>{{ table_pakage.pricePakage }}</td>
                 <td>
-                    <a href="{{ path('app_table_pakage_show', {'id': table_pakage.id}) }}">show</a>
-                    <a href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">edit</a>
+                    {# {% if is_granted('IS_AUTHENTICATED_FULLY') %}    #}
+                    <a class="btn btn-secondary" href="{{ path('app_table_pakage_show', {'id': table_pakage.id}) }}">Посмотреть</a>
+                    {# {% endif %} #}
+                    {% if is_granted('ROLE_ADMIN') %}   
+                    <a class="btn btn-warning" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
+                    {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no records found</td>
+                <td colspan="4">Пока еще нет записей</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_table_pakage_new') }}">Create new</a>
+    {% if is_granted('ROLE_ADMIN') %}   
+    <a class="btn btn-success" href="{{ path('app_table_pakage_new') }}">Добавить новый пакет</a>
+    {% endif %}
+</div>
 {% endblock %}

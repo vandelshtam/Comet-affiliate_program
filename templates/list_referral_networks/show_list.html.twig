@@ -31,7 +31,7 @@
         </tbody>
     </table>
 
-    <a  class="btn btn-secondary mb-3" href="{{ path('app_list_referral_networks_index') }}">Назад</a>
+    <a  class="btn btn-secondary mb-3" href="{{ path('app_list_referral_networks_index_list') }}">Назад</a>
     {% if is_granted('ROLE_ADMIN') %}   
     <a  class="btn btn-warning mb-3" href="{{ path('app_list_referral_networks_edit', {'id': list_referral_network.id}) }}">Редактировать</a>
 

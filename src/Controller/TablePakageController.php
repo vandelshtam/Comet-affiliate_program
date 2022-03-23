@@ -17,7 +17,9 @@ class TablePakageController extends AbstractController
     public function index(TablePakageRepository $tablePakageRepository): Response
     {
         return $this->render('table_pakage/index.html.twig', [
+            'controller_name' => 'Страница обзора пакетов',
             'table_pakages' => $tablePakageRepository->findAll(),
+            'title' => 'Pakages',
         ]);
     }
 
