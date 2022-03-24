@@ -19,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 
-#[Route('/list/referral/networks')]
+#[Route('/list/referral')]
 class ListReferralNetworksController extends AbstractController
 {
     #[Route('/', name: 'app_list_referral_networks_index', methods: ['GET'])]
