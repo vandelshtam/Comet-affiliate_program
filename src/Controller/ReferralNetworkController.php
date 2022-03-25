@@ -312,6 +312,29 @@ class ReferralNetworkController extends AbstractController
         ]);
     }
 
+    #[Route('/myplace', name: 'app_referral_network_myplace', methods: ['GET', 'POST'])]
+    public function my_зlace(Request $request, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine)
+    {
+        $user = $this -> getUser();
+        $user_id = $user -> getId();
+        $entityManager = $doctrine->getManager();
+        //$referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $id]);
+        //$pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
+        if ($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $user_id]) == true) {
+            //проводим предварительное создание записи в таблицу строки нового участника реферальной сети (рефовод)
+            $id = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $user_id]) -> getId();
+            //dd($id);
+            return $this->redirectToRoute('app_referral_network_show', ['id' => $id], Response::HTTP_SEE_OTHER);
+        }
+        else{
+            $this->addFlash(
+                'danger',
+                'Такого пользователя нет.');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+    }
+
+
     #[Route('/{id}', name: 'app_referral_network_show', methods: ['GET'])]
     public function show(ReferralNetwork $referralNetwork,ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine,  int $id,): Response
     {
