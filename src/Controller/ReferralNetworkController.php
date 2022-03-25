@@ -313,10 +313,66 @@ class ReferralNetworkController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_referral_network_show', methods: ['GET'])]
-    public function show(ReferralNetwork $referralNetwork): Response
+    public function show(ReferralNetwork $referralNetwork,ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine,  int $id,): Response
     {
+        $entityManager = $doctrine->getManager();
+        $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['id' => $id]);
+        //$user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);
+        $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
+        $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
+        $user_referral_status = $referral_network -> getUserStatus();
+        $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);
+        $owner_array[] = $user_owner;//основатель сети
+        $reward = $referral_network -> getReward();
+
+        //построение линии сингл-лайт в виде массива
+        $single_line = array_merge($referral_network_left, $owner_array, $referral_network_right);//объеденяем в один массив в  соотвтетсвии с правилом построения линии сингл-лайн
+        //dd(count($single_line));
+        //получаем ключ положения пользователя в массиве объектов участников реферальной сети
+        $j = 0;
+        for($i = 0; $i < count($single_line); $i++){
+            if($single_line[$i] -> getId() == $id){
+                $j += 1;
+                $key_user[] = $i;
+                //dd($single_line[$i] -> getId());
+               // break;
+            }
+        }
+        //dd($key_user);
+        //dd($single_line);
+        $single_line_left = [];
+        for($i = 0; $i < $key_user[0]; $i++){
+            $single_line_left[] = $single_line[$i];
+        }
+        $single_line_right = [];
+        for($i = $key_user[0] + 1; $i < count($single_line); $i++){
+            $single_line_right[] = $single_line[$i];
+        }
+        
+
+        //gолучаем баланс левой и правой части линии
+        $single_line_left_balance = [];
+        for($i = 0; $i < count($single_line_left); $i++){
+            $single_line_left_balance[] = $single_line_left[$i] -> getBalance();
+        }
+        $summ_single_line_left_balance = array_sum($single_line_left_balance);
+        $count_single_line_left = count($single_line_left_balance);
+        
+        $single_line_right_balance = [];
+        for($i = 0; $i < count($single_line_right); $i++){
+            $single_line_right_balance[] = $single_line_right[$i] -> getBalance();
+        }
+        $summ_single_line_right_balance = array_sum($single_line_right_balance);
+        $count_single_line_right = count($single_line_right_balance);
+
+        $array_data = ['summ_left' => $summ_single_line_left_balance, 'summ_right' => $summ_single_line_right_balance,
+                       'count_left' => $count_single_line_left, 'count_right' => $count_single_line_right,
+                       'my_summ' => $reward];
+
+        //dd($array_data);
         return $this->render('referral_network/show.html.twig', [
             'referral_network' => $referralNetwork,
+            'data' => $array_data,
         ]);
     }
 
@@ -513,7 +569,7 @@ class ReferralNetworkController extends AbstractController
         $array_single_line_right = $single_line_right;
 
         //переворачиваем  массив пользователей с левой стороны линии в нормальный вид
-        $single_line_left = array_reverse($single_line_left);
+        //$single_line_left = array_reverse($single_line_left);
         $array_single_line_left = $single_line_left;
 
         //gолучаем баланс левой и правой части линии

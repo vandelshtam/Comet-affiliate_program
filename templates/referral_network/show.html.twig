@@ -30,6 +30,38 @@
             </tr>
         </tbody>
     </table>
+    <div class="row mb-3">
+    <div class="col-sm-4">
+        <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Сеть с левой стороны</h5>
+            <p class="card-text">Баланс сети слева {{ data.summ_left }} </p>
+            <p class="card-text">Количество участников слева {{ data.count_left }}</p>
+            <a href="#" class="btn btn-primary">Перейти куда-нибудь</a>
+        </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Моё место в сети</h5>
+            <p class="card-text">Мой баланс</p>
+            <p class="card-text">{{ data.my_summ }}</p>
+            <a href="#" class="btn btn-primary">Перейти куда-нибудь</a>
+        </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Сеть с правой стороны</h5>
+            <p class="card-text">Баланс сети справа {{ data.summ_right }}</p>
+            <p class="card-text">Количество участников с правой стороны {{ data['count_right'] }}</p>
+            <a href="#" class="btn btn-primary">Перейти куда-нибудь</a>
+        </div>
+        </div>
+    </div>
+    </div>
 
     <a  class="btn btn-secondary mb-3" href="{{ path('app_referral_network_index') }}">Назад</a>
 
