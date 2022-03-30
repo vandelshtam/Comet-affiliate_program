@@ -6,6 +6,8 @@ use App\Entity\Pakege;
 use App\Entity\ReferralNetwork;
 use App\Form\ReferralNetworkType;
 use App\Entity\ListReferralNetworks;
+use App\Entity\SettingOptions;
+use App\Entity\TokenRate;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,260 +20,7 @@ class ReferralNetworkController extends AbstractController
 {
     #[Route('/', name: 'app_referral_network_index', methods: ['GET'])]
     public function index(ReferralNetworkRepository $referralNetworkRepository,ManagerRegistry $doctrine): Response
-    {
-//         //=========формула расчета наград в сети при количестве участников 4 и более======
-//         //получаем информацию о сети и записи участника предоставившего реферальную ссылку(рефовода)
-//         $entityManager = $doctrine->getManager();
-//         $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
-//         $referral_network_user = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => '23-49-48-qZg78nGIOCPirhHijUxY']);//объект пользователя представившего реферальную ссылку (рефовода извлекаем по реферальной ссылке referral_link)
-//         $referral_network_user_new = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => '23-52-48-qZg78nGIOCPirhHijUxY']);//объект нового партнера в  реферальной  сети (получаем по member_code)
-//         //$referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'left']);
-//         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
-//         //$referral_network_left_balance = $entityManager->getRepository(ReferralNetwork::class)->findByBalanceField('left',0);//получаем объект участников с левой стороны линии с балансом более "0"
-//         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
-//         //$referral_network_right_balance = $entityManager->getRepository(ReferralNetwork::class)->findByBalanceField('right',0);//получаем объект участников с правой стороны линии с балансом более "0"
-//         $user_referral_status = $referral_network_user -> getUserStatus();
-//         $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);
-//         $owner_array[] = $user_owner;//основатель сети
-
-//         //построение линии сингл-лайт
-//         $single_line = array_merge($referral_network_left, $owner_array, $referral_network_right);//объеденяем в один массив  соотвтетсвии с правилом построения линии сингл-лайн
-//         for($i = 0; $i <= count($single_line); $i++){
-//             if($single_line[$i] -> getMemberCode() == '23-49-48-qZg78nGIOCPirhHijUxY'){
-//                 $key_user = $i;
-//                 $single_line_id_refovod = $i;
-//                 break;
-//             }
-//         }
-//         $single_line_left = [];
-//         for($i = 0; $i < $key_user; $i++){
-//             $single_line_left[] = $single_line[$i];
-//         }
-//         $single_line_right = [];
-//         for($i = $key_user; $i < count($single_line); $i++){
-//             $single_line_right[] = $single_line[$i];
-//         }
-//         $array_single_line_right = $single_line_right;
-
-//         //переворачиваем  массив пользователей с левой стороны линии в нормальный вид
-//         $single_line_left = array_reverse($single_line_left);
-//         $array_single_line_left = $single_line_left;
-
-//         //gолучаем баланс левой и правой части линии
-//         $single_line_left_balance = [];
-//         for($i = 0; $i < count($single_line_left); $i++){
-//             $single_line_left_balance[] = $single_line_left[$i] -> getBalance();
-//         }
-//         $summ_single_line_left_balance = array_sum($single_line_left_balance);
-        
-//         $single_line_right_balance = [];
-//         for($i = 0; $i < count($single_line_right); $i++){
-//             $single_line_right_balance[] = $single_line_right[$i] -> getBalance();
-//         }
-//         $summ_single_line_right_balance = array_sum($single_line_right_balance);
-
-//         //dd($summ_single_line_right_balance);
-
-
-//         //определяем с какой стороны линии сумма баланса больше
-//         if($summ_single_line_left_balance == $summ_single_line_right_balance){
-//                 //вычислим и запишем награду участнику относительно которого выстроена линия (рефовод)
-//                 $reward_refovod = $referral_network_user -> getReward();
-//                 $reward_right_user = $summ_single_line_right_balance *0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-//                 $reward_user = $reward_refovod + $reward_right_user; 
-//                 $referral_network_user -> setReward($reward_right_user);
-//         }
-//         else{
-
-//             // $reward_refovod = $referral_network_user -> getReward();
-//             // $reward_right_user = $summ_single_line_right_balance *0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-//             // $reward_user = $reward_refovod + $reward_right_user; 
-//             // $referral_network_user -> setReward($reward_right_user);
-
-//             //далее начинаем начисление наград участникам линии двигаясь в правую сторону перебирая массив участников справа
-//             //достаем участника из массива проверяем его баланс если нулевой начисляем награду от меньшей скммы справа,
-//             //если баланс имеется, то заново определяем меньшую сторну баланс и начисляем награду от меньшей суммы
-                
-//             $i = 1; 
-//             while($i < count($single_line_right)){
-                
-//                 $user = array_shift($single_line_right);
-                
-//                 $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
-
-//                 //получаем баланс левой и правой части линии
-//                 $single_line_left_balance_new = [];
-//                 for($j = 0; $j < count($single_line_left); $j++){
-//                     $single_line_left_balance_new[] = $single_line[$i] -> getBalance();
-//                 }
-//                 $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
-                    
-//                 $single_line_right_balance_new = [];
-//                 for($k = 0; $k < count($single_line_right); $k++){
-//                     $single_line_left_balance_new[] = $single_line[$i] -> getBalance();
-//                 }
-//                 $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
-
-//                 if($summ_single_line_left_balance > $summ_single_line_right_balance){
-//                     $reward_user_new = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-//                     $reward_user = $reward_user_new + $reward; 
-//                     $user -> setReward($reward_user);
-//                     $entityManager->flush();   
-//                 }
-//                 if($summ_single_line_left_balance < $summ_single_line_right_balance){
-//                     $reward_user_new = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-//                     $reward_user = $reward_user_new + $reward; 
-//                     $user -> setReward($reward_user);
-//                     $entityManager->flush();   
-//                 } 
-//                 $reward1[] = $reward;   
-//             }
-
-//             //теперь проеделываем операции по определению наград двигаясь в левую сторону от рефовода по линии 
-//             $i = 1;
-//             while($i < count($single_line_left)){
-                
-//                 $user = array_shift($single_line_left);
-                
-//                 $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
-
-//                 //получаем баланс левой и правой части линии
-//                 $single_line_left_balance_new = [];
-//                 for($j = 0; $j < count($single_line_left); $j++){
-//                     $single_line_left_balance_new[] = $single_line[$i] -> getBalance();
-//                 }
-//                 $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
-                    
-//                 $single_line_right_balance_new = [];
-//                 for($k = 0; $k < count($single_line_right); $k++){
-//                     $single_line_left_balance_new[] = $single_line[$i] -> getBalance();
-//                 }
-//                 $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
-
-//                 if($summ_single_line_left_balance > $summ_single_line_right_balance){
-//                     $reward_user_new = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-//                     $reward_user = $reward_user_new + $reward; 
-//                     $user -> setReward($reward_user);
-//                     $entityManager->flush();   
-//                 }
-//                 if($summ_single_line_left_balance < $summ_single_line_right_balance){
-//                     $reward_user_new = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-//                     $reward_user = $reward_user_new + $reward; 
-//                     $user -> setReward($reward_user);
-//                     $entityManager->flush();
-//                     //dd($reward_user);     
-//                 } 
-//                 $reward2[] = $reward;   
-//             }
-
-//         }
-
-
-//         //проводим погашение баланса покетов пользователей в линии
-//         //сформируем массивы баланса пакетов больше нуля с левой и с правой стороны
-// //dd($single_line_left);
-//         $single_line_left_balance_pakege = [];
-//         for($i = 0; $i < count($array_single_line_left); $i++){
-//             if($array_single_line_left[$i] -> getBalance() > 0){
-//                 $single_line_left_balance_pakege[] = $array_single_line_left[$i];
-//                 $array_left_balance_pakege[] = $array_single_line_left[$i] -> getBalance();
-//             }    
-//         }
-//         $summ_left_balance_pakege = array_sum($array_left_balance_pakege);
-//         $count_left_balance_pakege = count($array_left_balance_pakege);
-//         //dd($single_line_left_balance_pakege);
-
-//         $single_line_right_balance_pakege = [];
-//         for($i = 0; $i < count($array_single_line_right); $i++){
-//             if($array_single_line_right[$i] -> getBalance() > 0){
-//                 $single_line_right_balance_pakege[] = $array_single_line_right[$i];
-//                 $array_right_balance_pakege[] = $array_single_line_right[$i] -> getBalance();
-//             }
-//         }
-//         $summ_right_balance_pakege = array_sum($array_right_balance_pakege);
-//         $count_right_balance_pakege = count($array_right_balance_pakege);
-
-//         //dd($summ_right_balance_pakege);
-        
-
-//         if($summ_left_balance_pakege > $summ_right_balance_pakege){
-            
-//             //dd($summ_middle1);
-//             for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-//                 $summ_middle1 = $summ_right_balance_pakege/$count_left_balance_pakege;
-//                 $balance_old1 = $single_line_left_balance_pakege[$i] -> getBalance();
-//                 $balance_new1 = $balance_old1 - $summ_middle1;
-//                 $single_line_left_balance_pakege[$i] -> setBalance($balance_new1);
-//                 $entityManager->flush();
-//                 //dd($count_left_balance_pakege);
-//             }
-//             for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-//                 $summ_middle2 = $summ_right_balance_pakege/$count_right_balance_pakege;
-//                 $balance_old2 = $single_line_right_balance_pakege[$i] -> getBalance();
-//                 $balance_new2 = $balance_old2 - $summ_middle2;
-//                 $single_line_right_balance_pakege[$i] -> setBalance($balance_new2);
-//                 $entityManager->flush();
-//             }
-//         }
-//         //dd($single_line_right_balance);
-//         if($summ_left_balance_pakege < $summ_right_balance_pakege){
-            
-//             //dd($summ_middle2);
-//             for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-//                 $summ_middle2 = $summ_left_balance_pakege/$count_right_balance_pakege;
-//                 $balance_old3 = $single_line_right_balance_pakege[$i] -> getBalance();
-//                 $balance_new3 = $balance_old3 - $summ_middle2;
-//                 $single_line_right_balance_pakege[$i] -> setBalance($balance_new3);
-//                 $entityManager->flush();
-//             }
-//             for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-//                 $summ_middle2 = $summ_left_balance_pakege/$count_left_balance_pakege;
-//                 $balance_old4 = $single_line_left_balance_pakege[$i] -> getBalance();
-//                 $balance_new4 = $balance_old4 - $summ_middle2;
-//                 $single_line_left_balance_pakege[$i] -> setBalance($balance_new4);
-//                 $entityManager->flush();
-//             }
-//         }
-    
-        //dd($single_line_left_balance);
-        //первое выстраиваивание линии из трех участников реферальной сети
-        // if($referral_network_count == 3){
-            
-        //     if($referral_network_left -> getBalance() == $referral_network_right -> getBalance()){
-        //         $balance_pred = $referral_network_left -> getBalance();
-        //         $referral_network_left -> setBalance(0);
-        //         $referral_network_right -> setBalance(0);
-        //         $reward_user = $referral_network_user ->  getReward();
-        //         $balance = $balance_pred * 0.1;
-        //         $reward = $reward_user + $balance;
-        //         $referral_network_user ->  setReward($reward);
-        //     }
-        //     if($referral_network_left -> getBalance() < $referral_network_right -> getBalance()){
-        //         $balance_pred_left = $referral_network_left -> getBalance();
-        //         $balance_pred_right = $referral_network_right -> getBalance();
-        //         $balace_right = $balance_pred_right - $balance_pred_left;
-        //         $referral_network_left -> setBalance(0);
-        //         $referral_network_right -> setBalance($balace_right);
-        //         $reward_user = $referral_network_user ->  getReward();
-        //         $balance = $balance_pred_left * 0.1;
-        //         $reward = $reward_user + $balance;
-        //         $referral_network_user ->  setReward($reward);
-        //     }
-        //     if($referral_network_left -> getBalance() > $referral_network_right -> getBalance()){
-        //         $balance_pred_left = $referral_network_left -> getBalance();
-        //         $balance_pred_right = $referral_network_right -> getBalance();
-        //         $balace_left = $balance_pred_left - $balance_pred_right;
-        //         $referral_network_left -> setBalance($balace_left);
-        //         $referral_network_right -> setBalance(0);
-        //         $reward_user = $referral_network_user ->  getReward();
-        //         $balance = $balance_pred_right * 0.1;
-        //         $reward = $reward_user + $balance;
-        //         $referral_network_user ->  setReward($reward);
-        //     }    
-        // }
-        
-        //dd($referral_network_left_balance);
-        //$entityManager->flush();
+    {         
         return $this->render('referral_network/index.html.twig', [
             'referral_networks' => $referralNetworkRepository->findAll(),
         ]);
@@ -283,25 +32,29 @@ class ReferralNetworkController extends AbstractController
         $entityManager = $doctrine->getManager();
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['network_code' => $referral_link]);
         $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
-        $arr = explode('-', $referral_link);//уникальный персональный код участника сети со статусом владелец сети преобразуем в массив для извлечения информации о участнике предоставившегго реферальную ссылку
-        //$arr[0] - id сети
-        //$id пакета нового участника сети
-        //$arr[2]id пакета владельца сети
-        //$arr[3] 
-        $member_code = $arr[0].'-'.$id.'-'.$arr[2].'-'.$arr[3];//уникальный персональный код  нового участника сети пришедшего по реферальной ссылке (рефовод)
-        //dd($member_code);
+        $arr = explode('-', $referral_link);//уникальный персональный код участника сети со статусом владелец сети преобразуем в массив для извлечения информации об участнике предоставившегго реферальную ссылку (рефовод)
+    
+        //создание уникального персонального кода  нового участника сети пришедшего по реферальной ссылке (рефовода)
+        $arr1 = $arr[0]; $arr2 = $arr[2]; $arr3 = $arr[3];
+        $member_code = $this -> makeMemberCode($arr1,$id,$arr2,$arr3);
 
         $referralNetwork = new ReferralNetwork();
         $form = $this->createForm(ReferralNetworkType::class, $referralNetwork);
         $form->handleRequest($request);
 
-         $user = $this -> getUser();
-         $username = $user -> getUsername();
-        
+        $user = $this -> getUser();
+        $username = $user -> getUsername();
         if ($form->isSubmitted() && $form->isValid()) {
-            //проводим предварительное создание записи в таблицу строки нового участника реферальной сети (рефовод)
+            //проводим предварительное создание записи в таблицу строки нового участника реферальной сети 
             $referralNetworkRepository->add($referralNetwork);
-            return $this->redirectToRoute('app_referral_network_new_confirm', ['member_code' => $member_code, 'id' => $id, 'referral_link' => $referral_link], Response::HTTP_SEE_OTHER);
+            //запись нового участника в линию single_line
+            $this -> newConfirm($request,$referralNetworkRepository, $doctrine,$member_code,$id,$referral_link);
+            $this->addFlash(
+                         'success',
+                         'Поздравляем! Вы успешно активировали пакет и вступили в  реферальную сеть.');
+                        
+            return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
+
         }
 
         return $this->renderForm('referral_network/new.html.twig', [
@@ -313,17 +66,13 @@ class ReferralNetworkController extends AbstractController
     }
 
     #[Route('/myplace', name: 'app_referral_network_myplace', methods: ['GET', 'POST'])]
-    public function my_зlace(Request $request, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine)
+    public function my_place(Request $request, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine)
     {
         $user = $this -> getUser();
         $user_id = $user -> getId();
         $entityManager = $doctrine->getManager();
-        //$referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $id]);
-        //$pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
         if ($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $user_id]) == true) {
-            //проводим предварительное создание записи в таблицу строки нового участника реферальной сети (рефовод)
             $id = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $user_id]) -> getId();
-            //dd($id);
             return $this->redirectToRoute('app_referral_network_show', ['id' => $id], Response::HTTP_SEE_OTHER);
         }
         else{
@@ -340,7 +89,6 @@ class ReferralNetworkController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['id' => $id]);
-        //$user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);
         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
         $user_referral_status = $referral_network -> getUserStatus();
@@ -348,21 +96,18 @@ class ReferralNetworkController extends AbstractController
         $owner_array[] = $user_owner;//основатель сети
         $reward = $referral_network -> getReward();
 
-        //построение линии сингл-лайт в виде массива
+        //построение линии сингл-лайн в виде массива
         $single_line = array_merge($referral_network_left, $owner_array, $referral_network_right);//объеденяем в один массив в  соотвтетсвии с правилом построения линии сингл-лайн
-        //dd(count($single_line));
+        
         //получаем ключ положения пользователя в массиве объектов участников реферальной сети
         $j = 0;
         for($i = 0; $i < count($single_line); $i++){
             if($single_line[$i] -> getId() == $id){
                 $j += 1;
                 $key_user[] = $i;
-                //dd($single_line[$i] -> getId());
-               // break;
+                break;
             }
         }
-        //dd($key_user);
-        //dd($single_line);
         $single_line_left = [];
         for($i = 0; $i < $key_user[0]; $i++){
             $single_line_left[] = $single_line[$i];
@@ -372,8 +117,7 @@ class ReferralNetworkController extends AbstractController
             $single_line_right[] = $single_line[$i];
         }
         
-
-        //gолучаем баланс левой и правой части линии
+        //получаем баланс левой и правой части линии
         $single_line_left_balance = [];
         for($i = 0; $i < count($single_line_left); $i++){
             $single_line_left_balance[] = $single_line_left[$i] -> getBalance();
@@ -392,7 +136,6 @@ class ReferralNetworkController extends AbstractController
                        'count_left' => $count_single_line_left, 'count_right' => $count_single_line_right,
                        'my_summ' => $reward];
 
-        //dd($array_data);
         return $this->render('referral_network/show.html.twig', [
             'referral_network' => $referralNetwork,
             'data' => $array_data,
@@ -426,25 +169,24 @@ class ReferralNetworkController extends AbstractController
         return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{member_code}/{id}/{referral_link}/new/confirm', name: 'app_referral_network_new_confirm', methods: ['GET', 'POST'])]
-    public function newConfirm(Request $request, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine, string $member_code, int $id, string $referral_link): Response
+    private function newConfirm($request,  $referralNetworkRepository,  $doctrine,  $member_code,  $id,  $referral_link)
     {
-        //dd($member_code);
         $entityManager = $doctrine->getManager();
-        $referral_network_status = $entityManager->getRepository(ReferralNetwork::class)->findByExampleField();//получем две самых новых по времени записи в реферальной сети (в таблице)
+        $referral_network_status = $entityManager->getRepository(ReferralNetwork::class)->findByExampleField();//получем две самых новых по времени записи в реферальной сети (в таблице), предпоследняя запись содержит статус пользователя (left/right) для присвоения статуса новому пользователю
         $status_user = $referral_network_status[1]->getUserStatus();//получаем запись самого нового участника сети ,определяем его положение в линии "слева" или "справа"
         $status = $this -> status($status_user);// присваеваем новому участнику сети положение в линии  слева или справа
         $referral_network_referral = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]);//получаем объект пользователя участника  реферальной сети который предоставил реферальную ссылку
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code]);//получаем данные нового участника в реферальной сети (рефовод) чтобы дополнить информацию всеми необходимыми данными
+        $network_code = $referral_network_referral -> getNetworkCode();//получаем код родительской сети
+        $list_network = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['network_code' => $network_code]);//обект родительской сети
+        $list_network_all = $entityManager->getRepository(ReferralNetwork::class)->findByMemberField([$network_code]);//все обекты родительской сети
         $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);// получаем оъект пакета нового участника реферальной сети
-        
-        //dd($referral_network);
         $arr = explode('-', $member_code);//уникальный код участника сети преобразуем в массив для получения важных данных
         $listReferralNetwork_id = $arr[0];//айди реферальной сети
         $pakege_user_id = $arr[1];//айди пакета нового участника сети
         $user_id = $pakege_user -> getUserId();//айди нвого участника сети
         $balance = $pakege_user -> getPrice();//стоимость пакета нового участника сети
-        
+        $list_network_all_count = count($list_network_all);
         
 	    //получаем объект записи родительской реферальной сети и получем из нее код этой сети
         $listReferralNetwork = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['id' => $listReferralNetwork_id]);
@@ -452,18 +194,26 @@ class ReferralNetworkController extends AbstractController
 
         //изменения статуса пакета приглашенного участника сети на "активирован"
         $pakege_user -> setActivation('активирован');
+        $pakege_user -> setReferralNetworksId($network_code);
 
-        //данные пользователя который предосавил реферальную ссылку
-        $network_referral_id = $referral_network_referral -> getId();//айди записи участника реферальной сети предоставившего ссылку
+        //построение первичной линии при количестве учстников менее 3-х
+        //данные пользователя который предоставил реферальную ссылку
+        $network_referral_id = $referral_network_referral -> getId();//айди записи участника реферальной сети предоставившего ссылку (рефовода)
         $user_referral_id = $referral_network_referral -> getUserId();//пользователя системы участвующего в реферальной сети и предоставившего реферальную ссылку
-//dd($user_referral_id);
-        //расчет награды за приглашенного участника члену сети предоставишему реферальную ссылку (рефовода)
-        $bonus = $balance * 0.1;
+
+        //расчет награды за приглашенного участника члену сети предоставишему реферальную ссылку (рефовода) DIRECT
+        $bonus = $balance * 0.1;//direct начисление за приглашенного участника
+        //dd($bonus);
         $referral_network_referral_bonus = $referral_network_referral -> getReward();
+        $referral_network_referral_direct = $referral_network_referral -> getDirect();
         $reward = $bonus + $referral_network_referral_bonus;
+        $direct = $bonus + $referral_network_referral_direct;
+        $profit_network_advance = $balance - $bonus;
+        //dd($direct);
         $referral_network_referral -> setReward($reward);
+        $referral_network_referral -> setDirect($direct);
         
-        //записываем и сохраняем в таблицу участника реферальной сети все нужные данные
+        //записываем и сохраняем в таблицу участника реферальной сети все дополнительные и обязательные данные
         $user = $this -> getUser();    
         $referral_network -> setUserId($user_id);
         $referral_network -> setUserStatus($status);
@@ -473,70 +223,68 @@ class ReferralNetworkController extends AbstractController
         $referral_network -> setNetworkCode($network_code);
         $referral_network -> setUserReferralId($user_referral_id);
         $referral_network -> setNetworkReferralId($network_referral_id);
+        $referral_network -> setMyTeam($referral_link);
+        $referral_network -> setPaymentsNetwork($bonus);
+        $referral_network -> setPaymentsCash(0);
+        $referral_network -> setCurrentNetworkProfit(0);
+        $referral_network -> setPakage($balance);
         $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
         $referralNetworkRepository->add($referral_network);
-
+        $old_profit_network = $list_network -> getProfitNetwork();
+        $new_profit_network = $old_profit_network + $profit_network_advance;
+        //$list_network ->setProfitNetwork($new_profit_network);
 
 
         //========выполнение формулы одной линии========= 
-         $entityManager = $doctrine->getManager();
         $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
-        $referral_network_user = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]);//объект пользователя представившего реферальную ссылку
         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'left']);
         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'right']);
-        //dd($referral_network_left);
-        $referral_network_user_id = $referral_network_user -> getId();
+        $referral_network_user_id = $referral_network_referral -> getId();
 
-        //первое выстраиваивание линии из трех участников реферальной сети
-        if($referral_network_count == 3){
-            
-            if($referral_network_left -> getBalance() == $referral_network_right -> getBalance()){
-                $balance_pred = $referral_network_left -> getBalance();
-                $referral_network_left -> setBalance(0);
-                $referral_network_right -> setBalance(0);
-                $reward_user = $referral_network_user ->  getReward();
-                $balance = $balance_pred * 0.1;
-                $reward = $reward_user + $balance;
-                $referral_network_user ->  setReward($reward);
-            }
-            if($referral_network_left -> getBalance() < $referral_network_right -> getBalance()){
-                $balance_pred_left = $referral_network_left -> getBalance();
-                $balance_pred_right = $referral_network_right -> getBalance();
-                $balace_right = $balance_pred_right - $balance_pred_left;
-                $referral_network_left -> setBalance(0);
-                $referral_network_right -> setBalance($balace_right);
-                $reward_user = $referral_network_user ->  getReward();
-                $balance = $balance_pred_left * 0.1;
-                $reward = $reward_user + $balance;
-                $referral_network_user ->  setReward($reward);
-            }
-            if($referral_network_left -> getBalance() > $referral_network_right -> getBalance()){
-                $balance_pred_left = $referral_network_left -> getBalance();
-                $balance_pred_right = $referral_network_right -> getBalance();
-                $balace_left = $balance_pred_left - $balance_pred_right;
-                $referral_network_left -> setBalance($balace_left);
-                $referral_network_right -> setBalance(0);
-                $reward_user = $referral_network_user ->  getReward();
-                $balance = $balance_pred_right * 0.1;
-                $reward = $reward_user + $balance;
-                $referral_network_user ->  setReward($reward);
-            }    
+    //dd($list_network_all_count);
+        //первое построение линии из трех участников реферальной сети
+        if($list_network_all_count == 2){
+            $referral_network_user = $referral_network_referral;
+            $this -> singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus);
+            $entityManager->persist($referral_network);
+            $entityManager->persist($referral_network_referral);
+            $entityManager->flush();
         }
+
+        //построение линии при количестве участников более 3-х
+        if($list_network_all_count > 2){
+            $referral_network_user = $referral_network_referral;
+            $referral_network_user_new = $referral_network;
+            $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
+            $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);
+            $this -> single($request, $referralNetworkRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user, $referral_network_user_new, $referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus);
+            $entityManager->persist($referral_network);
+            $entityManager->flush();
+        }
+
+        //получаем все начисления и погашеня сети 
+        $list_network_all_new = $entityManager->getRepository(ReferralNetwork::class)->findByMemberField([$network_code]);//обновляем все обекты родительской сети
+        foreach($list_network_all_new as $curren_network_profit){
+            $curren_network[] = $curren_network_profit -> getCurrentNetworkProfit();
+        } 
+        foreach($list_network_all_new as $payments_network){
+            $payments_direct[] = $payments_network -> getPaymentsNetwork();
+        } 
+        foreach($list_network_all_new as $payments_network_cash){
+            $payments_cash[] = $payments_network_cash -> getPaymentsCash();
+        } 
+        $curren_network_summ = array_sum($curren_network);
+        $payments_direct_summ = array_sum($payments_direct);
+        $payments_cash_summ = array_sum($payments_cash);
+
+        //запись данных начислений во всей сети в родительский объект сети
+        $listReferralNetwork -> setProfitNetwork($curren_network_summ);
+        $listReferralNetwork -> setPaymentsDirect($payments_direct_summ);
+        $listReferralNetwork -> setPaymentsCash($payments_cash_summ);
 
         $entityManager->persist($referral_network);
         $entityManager->persist($referral_network_referral);
-        $entityManager->flush();
-
-        if($referral_network_count > 3){
-            return $this->redirectToRoute('app_referral_network_single', ['member_code' => $member_code, 'id' => $id, 'referral_link' => $referral_link], Response::HTTP_SEE_OTHER);
-        }
-
-        $this->addFlash(
-            'success',
-            'Поздравляем! Вы успешно активировали пакет и вступили в  реферальную сеть.');
-            
-        return $this->redirectToRoute('app_referral_network_index', ['member_code' => $member_code, 'id' => $id, 'referral_link' => $referral_link], Response::HTTP_SEE_OTHER);
-        
+        $entityManager->flush();    
     }
 
     
@@ -553,24 +301,34 @@ class ReferralNetworkController extends AbstractController
         return $status_u; 
     }
 
-    #[Route('/{member_code}/{id}/{referral_link}/new/singl', name: 'app_referral_network_single', methods: ['GET', 'POST'])]
-    public function single(Request $request, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine,string $member_code, int $id, string $referral_link): Response
+
+    public function single($request, ReferralNetworkRepository $referralNetworkRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user,$referral_network_user_new,$referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus)
     {
-        //dd($referral_link);
         //=========формула расчета наград в сети при количестве участников 4 и более======
         //получаем информацию о сети и записи участника предоставившего реферальную ссылку(рефовода)
         $entityManager = $doctrine->getManager();
-        $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
-        $referral_network_user = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]);//объект пользователя представившего реферальную ссылку (рефовода извлекаем по реферальной ссылке referral_link)
-        $referral_network_user_new = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code]);//объект нового партнера в  реферальной  сети (получаем по member_code)
-        //$referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'left']);
         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
         //$referral_network_left_balance = $entityManager->getRepository(ReferralNetwork::class)->findByBalanceField('left',0);//получаем объект участников с левой стороны линии с балансом более "0"
         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
         //$referral_network_right_balance = $entityManager->getRepository(ReferralNetwork::class)->findByBalanceField('right',0);//получаем объект участников с правой стороны линии с балансом более "0"
+        $referral_network_all = $entityManager->getRepository(ReferralNetwork::class)->findByMemberField(['network_code' => $network_code]);//получаем все  объекты сети
+        //$referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByStatusField(['right',$network_code]);//получаем объект участников участников с правой стороны
+        //$referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByStatusField(['left',$network_code]);//получаем объект всех участников с левой стороны линии 
+        $pakege_all = $entityManager->getRepository(Pakege::class)->findByExampleField(['referral_networks_id' => $network_code]);//получаем все  объекты купленных в сети пакетов
+        $price_pakage_all = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getAllPricePakage();//получаем параметр предельного баланса всех купленных пакетов для начисления выплат, если сеть достигла предела выплаты single-line не начисляются
+        $k_payments_singl_line = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getPaymentsSingleline();//получаем коеффициент начисления наград в  single-line 
+        $k_payments_direct = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getPaymentsDirect();//получаем коэффициент начисления direct
+        $k_cash_back = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getCashBack()/100;//получаем коэффициент начисления cash_back
+        $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//получаем курс внутреннего токена сети
         $user_referral_status = $referral_network_user -> getUserStatus();
-        $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);
         $owner_array[] = $user_owner;//основатель сети
+
+        //сумма стоимости всех приобретенных в сети пакетов
+        foreach($pakege_all as $pakages){
+            $pakages_summ[] = $pakages -> getPrice();
+        }
+        $all_pakages_summ = array_sum($pakages_summ) * $token_rate;
+
 
         //построение линии сингл-лайт
         $single_line = array_merge($referral_network_left, $owner_array, $referral_network_right);//объеденяем в один массив в  соотвтетсвии с правилом построения линии сингл-лайн
@@ -590,12 +348,10 @@ class ReferralNetworkController extends AbstractController
             $single_line_right[] = $single_line[$i];
         }
         $array_single_line_right = $single_line_right;
-
-        //переворачиваем  массив пользователей с левой стороны линии в нормальный вид
-        //$single_line_left = array_reverse($single_line_left);
         $array_single_line_left = $single_line_left;
-
-        //gолучаем баланс левой и правой части линии
+        //dd($array_single_line_left);
+        
+        //получаем баланс левой и правой части линии перед погашением
         $single_line_left_balance = [];
         for($i = 0; $i < count($single_line_left); $i++){
             $single_line_left_balance[] = $single_line_left[$i] -> getBalance();
@@ -607,333 +363,509 @@ class ReferralNetworkController extends AbstractController
             $single_line_right_balance[] = $single_line_right[$i] -> getBalance();
         }
         $summ_single_line_right_balance = array_sum($single_line_right_balance);
+    
+        // //==============проводим погашение баланса покетов пользователей в линии=============
+        //     //сформируем массивы баланса пакетов больше нуля с левой и с правой стороны
+        // if($summ_single_line_left_balance != $summ_single_line_right_balance && ($summ_single_line_left_balance != 0 or $summ_single_line_right_balance != 0)){
+        //     $single_line_left_balance_pakege = [];
+        //     for($i = 0; $i < count($array_single_line_left); $i++){
+        //         if($array_single_line_left[$i] -> getBalance() > 0){
+        //             $single_line_left_balance_pakege[] = $array_single_line_left[$i];
+        //             $array_left_balance_pakege[] = $array_single_line_left[$i] -> getBalance();
+        //         }    
+        //     }
+        //     //dd($array_single_line_left);
+        //     $summ_left_balance_pakege = array_sum($array_left_balance_pakege);
+        //     $count_left_balance_pakege = count($array_left_balance_pakege);
+            
+        //     $single_line_right_balance_pakege = [];
+        //     for($i = 0; $i < count($array_single_line_right); $i++){
+        //         if($array_single_line_right[$i] -> getBalance() > 0){
+        //             $single_line_right_balance_pakege[] = $array_single_line_right[$i];
+        //             $array_right_balance_pakege[] = $array_single_line_right[$i] -> getBalance();
+        //         }
+        //     }
+        //     $summ_right_balance_pakege = array_sum($array_right_balance_pakege);
+        //     $count_right_balance_pakege = count($array_right_balance_pakege);
+            
+        //     //запись нвого баланса стоимости пакетов
+        //     if($summ_left_balance_pakege > $summ_right_balance_pakege){
+        //         $summ_remainder = $summ_left_balance_pakege - $summ_right_balance_pakege;
 
-        //dd($summ_single_line_left_balance);
+        //         for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
+        //             $balance_old1 = $single_line_left_balance_pakege[$i] -> getBalance();
+        //             $participation_rate = $balance_old1 / $summ_left_balance_pakege;
+        //             $single_line_left_balance_pakege[$i] -> setKoef($participation_rate);
+        //             $entityManager->flush();
+        //         }
+        //         for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
+        //             $participation_rate_user = $single_line_left_balance_pakege[$i] -> getKoef();
+        //             $new_balance_user = $participation_rate_user * $summ_remainder;
+        //             $single_line_left_balance_pakege[$i] -> setBalance($new_balance_user);
+        //             $entityManager->flush();
+        //         }
 
+        //         for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
+        //             $single_line_right_balance_pakege[$i] -> setBalance(0);
+        //             $entityManager->flush();
+        //         }
+                
+        //     }
+        //     else{
+        //         $summ_remainder2 = $summ_right_balance_pakege - $summ_left_balance_pakege;
+        //         for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
+                    
+        //             $balance_old2 = $single_line_right_balance_pakege[$i] -> getBalance();
+        //             $participation_rate2 = $balance_old2 / $summ_right_balance_pakege;
+        //             $single_line_right_balance_pakege[$i] -> setKoef($participation_rate2);
+        //             $entityManager->flush();
+        //         }
+        //         for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
+                    
+        //             $participation_rate_user2 = $single_line_right_balance_pakege[$i] -> getKoef();
+        //             $new_balance_user2 = $participation_rate_user2 * $summ_remainder2;
+        //             $single_line_right_balance_pakege[$i] -> setBalance($new_balance_user2);
+        //             $entityManager->flush();
+        //         }
 
-        //определяем с какой стороны линии сумма баланса больше
-
-        // if($summ_single_line_left_balance == 0){
-        //     //вычислим и запишем награду участнику относительно которого выстроена линия (рефовод)
-        //     $reward_refovod = $referral_network_user -> getReward();
-        //     $reward_right_user = $summ_single_line_right_balance *0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-        //     $reward_user = $reward_refovod + $reward_right_user; 
-        //     $referral_network_user -> setReward($reward_right_user);
-        //     $entityManager->flush(); 
+        //         for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
+        //             $single_line_left_balance_pakege[$i] -> setBalance(0);
+        //             $entityManager->flush();
+        //         }
+        //     } 
         // }
-        if($summ_single_line_right_balance == 0 or $summ_single_line_left_balance == 0){
-            //вычислим и запишем награду участнику относительно которого выстроена линия (рефовод)
-            $reward_refovod = $referral_network_user -> getReward();
-            $reward_right_user = $summ_single_line_right_balance *0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-            $reward_user = $reward_refovod + $reward_right_user; 
-            $referral_network_user -> setReward($reward_right_user);
-            $entityManager->flush(); 
+            
+            
+        // //вычисление и запись вознаграждений rewards
+        // //получаем баланс левой и правой части линии после погашения
+        // $single_line_left_balance = [];
+        // for($i = 0; $i < count($single_line_left); $i++){
+        //     $single_line_left_balance[] = $single_line_left[$i] -> getBalance();
+        // }
+        // $summ_single_line_left_balance = array_sum($single_line_left_balance);
+        
+        // $single_line_right_balance = [];
+        // for($i = 0; $i < count($single_line_right); $i++){
+        //     $single_line_right_balance[] = $single_line_right[$i] -> getBalance();
+        // }
+        // $summ_single_line_right_balance = array_sum($single_line_right_balance);
+        
+     
+        //определяем с какой стороны линии сумма баланса больше
+        if($summ_single_line_left_balance == 0 || $summ_single_line_right_balance == 0){
+            //dd('malance 0');
+            $not_needed_variable = 0;
+            if($price_pakage_all <= $all_pakages_summ){
+                $this->addFlash(
+                    'danger',
+                    'Сеть достигла предела накопления пакетов 1');
+            }
         }
-
-        elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
-                //вычислим и запишем награду участнику относительно которого выстроена линия (рефовод)
-                $reward_refovod = $referral_network_user -> getReward();
-                $reward_right_user = $summ_single_line_right_balance *0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                $reward_user = $reward_refovod + $reward_right_user; 
-                $referral_network_user -> setReward($reward_right_user);
-                $entityManager->flush(); 
-
+        elseif($summ_single_line_left_balance == $summ_single_line_right_balance ){
+            //dd(',fkfyc 000');
+                //вычислим и запишем награду участнику относительно которого выстроена линия (рефоводу) и проведем погашение балансов пакетов
+                $this -> where_is_balance($referral_network_user,$summ_single_line_right_balance);
+                $entityManager->flush();
+                $repayment_amount = 0;
+                //всем кроме рефовода обнуляем баланс
                 while($i <= count($single_line_right)){
-                $user = array_shift($single_line_right);
-                $user -> setReward(0);
-                $entityManager->flush(); 
+                    $user = array_shift($single_line_right);
+                    $user -> setBalance(0);
+                    $entityManager->flush(); 
                 } 
                 while($i <= count($single_line_left)){
                     $user = array_shift($single_line_left);
-                    $user -> setReward(0);
+                    $user -> setBalance(0);
                     $entityManager->flush(); 
-                    }   
-
+                    } 
+                $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - $bonus;
+                if($price_pakage_all <= $all_pakages_summ){
+                    $this->addFlash(
+                        'danger',
+                        'Сеть достигла предела накопления пакетов 2');
+                }  
         }
-        else{
-
-            // $reward_refovod = $referral_network_user -> getReward();
-            // $reward_right_user = $summ_single_line_right_balance *0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-            // $reward_user = $reward_refovod + $reward_right_user; 
-            // $referral_network_user -> setReward($reward_right_user);
-
-            //далее начинаем начисление наград участникам линии двигаясь в правую сторону перебирая массив участников справа
-            //достаем участника из массива проверяем его баланс если нулевой начисляем награду от меньшей скммы справа,
-            //если баланс имеется, то заново определяем меньшую сторну баланс и начисляем награду от меньшей суммы
-            array_unshift($single_line_right, $referral_network_user);//добавляем рефовода который прелоставил ссылку в массив    
-            $i = 1; 
-            while($i < count($single_line_right)){
-                
-                $user = array_shift($single_line_right);
-                
-                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
-
-                //получаем баланс левой и правой части линии
-                $single_line_left_balance_new = [];
-                for($j = 0; $j < count($single_line_left); $j++){
-                    $single_line_left_balance_new[] = $single_line[$i] -> getBalance();
-                }
-                $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
-                    
-                $single_line_right_balance_new = [];
-                for($k = 0; $k < count($single_line_right); $k++){
-                    $single_line_left_balance_new[] = $single_line[$i] -> getBalance();
-                }
-                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
-
-                if($summ_single_line_left_balance >= $summ_single_line_right_balance){
-                    $reward_user_new = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    $reward_user = $reward_user_new + $reward; 
-                    $user -> setReward($reward_user);
-                    $entityManager->flush();   
-                }
-                if($summ_single_line_left_balance < $summ_single_line_right_balance){
-                    $reward_user_new = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    $reward_user = $reward_user_new + $reward; 
-                    $user -> setReward($reward_user);
-                    $entityManager->flush();   
-                } 
-                //$reward1[] = $reward;   
-            }
-
-            //теперь проеделываем операции по определению наград двигаясь в левую сторону от рефовода по линии 
-            $i = 1;
-            while($i < count($single_line_left)){
-                
-                $user = array_shift($single_line_left);
-                
-                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
-
-                //получаем баланс левой и правой части линии
-                $single_line_left_balance_new = [];
-                for($j = 0; $j < count($single_line_left); $j++){
-                    $single_line_left_balance_new[] = $single_line[$i] -> getBalance();
-                }
-                $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
-                    
-                $single_line_right_balance_new = [];
-                for($k = 0; $k < count($single_line_right); $k++){
-                    $single_line_left_balance_new[] = $single_line[$i] -> getBalance();
-                }
-                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
-
-                if($summ_single_line_left_balance >= $summ_single_line_right_balance){
-                    $reward_user_new = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    $reward_user = $reward_user_new + $reward; 
-                    $user -> setReward($reward_user);
-                    $entityManager->flush();   
-                }
-                if($summ_single_line_left_balance < $summ_single_line_right_balance){
-                    $reward_user_new = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    $reward_user = $reward_user_new + $reward; 
-                    $user -> setReward($reward_user);
-                    $entityManager->flush();
-                    //dd($reward_user);     
-                } 
-                //$reward2[] = $reward;   
-            }
-
-        
-
-
-                //проводим погашение баланса покетов пользователей в линии
-                //сформируем массивы баланса пакетов больше нуля с левой и с правой стороны
-        //dd($summ_single_line_right_balance_new);
-                $single_line_left_balance_pakege = [];
-                for($i = 0; $i < count($array_single_line_left); $i++){
-                    if($array_single_line_left[$i] -> getBalance() > 0){
-                        $single_line_left_balance_pakege[] = $array_single_line_left[$i];
-                        $array_left_balance_pakege[] = $array_single_line_left[$i] -> getBalance();
-                    }    
-                }
-                //dd($single_line_left_balance_pakege);
-                $summ_left_balance_pakege = array_sum($array_left_balance_pakege);
-                $count_left_balance_pakege = count($array_left_balance_pakege);
-                
-
-                $single_line_right_balance_pakege = [];
-                for($i = 0; $i < count($array_single_line_right); $i++){
-                    if($array_single_line_right[$i] -> getBalance() > 0){
-                        $single_line_right_balance_pakege[] = $array_single_line_right[$i];
-                        $array_right_balance_pakege[] = $array_single_line_right[$i] -> getBalance();
-                    }
-                }
-                $summ_right_balance_pakege = array_sum($array_right_balance_pakege);
-                $count_right_balance_pakege = count($array_right_balance_pakege);
-
-                //dd($summ_right_balance_pakege);
-                
-
-                if($summ_left_balance_pakege > $summ_right_balance_pakege){
-                    $summ_remainder = $summ_left_balance_pakege - $summ_right_balance_pakege;
-                    //dd($summ_middle1);
-
-                    for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-                        
-                        $balance_old1 = $single_line_left_balance_pakege[$i] -> getBalance();
-                        $participation_rate = $balance_old1 / $summ_left_balance_pakege;
-                        //dd($participation_rate);
-                        $single_line_left_balance_pakege[$i] -> setKoef($participation_rate);
-                        $entityManager->flush();
-                    }
-                    //dd($participation_rate);
-                    for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-                        
-                        $participation_rate_user = $single_line_left_balance_pakege[$i] -> getKoef();
-                        $new_balance_user = $participation_rate_user * $summ_remainder;
-                        $single_line_left_balance_pakege[$i] -> setBalance($new_balance_user);
-                        $entityManager->flush();
-                    }
-
-                    for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-                
-                        $single_line_right_balance_pakege[$i] -> setBalance(0);
-                        $entityManager->flush();
-                    }
-                    
-                }
-                else{
-                    $summ_remainder2 = $summ_right_balance_pakege - $summ_left_balance_pakege;
-                    //dd($summ_middle1);
-
-                    for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-                        
-                        $balance_old2 = $single_line_right_balance_pakege[$i] -> getBalance();
-                        $participation_rate2 = $balance_old2 / $summ_right_balance_pakege;
-                        //dd($participation_rate2);
-                        $single_line_right_balance_pakege[$i] -> setKoef($participation_rate2);
-                        $entityManager->flush();
-                    }
-                    //dd($balance_old2);
-                    for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-                        
-                        $participation_rate_user2 = $single_line_right_balance_pakege[$i] -> getKoef();
-                        //dd($single_line_left_balance_pakege);
-                        $new_balance_user2 = $participation_rate_user2 * $summ_remainder2;
-                        $single_line_right_balance_pakege[$i] -> setBalance($new_balance_user2);
-                        $entityManager->flush();
-                    }
-
-                    for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-                        
-                        $single_line_left_balance_pakege[$i] -> setBalance(0);
-                        $entityManager->flush();
-                    }
-                }
-
-                //dd($single_line_right_balance);
-                // if($summ_left_balance_pakege < $summ_right_balance_pakege){
-                    
-                //     //dd($summ_middle2);
-                //     for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-                //         $summ_middle2 = $summ_left_balance_pakege/$count_right_balance_pakege;
-                //         $balance_old3 = $single_line_right_balance_pakege[$i] -> getBalance();
-                //         $cash_balance2 = 0;
-                //         if($balance_old3 < $summ_middle2){
-                //             $cash_balance2 +=  $summ_middle2 - $balance_old3;
-                //             $balance_new3 = 0;
-                //         }
-                //         else{
-                //            $balance_new3 = $balance_old3 - $summ_middle2;
-                //         }
-                //         $single_line_right_balance_pakege[$i] -> setBalance($balance_new3);
-                //         $entityManager->flush();
-                //     }
-                //     if($cash_balance2 != 0){
-                //     //перераспределяем остаток не "сгоревшего" баланса на участников у кторых баланс не равен "0"
-                //     $single_line_right_balance_pakege_cash = [];
-                //     for($i = 0; $i < count($array_single_line_right); $i++){
-                //         if($array_single_line_right[$i] -> getBalance() > 0){
-                //             $single_line_right_balance_pakege_cash[] = $array_single_line_right[$i];
-                //             //$array_left_balance_pakege[] = $array_single_line_left[$i] -> getBalance();
-                //         }
-                //     }
-                //     $cash_balance_middle2 =  $cash_balance2 / count($single_line_right_balance_pakege_cash);
-                //     for($i = 0; $i < count($single_line_left_balance_pakege_cash); $i++){
-                //         $balance_cash2 = $single_line_right_balance_pakege_cash[$i] -> getBalance();
-                //         $new_balance2 = $balance_cash2 + $cash_balance_middle2;
-                //         $single_line_right_balance_pakege_cash[$i] -> setBalance($new_balance2);
-                //         $entityManager->flush();
-                //     }
-                //     }
-
-
-                //     for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-                //         $summ_middle2 = $summ_left_balance_pakege/$count_left_balance_pakege;
-                //         $balance_old4 = $single_line_left_balance_pakege[$i] -> getBalance();
-                //         $balance_new4 = $balance_old4 - $summ_middle2;
-                //         $single_line_left_balance_pakege[$i] -> setBalance($balance_new4);
-                //         $entityManager->flush();
-                //     }
-                // }
-        }
-        
-        // $entityManager->persist($referral_network);
-        // $entityManager->flush();
-        $this->addFlash(
-            'success',
-            'Поздравляем! Вы успешно активировали пакет и вступили в  реферальную сеть.');
+        elseif($summ_single_line_left_balance != $summ_single_line_right_balance ){
             
-        return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
+                    //dd('balance no 0');
+                    //array_unshift($single_line_right, $referral_network_user);//добавляем рефовода который предоставил ссылку в массив с права 
+                    $count_left = count($single_line_left);
+                    $count_right = count($single_line_right);
+
+                    
+                 
+                    //==========вычисляем и записываем награды участникам лини двигаясь в левую сторону ===========
+                    array_unshift($single_line_right, $referral_network_user);//добавляем рефовода который предоставил ссылку в массив с права , так как сначала масивы участников строились слева и спава от рефовода, самого рефовода
+                    //нет в массивах, теперь чтобы начислять награды двигаясь полинии и сравнивая балансы, рефовода нужно добаить в любой массив, в данном случае добавлен в массив справа
+                    $count_left = count($single_line_left);
+                    $count_right = count($single_line_right);
+            if($price_pakage_all > $all_pakages_summ){           
+                    //теперь проделываем операции по определению наград двигаясь в левую сторону от рефовода по линии 
+                    $all_cash_right = $this -> reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back);  
+                    //теперь проделываем операции по определению наград двигаясь в правую сторону от рефовода по линии 
+                    $all_cash_left = $this -> reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back); 
+            } 
+            else{
+                $this->addFlash(
+                    'danger',
+                    'ВНИМАНИЕ! Сеть достигла предела накопления пакетов 3');
+            }       
+
+                    //=====запись текущих начислений и выплат в сети ========
+            if($price_pakage_all > $all_pakages_summ){   
+                    $all_cash_right_summ = array_sum($all_cash_right);
+                    $all_cash_left_summ = array_sum($all_cash_left);
+            }
+            else{
+                    $all_cash_right_summ = 0;
+                    $all_cash_left_summ = 0;
+            }
+                    $payments_cash = $all_cash_right_summ + $all_cash_left_summ;
+                    $referral_network -> setPaymentsNetwork($bonus);//direct начисление статистики за текущиую итерацию сети
+                    //dd($all_cash_left_summ);
+                    $referral_network -> setPaymentsCash($payments_cash);//начисление single-line
+
+                    //вычисление суммы к погашению и зачислению в проект
+                    $repayment_amount =0;
+                    //сумма к погашению в стеи и начислению в проект
+                    if($summ_single_line_left_balance < $summ_single_line_right_balance){
+                        $repayment_amount = ($summ_single_line_left_balance * 2) - ($bonus + $payments_cash);
+                    }
+                    elseif($summ_single_line_left_balance > $summ_single_line_right_balance){
+                        $repayment_amount = ($summ_single_line_right_balance * 2) - ($bonus + $payments_cash);
+                    }
+                    elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
+                        $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - ($bonus + $payments_cash);
+                    }
+                    //dd($repayment_amount);
+
+
+                    //==============проводим погашение баланса пакетов пользователей в линии=============
+                    //сформируем массивы баланса пакетов больше нуля с левой и с правой стороны
+                    //dd($array_single_line_left);
+                        $single_line_left_balance_pakege = [];
+                        for($i = 0; $i < count($array_single_line_left); $i++){
+                            if($array_single_line_left[$i] -> getBalance() > 0){
+                                $single_line_left_balance_pakege[] = $array_single_line_left[$i];
+                                $array_left_balance_pakege[] = $array_single_line_left[$i] -> getBalance();
+                            }    
+                        }
+                        //dd($array_left_balance_pakege);
+                        $summ_left_balance_pakege = array_sum($array_left_balance_pakege);
+                        $count_left_balance_pakege = count($array_left_balance_pakege);
+                        
+                        $single_line_right_balance_pakege = [];
+                        for($i = 0; $i < count($array_single_line_right); $i++){
+                            if($array_single_line_right[$i] -> getBalance() > 0){
+                                $single_line_right_balance_pakege[] = $array_single_line_right[$i];
+                                $array_right_balance_pakege[] = $array_single_line_right[$i] -> getBalance();
+                            }
+                        }
+                        $summ_right_balance_pakege = array_sum($array_right_balance_pakege);
+                        $count_right_balance_pakege = count($array_right_balance_pakege);
+                        
+                        //запись нвого баланса стоимости пакетов
+                        if($summ_left_balance_pakege > $summ_right_balance_pakege){
+                            $summ_remainder = $summ_left_balance_pakege - $summ_right_balance_pakege;
+
+                            for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
+                                $balance_old1 = $single_line_left_balance_pakege[$i] -> getBalance();
+                                $participation_rate = $balance_old1 / $summ_left_balance_pakege;
+                                $single_line_left_balance_pakege[$i] -> setKoef($participation_rate);
+                                $entityManager->flush();
+                            }
+                            for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
+                                $participation_rate_user = $single_line_left_balance_pakege[$i] -> getKoef();
+                                $new_balance_user = $participation_rate_user * $summ_remainder;
+                                $single_line_left_balance_pakege[$i] -> setBalance($new_balance_user);
+                                $entityManager->flush();
+                            }
+
+                            for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
+                                $single_line_right_balance_pakege[$i] -> setBalance(0);
+                                $entityManager->flush();
+                            }
+                            
+                        }
+                        else{
+                            $summ_remainder2 = $summ_right_balance_pakege - $summ_left_balance_pakege;
+                            for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
+                                
+                                $balance_old2 = $single_line_right_balance_pakege[$i] -> getBalance();
+                                $participation_rate2 = $balance_old2 / $summ_right_balance_pakege;
+                                $single_line_right_balance_pakege[$i] -> setKoef($participation_rate2);
+                                $entityManager->flush();
+                            }
+                            for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
+                                
+                                $participation_rate_user2 = $single_line_right_balance_pakege[$i] -> getKoef();
+                                $new_balance_user2 = $participation_rate_user2 * $summ_remainder2;
+                                $single_line_right_balance_pakege[$i] -> setBalance($new_balance_user2);
+                                $entityManager->flush();
+                            }
+
+                            for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
+                                $single_line_left_balance_pakege[$i] -> setBalance(0);
+                                $entityManager->flush();
+                            }
+                        }      
+                    $referral_network -> setCurrentNetworkProfit($repayment_amount);// запись начисления погашаемой суммы в компанию
+            
+            
+        }
+     
+     
         
+        //запишем общий баланс дохода сети
+        // foreach($referral_network_all as $all_cash){
+        //     $array_balance_network_all_cash[] = $all_cash -> getCash();
+        // }
+        // foreach($referral_network_all as $all_direct){
+        //     $array_balance_network_all_direct[] = $all_direct -> getCash();
+        // }
+        // foreach($pakege_all as $all_pakege_cash){
+        //     $array_balance_network_all_pakege[] = $all_pakege_cash -> getPrice();
+        // }
+        //$profit_network_all = array_sum($array_balance_network_all_pakege) - (array_sum($array_balance_network_all_cash) + array_sum($array_balance_network_all_direct));
+        //$list_network->setProfitNetwork($profit_network_all);
+        
+
+        $entityManager->persist($referral_network);
+        $entityManager->flush();
+    }
+    
+
+
+    
+    private function singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus)
+    {
+        //первое выстраиваивание линии из трех участников реферальной сети  и начисление вознаграждений       
+        if($referral_network_left -> getBalance() == $referral_network_right -> getBalance()){
+            $balance_pakege_right = $referral_network_right -> getBalance();
+            $balance_pred = $referral_network_left -> getBalance();
+            $cash_refovod = $referral_network_user -> getCash();
+            $referral_network_left -> setBalance(0);
+            $referral_network_right -> setBalance(0);
+            $reward_user = $referral_network_user ->  getReward();
+            //$direct_user = $referral_network_user ->  getDirect();
+            //$balance = $balance_pred * 0.1;
+            //$reward = $reward_user + $balance;
+            //$new_cash = $cash_refovod + $balance;
+            //$referral_network_user ->  setReward($reward);
+            //$referral_network_user -> setCash($new_cash);
+            $new_profit_network = ($balance_pred + $balance_pakege_right) - $bonus;
+            //$list_network ->setProfitNetwork($new_profit_network);
+            $payments = $bonus;
+            $referral_network -> setPaymentsNetwork($payments);
+            $referral_network ->setCurrentNetworkProfit($new_profit_network);
+        }
+        elseif($referral_network_left -> getBalance() < $referral_network_right -> getBalance()){
+            $balance_pred_left = $referral_network_left -> getBalance();
+            $balance_pred_right = $referral_network_right -> getBalance();
+            $repayment_balance = $balance_pred_left * 2;
+            $cash_refovod = $referral_network_user -> getCash();
+            $balance_right = $balance_pred_right - $balance_pred_left;
+            $referral_network_left -> setBalance(0);
+            $referral_network_right -> setBalance($balance_right);
+            $reward_user = $referral_network_user -> getReward();
+            $balance = $balance_pred_left * 0.1;
+            $reward = $reward_user + $balance;
+            $new_cash = $cash_refovod + $balance;
+            $referral_network_user ->  setReward($reward);
+            $referral_network_user -> setCash($new_cash);
+            $new_profit_network = $repayment_balance - ($bonus + $balance);
+            //$list_network ->setProfitNetwork($new_profit_network);
+            $payments = $bonus + $balance;
+            $referral_network -> setPaymentsNetwork($bonus);
+            $referral_network -> setPaymentsCash($balance);
+            $referral_network ->setCurrentNetworkProfit($new_profit_network);
+        }
+        elseif($referral_network_left -> getBalance() > $referral_network_right -> getBalance()){
+            $balance_pred_left = $referral_network_left -> getBalance();
+            $balance_pred_right = $referral_network_right -> getBalance();
+            $repayment_balance = $balance_pred_right * 2;
+            $cash_refovod = $referral_network_user -> getCash();
+            $balance_left = $balance_pred_left - $balance_pred_right;
+            $referral_network_left -> setBalance($balance_left);
+            $referral_network_right -> setBalance(0);
+            $reward_user = $referral_network_user ->  getReward();
+            $balance = $balance_pred_right * 0.1;
+            $reward = $reward_user + $balance;
+            $referral_network_user ->  setReward($reward);
+            $new_cash = $cash_refovod + $balance;
+            $referral_network_user -> setCash($new_cash);
+            $new_profit_network = $repayment_balance - ($bonus + $balance);
+            $payments = $bonus + $balance;
+            $referral_network -> setPaymentsNetwork($bonus);
+            $referral_network -> setPaymentsCash($balance);
+            //$list_network ->setProfitNetwork($new_profit_network);
+            $referral_network -> setCurrentNetworkProfit($new_profit_network);
+        } 
+             
     }
 
+    private function where_is_balance($referral_network_user,$summ_single_line_right_balance){
+        //вычислим и запишем награду участнику относительно которого выстроена линия (рефовод)
+        $reward_refovod = $referral_network_user -> getReward();
+        $cash_refovod = $referral_network_user -> getCash();
+        $reward_right_user = $summ_single_line_right_balance *0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+        $reward_user = $reward_refovod + $reward_right_user; 
+        $new_cash = $cash_refovod + $reward_right_user;
+        $referral_network_user -> setReward($reward_user);
+        $referral_network_user -> setCash($new_cash);
+    }
 
-    #[Route('/{member_code}/{id}/{referral_link}/new/singl/three', name: 'app_referral_network_single_three', methods: ['GET', 'POST'])]
-    public function singleThree(Request $request, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine,string $member_code, int $id, string $referral_link): Response
-    {
-        $entityManager = $doctrine->getManager();
-        $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
-        $referral_network_user = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]);//объект пользователя представившего реферальную ссылку
-        $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'left']);
-        $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'right']);
-        //dd($referral_network_left);
-        $referral_network_user_id = $referral_network_user -> getId();
+    private function reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back){
+        //далее начинаем начисление наград участникам линии двигаясь в правую сторону перебирая массив участников 
+        //достаем участника из массива проверяем его баланс если нулевой начисляем награду от меньшей суммы справа или слева,
+        //если баланс имеется, то заново определяем баланс с каждой стороны, орпеделяем на какой стороне баланс меньше, начисляем награду от меньшей суммы
+        $i = 1;
+        $single_line_right_r = $single_line_right;
+        $single_line_left_r = $single_line_left;
+        $cash_all = [];
+        while($i < count($single_line_right_r))
+        {
+                $entityManager = $doctrine->getManager();
+                $user = array_shift($single_line_right_r);// убираем одного пользователя с левой  стороны которого достали из массива , относительно которого рассчитываем баланс слева и справа
+                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
+                $single_line_left_balance_new = [];
+                for($j = 0; $j < count($single_line_left_r); $j++){
+                    $single_line_left_balance_new[] = $single_line_left_r[$j] -> getBalance();
+                }
+                $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
+                $single_line_right_balance_new = [];
+                for($k = 0; $k < count($single_line_right_r); $k++){
+                    $single_line_right_balance_new[] = $single_line_right_r[$k] -> getBalance();
+                }
+                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
 
-        //первое выстраиваивание линии из трех участников реферальной сети
-        if($referral_network_count == 3){
-            
-            if($referral_network_left -> getBalance() == $referral_network_right -> getBalance()){
-                $balance_pred = $referral_network_left -> getBalance();
-                $referral_network_left -> setBalance(0);
-                $referral_network_right -> setBalance(0);
-                $reward_user = $referral_network_user ->  getReward();
-                $balance = $balance_pred * 0.1;
-                $reward = $reward_user + $balance;
-                $referral_network_user ->  setReward($reward);
-            }
-            if($referral_network_left -> getBalance() < $referral_network_right -> getBalance()){
-                $balance_pred_left = $referral_network_left -> getBalance();
-                $balance_pred_right = $referral_network_right -> getBalance();
-                $balace_right = $balance_pred_right - $balance_pred_left;
-                $referral_network_left -> setBalance(0);
-                $referral_network_right -> setBalance($balace_right);
-                $reward_user = $referral_network_user ->  getReward();
-                $balance = $balance_pred_left * 0.1;
-                $reward = $reward_user + $balance;
-                $referral_network_user ->  setReward($reward);
-            }
-            if($referral_network_left -> getBalance() > $referral_network_right -> getBalance()){
-                $balance_pred_left = $referral_network_left -> getBalance();
-                $balance_pred_right = $referral_network_right -> getBalance();
-                $balace_left = $balance_pred_left - $balance_pred_right;
-                $referral_network_left -> setBalance($balace_left);
-                $referral_network_right -> setBalance(0);
-                $reward_user = $referral_network_user ->  getReward();
-                $balance = $balance_pred_right * 0.1;
-                $reward = $reward_user + $balance;
-                $referral_network_user ->  setReward($reward);
-            }    
+                if($summ_single_line_left_balance_new > $summ_single_line_right_balance_new){
+                    $reward_user_new1 = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    $cash_refovod = $user -> getCash();
+                    $user_id_pakege = $user -> getPakage();
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    //$pakege_user_network = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);// получаем оъект пакета  участника реферальной сети
+                    $reward1 = $user -> getReward();
+                    if($reward1 <= $limit_cash_back){
+                        $new_cash = $cash_refovod + $reward_user_new1;
+                        $user -> setCash($new_cash); 
+                        $reward_user1 = $reward_user_new1 + $reward1; 
+                        $user -> setReward($reward_user1);
+                    }
+                    $cash_all[] = $reward_user_new1;
+                    $entityManager->flush();   
+                }
+                elseif($summ_single_line_left_balance < $summ_single_line_right_balance){
+                    $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    $cash_refovod2 = $user -> getCash();
+                    $user_id_pakege = $user -> getPakage();
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    $reward2 = $user -> getReward();
+                    if($reward2 <= $limit_cash_back){
+                        $new_cash2 = $cash_refovod2 + $reward_user_new2; 
+                        $reward_user2 = $reward_user_new2 + $reward2; 
+                        $user -> setReward($reward_user2);
+                        $user -> setCash($new_cash2);
+                    }
+                    $cash_all[] = $reward_user_new2;
+                    $entityManager->flush();   
+                } 
+                elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
+                    $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    // $cash_refovod2 = $user -> getCash();
+                    // $reward2 = $user -> getReward();
+                    // $new_cash2 = $cash_refovod2 + $reward_user_new2; 
+                    // $reward_user2 = $reward_user_new2 + $reward2; 
+                    // $user -> setReward($reward_user2);
+                    // $user -> setCash($new_cash2);
+                    // $entityManager->flush();   
+                } 
+                array_unshift($single_line_left_r, $user);//добавляем  пользователя  в массив с левой стороны
+                
         }
+        return $cash_all;
+    } 
+    
+    
+    private function reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back){
+        //далее начинаем начисление наград участникам линии двигаясь в правую сторону перебирая массив участников 
+        //достаем участника из массива проверяем его баланс если нулевой начисляем награду от меньшей суммы справа или слева,
+        //если баланс имеется, то заново определяем баланс с каждой стороны, орпеделяем на какой стороне баланс меньше, начисляем награду от меньшей суммы
+        $i = 1;
+        $single_line_right_l = $single_line_right;
+        $single_line_left_l = $single_line_left;
+        $cash_all2 = [];
+        while($i < count($single_line_left_l))
+        {    
+                $entityManager = $doctrine->getManager();
+                $user = array_shift($single_line_left_l);
+                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
+                
+                //получаем баланс левой и правой части линии
+                $single_line_left_balance_new = [];
+                for($j = 0; $j < count($single_line_left_l); $j++){
+                    $single_line_left_balance_new[] = $single_line_left_l[$j] -> getBalance();
+                }
+                $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
+                    
+                $single_line_right_balance_new = [];
+                for($k = 0; $k < count($single_line_right_l); $k++){
+                    $single_line_right_balance_new[] = $single_line_right_l[$k] -> getBalance();
+                }
+                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
 
-        // $entityManager->persist($referral_network);
-        // $entityManager->flush();
-        $this->addFlash(
-            'success',
-            'Поздравляем! Вы успешно активировали пакет и вступили в  реферальную сеть.');
-            
-        return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
-        
+                if($summ_single_line_left_balance_new > $summ_single_line_right_balance_new){
+                    $reward_user_new3 = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    $cash_refovod3 = $user -> getCash();
+                    $reward3 = $user -> getReward();
+                    $user_id_pakege = $user -> getPakage();
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    if($reward3 <= $limit_cash_back){
+                        $new_cash3 = $cash_refovod3 + $reward_user_new3; 
+                        $reward_user3 = $reward_user_new3 + $reward3; 
+                        $user -> setReward($reward_user3);
+                        $user -> setCash($new_cash3);
+                    }
+                    $cash_all2[] = $reward_user_new3;
+                    $entityManager->flush();   
+                }
+                elseif($summ_single_line_left_balance_new < $summ_single_line_right_balance_new){
+                    $reward_user_new4 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    $cash_refovod4 = $user -> getCash();
+                    $reward4 = $user -> getReward();
+                    $user_id_pakege = $user -> getPakage();
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    if($reward4 <= $limit_cash_back){
+                        $new_cash4 = $cash_refovod4 + $reward_user_new4;  
+                        $reward_user4 = $reward_user_new4 + $reward4; 
+                        $user -> setReward($reward_user4);
+                        $user -> setCash($new_cash4);
+                    }
+                    $cash_all2[] = $reward_user_new4;
+                    $entityManager->flush();   
+                }
+                elseif($summ_single_line_left_balance_new == $summ_single_line_right_balance_new){
+                    $reward_user_new4 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    // $cash_refovod4 = $user -> getCash();
+                    // $reward4 = $user -> getReward();
+                    // $new_cash4 = $cash_refovod4 + $reward_user_new4;  
+                    // $reward_user4 = $reward_user_new4 + $reward4; 
+                    // $user -> setReward($reward_user4);
+                    // $user -> setCash($new_cash4);
+                    // $entityManager->flush();   
+                }
+                array_unshift($single_line_right_l, $user);//добавляем  пользователя  в массив с правой стороны
+        }
+        return $cash_all2;
+    }
+
+    private function makeMemberCode($arr1,$id,$arr2,$arr3){
+        //$arr[0] = arr1 - id сети
+        //$id пакета нового участника сети
+        //$arr[2] = arr2 -id пакета владельца сети
+        //$arr[3] = arr3  
+        $member_code = $arr1.'-'.$id.'-'.$arr2.'-'.$arr3;
+        return $member_code;
     }
 
 }

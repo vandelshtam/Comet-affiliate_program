@@ -53,6 +53,27 @@ class ReferralNetwork
     #[ORM\Column(type: 'float', nullable: true)]
     private $koef;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $cash;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $direct;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $my_team;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $current_network_profit;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $payments_network;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $payments_cash;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $pakage;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -216,6 +237,90 @@ class ReferralNetwork
     public function setKoef(?float $koef): self
     {
         $this->koef = $koef;
+
+        return $this;
+    }
+
+    public function getCash(): ?int
+    {
+        return $this->cash;
+    }
+
+    public function setCash(?int $cash): self
+    {
+        $this->cash = $cash;
+
+        return $this;
+    }
+
+    public function getDirect(): ?int
+    {
+        return $this->direct;
+    }
+
+    public function setDirect(?int $direct): self
+    {
+        $this->direct = $direct;
+
+        return $this;
+    }
+
+    public function getMyTeam(): ?string
+    {
+        return $this->my_team;
+    }
+
+    public function setMyTeam(?string $my_team): self
+    {
+        $this->my_team = $my_team;
+
+        return $this;
+    }
+
+    public function getCurrentNetworkProfit(): ?int
+    {
+        return $this->current_network_profit;
+    }
+
+    public function setCurrentNetworkProfit(?int $current_network_profit): self
+    {
+        $this->current_network_profit = $current_network_profit;
+
+        return $this;
+    }
+
+    public function getPaymentsNetwork(): ?int
+    {
+        return $this->payments_network;
+    }
+
+    public function setPaymentsNetwork(?int $payments_network): self
+    {
+        $this->payments_network = $payments_network;
+
+        return $this;
+    }
+
+    public function getPaymentsCash(): ?int
+    {
+        return $this->payments_cash;
+    }
+
+    public function setPaymentsCash(?int $payments_cash): self
+    {
+        $this->payments_cash = $payments_cash;
+
+        return $this;
+    }
+
+    public function getPakage(): ?int
+    {
+        return $this->pakage;
+    }
+
+    public function setPakage(?int $pakage): self
+    {
+        $this->pakage = $pakage;
 
         return $this;
     }

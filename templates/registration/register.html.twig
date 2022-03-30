@@ -9,6 +9,7 @@
     {% for flash_error in app.flashes('verify_email_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
+    
     {# {% if form_errors(form) %}
         <div class="my-custom-class-for-errors">
             {{ form_errors(form) }}
@@ -17,6 +18,27 @@
     {{ form_start(registrationForm) }}
         <div class="form_box-inner">
             <div class="form_box-left">
+            {% for label, messages in app.flashes(['success', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-success" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['info', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-info" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['danger', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+            {% endfor %}
                     {# <label for="exampleInputEmail1" class="form-label">Email address</label> #}
                     {# <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"> #}
                     
@@ -31,6 +53,8 @@
                                             }) }}
                     <div id="emailHelp" class="form-text">Пароль должен иметь не менее 6 и не более 20 символов, должен содержать хотябы один специальный символ, одну цифру и одну главную букву.</div>
                     {# <input type="checkbox" class="form-check-input" id="exampleCheck1"> #}
+                    {{ form_row(registrationForm.referral_link) }}
+                    <div id="emailHelp" class="form-text">Если у вас есть рефералная ссылка, пожалуйста введите ее в это поле, если ссылки нет, то пожалуйста не заполняйте это поле.</div>
                     <label class="form-check-label" for="exampleCheck1">{{ form_row(registrationForm.agreeTerms) }}</label>
                     <div class="hidden">
                         {{ form_row(registrationForm.personal_data_id, {'value': 0 }) }}

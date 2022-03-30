@@ -21,7 +21,7 @@ class CurrentBalanceController extends AbstractController
         $id_user = $user -> getId();
         $referral_network_user = $entityManager->getRepository(ReferralNetwork::class)->findByUserIdField(['user_id' => $id_user]);//объект пользователя
         foreach($referral_network_user as $network){
-            $array_rewards[] = $network -> getBalance();
+            $array_rewards[] = $network -> getReward();
         } 
         $reward = array_sum($array_rewards);
         

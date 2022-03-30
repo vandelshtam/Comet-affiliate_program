@@ -12,7 +12,13 @@
 <div class="form_box-inner">   
     <div class="form_box-left">
     {{ form_row(form.name) }}<div id="emailHelp" class="form-text">Eсли у вас нет реферальной ссылки или кода клиента, то пожалуйста не заполняйте это поле!</div> 
-    {{ form_row(form.referral_link) }}<div id="emailHelp" class="form-text">Eсли у вас нет реферальной ссылки или кода клиента, то пожалуйста не заполняйте это поле!</div> 
+    {% if user_referral_link != NULL%}
+    {{ form_row(form.referral_link, {'value': user_referral_link }) }}<div id="emailHelp" class="form-text">Если вы ввели реферальную ссылку при регистрации это поле заполнится автоматически, пожалуйста ничего не меняйте в нем.</div> 
+    <div id="emailHelp" class="form-text">Eсли вы получили реферальную ссылку после регистрации пожалуйста введите в это поле реферальную ссылку</div> 
+    {% else %}
+    {{ form_row(form.referral_link) }}<div id="emailHelp" class="form-text">Если вы ввели реферальную ссылку при регистрации это поле заполнится автоматически, пожалуйста ничего не меняйте в нем.</div> 
+    <div id="emailHelp" class="form-text">Eсли вы получили реферальную ссылку после регистрации пожалуйста введите в это поле реферальную ссылку</div> 
+    {% endif %}
     <div class="hidden">
       {{ form_row(form.unique_code, {'value': unique_code }) }}
     </div>

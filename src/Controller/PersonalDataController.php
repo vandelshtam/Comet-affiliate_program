@@ -31,11 +31,9 @@ class PersonalDataController extends AbstractController
     #[Route('/{user_id}/new', name: 'app_personal_data_new', methods: ['GET', 'POST'])]
     public function new(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine, int $user_id): Response
     {
-        //dd($user_id);
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
         $personal_data_id = $this->getUser()->getPersonalDataId();
-        //dd($personal_data_id);
         if($personal_data_id != NULL)
         {
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -59,9 +57,7 @@ class PersonalDataController extends AbstractController
             $this->addFlash(
                 'success',
                 'Вы успешно зарегистрировали персональные данные');
-            // $this->addFlash(
-            //     'info',
-            //     'Чтобы совершать действия в системе Вам необходимо зарегистрировать персональные данные!');  
+        
             return $this->redirectToRoute('app_personal_data_show', ['personal_user_id' => $user -> getId()], Response::HTTP_SEE_OTHER);
         }
 
@@ -80,8 +76,6 @@ class PersonalDataController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
         $repository = $doctrine->getRepository(PersonalData::class);
-        //$personal_data_id = $this->getUser()->getPersonalDataId();
-        //dd($personal_user_id);
         if($personal_user_id != NULL)
         {
             if($repository->findOneBy(['user_id' => $user -> getId()])->getUserId() == false)
@@ -92,7 +86,7 @@ class PersonalDataController extends AbstractController
             
         $repository = $doctrine->getRepository(PersonalData::class);
         $personalDatum = $doctrine->getRepository(PersonalData::class)->findOneBySomeField($user -> getId());
-        //dd($personalDatum);
+        
         return $this->render('personal_data/show.html.twig', [
             'personal_datum' => $personalDatum,
             'user' => $user,

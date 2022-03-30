@@ -45,32 +45,32 @@ class PakegeRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return Pakege[] Returns an array of Pakege objects
-    //  */
-    /*
+     /**
+      * @return Pakege[] Returns an array of Pakege objects
+      */
+    
     public function findByExampleField($value)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
+            ->andWhere('p.referral_networks_id = :val')
             ->setParameter('val', $value)
             ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+            ->setMaxResults(10000)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+    
 
-    /*
+    
     public function findOneBySomeField($value): ?Pakege
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
+            ->andWhere('p.referral_networks_id = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
+    
 }

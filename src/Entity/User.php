@@ -44,6 +44,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Pakege::class)]
     private $pakeges;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $referral_link;
+
 
     public function __construct()
     {
@@ -195,6 +198,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $pakege->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getReferralLink(): ?string
+    {
+        return $this->referral_link;
+    }
+
+    public function setReferralLink(?string $referral_link): self
+    {
+        $this->referral_link = $referral_link;
 
         return $this;
     }

@@ -44,13 +44,11 @@ class ListReferralNetworksController extends AbstractController
         foreach($referralNetwork as $network){
             $network_id[] = $network -> getNetworkId();
         }
-        //$array_network_id = $referralNetwork -> getNetworkId();
         $array = array_unique($network_id);
         
         foreach($array as $value){
             $listReferralNetworks[] = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['id' => $value]);
         }
-        //dd($listReferralNetworks);
         return $this->render('list_referral_networks/index_list.html.twig', [
             'list_referral_networks' => $listReferralNetworks,
             'controller_name' => 'Список моих реферальных сетей',
@@ -146,7 +144,7 @@ class ListReferralNetworksController extends AbstractController
         $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user_id]);
         $owner_name = $user_table -> getUsername();
         $pakege_id = $pakege -> getId();//id пакета основателя сети
-        //$id переданный по аргументе id пакета пользователя пришедшего для записи в качестве члена сети, в данном случае совпадает с владельцем сети
+        //$id переданный в агрументе id пакета пользователя пришедшего для записи в качестве члена сети, в данном случае совпадает с владельцем сети
 
         $balance = $pakege -> getPrice();
         $client_code = $pakege -> getClientCode();
@@ -162,7 +160,9 @@ class ListReferralNetworksController extends AbstractController
         $listReferralNetwork -> setClientCode($client_code);
         $listReferralNetwork -> setNetworkCode($network_code);
         $listReferralNetwork -> setUniqueCode($unique_code);
+        //$listReferralNetwork -> setProfitNetwork($balance);
         $pakege -> setActivation('активирован');
+        $pakege -> setReferralNetworksId($member_code);
 
         //запись владельца сети в качестве - члена реферальной сети
         $referral_network = new ReferralNetwork();
@@ -174,19 +174,17 @@ class ListReferralNetworksController extends AbstractController
         $referral_network -> setBalance($balance);
         $referral_network -> setNetworkCode($network_code);
         $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
+        $referral_network -> setMyTeam($member_code);
         $referralNetworkRepository->add($referral_network);
-        //$manager->persist($referral_network);
-        //$entityManager->persist($referral_network);
+        
+        $entityManager->persist($referral_network);
         $entityManager->flush();
+
+
         $this->addFlash(
             'success',
             'Поздравляем! Вы успешно активировали пакет и создали новую реферальную сеть.');
-        // $this->addFlash(
-        //     'info',
-        //     'Вы активировали пакет без реферальной ссылки, вы владельц  сети.');    
         
-            //$unique = $form->get('pakege_id')->getData();
-            //dd($form->get('pakege_id'));
         $listReferralNetworksRepository->add($listReferralNetwork);
         return $this->redirectToRoute('app_list_referral_networks_index', [], Response::HTTP_SEE_OTHER);        
     }

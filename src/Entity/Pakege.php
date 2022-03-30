@@ -24,7 +24,7 @@ class Pakege
     #[ORM\Column(type: 'integer', nullable: true)]
     private $price;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(type: 'string', nullable: true)]
     private $referral_networks_id;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -98,12 +98,12 @@ class Pakege
         return $this;
     }
 
-    public function getReferralNetworksId(): ?int
+    public function getReferralNetworksId(): ?string
     {
         return $this->referral_networks_id;
     }
 
-    public function setReferralNetworksId(?int $referral_networks_id): self
+    public function setReferralNetworksId(?string $referral_networks_id): self
     {
         $this->referral_networks_id = $referral_networks_id;
 

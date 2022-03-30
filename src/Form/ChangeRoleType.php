@@ -24,15 +24,6 @@ class ChangeRoleType extends AbstractType
                 'User' => 'ROLE_USER',
             ]
         ])
-        //->add('role')
-    //     ->addModelTransformer(new CallbackTransformer(
-    //         function ($rolesAsArray) {
-    //              return count($rolesAsArray) ? $rolesAsArray[0]: null;
-    //         },
-    //         function ($rolesAsString) {
-    //              return [$rolesAsString];
-    //         }
-    // ))
     ;
     }
 

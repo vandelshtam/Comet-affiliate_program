@@ -38,6 +38,15 @@ class ListReferralNetworks
     #[ORM\Column(type: 'string',length: 100, nullable: true)]
     private $client_code;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $profit_network;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $payments_direct;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $payments_cash;
+
 
     public function getId(): ?int
     {
@@ -140,6 +149,42 @@ class ListReferralNetworks
     public function setClientCode(?string $client_code): self
     {
         $this->client_code = $client_code;
+
+        return $this;
+    }
+
+    public function getProfitNetwork(): ?int
+    {
+        return $this->profit_network;
+    }
+
+    public function setProfitNetwork(?int $profit_network): self
+    {
+        $this->profit_network = $profit_network;
+
+        return $this;
+    }
+
+    public function getPaymentsDirect(): ?int
+    {
+        return $this->payments_direct;
+    }
+
+    public function setPaymentsDirect(?int $payments_direct): self
+    {
+        $this->payments_direct = $payments_direct;
+
+        return $this;
+    }
+
+    public function getPaymentsCash(): ?int
+    {
+        return $this->payments_cash;
+    }
+
+    public function setPaymentsCash(?int $payments_cash): self
+    {
+        $this->payments_cash = $payments_cash;
 
         return $this;
     }

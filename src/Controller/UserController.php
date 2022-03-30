@@ -81,7 +81,6 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //dd($request);
             if ($request->get('new_email') != $request->get('confirm_email')){
                 $this->addFlash(
                     'danger',
@@ -96,8 +95,6 @@ class UserController extends AbstractController
             $this->addFlash(
                 'success',
                 'Вы успешно изменили регистрационные данные пользователя'); 
-            //$userRepository->add($user);
-            //$userRepository->add($user);
             return $this->redirectToRoute('app_user_show', ['id' => $id], Response::HTTP_SEE_OTHER);
         }
 
@@ -232,15 +229,12 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //dd($request);
             $user->setUsername($request->get('user')->getUsername());
             $entityManager->persist($user);
             $entityManager->flush();
             $this->addFlash(
                 'success',
                 'Вы успешно изменили имя пользователя'); 
-            //$userRepository->add($user);
-            //$userRepository->add($user);
             return $this->redirectToRoute('app_user_show', ['id' => $id], Response::HTTP_SEE_OTHER);
         }
 

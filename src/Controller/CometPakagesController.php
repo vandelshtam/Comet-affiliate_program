@@ -23,11 +23,4 @@ class CometPakagesController extends AbstractController
             'title' => 'Pakages',
         ]);
     }
-    // #[Route('/', name: 'app_table_pakage_index', methods: ['GET'])]
-    // public function index(TablePakageRepository $tablePakageRepository): Response
-    // {
-    //     return $this->render('table_pakage/index.html.twig', [
-    //         'table_pakages' => $tablePakageRepository->findAll(),
-    //     ]);
-    // }
 }

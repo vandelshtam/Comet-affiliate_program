@@ -26,13 +26,6 @@ class PakegeController extends AbstractController
     #[Route('/', name: 'app_pakege_index', methods: ['GET'])]
     public function index(PakegeRepository $pakegeRepository, ManagerRegistry $doctrine): Response
     {
-        //$pakege = $doctrine->getRepository(Pakege::class)->find(8);
-        //$user = $doctrine->getRepository(User::class)->find(2);
-        //$userUsername = $pakege->getUser();
-        //$user_pakeges = $user -> getPakeges();
-        // $collection = new ArrayCollection();
-        // $collection = setElements($user_pakeges);
-        //dd($user);
         return $this->render('pakege/index.html.twig', [
             'pakeges' => $pakegeRepository->findAll(),
             'controller_name' => 'Список всех приобретенных пакетов в сети',
@@ -43,15 +36,17 @@ class PakegeController extends AbstractController
     #[Route('/new', name: 'app_pakege_new', methods: ['GET', 'POST'])]
     public function new(Request $request, PakegeRepository $pakegeRepository, ManagerRegistry $doctrine,ReferralNetworkRepository $referralNetworkRepository): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $pakege = new Pakege();
         $form = $this->createForm(PakegeType::class, $pakege);
         $form->handleRequest($request);
         
-        // $user = $this -> getUser();
-        // $user_id = $user -> getId();
-         $entityManager = $doctrine->getManager();
-        // $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user_id]);
-        // $personal_data_table = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
+        $user = $this -> getUser();
+        $user_referral_link = $user -> getReferralLink();
+        
+        $entityManager = $doctrine->getManager();
+        
         $unique_code1 = $this->random_string(10);
         $unique_code2 = $this->random_string(10);
         $unique_code = $unique_code1.$unique_code2;
@@ -60,18 +55,23 @@ class PakegeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $form_referral_link = $form->get('referral_link')->getData();
-            if($network_referral_link_data = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $form_referral_link]) == NULL){
+            if($form_referral_link != NULL){
+                if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $form_referral_link]) == false ){
+                
                 $this->addFlash(
                     'danger',
                     'Вы ошиблись при введении ссылки или ввели устаревшую ссылку, пожалуйста попробуйте еще раз');
                 return $this->redirectToRoute('app_pakege_new', [], Response::HTTP_SEE_OTHER);
+                }
+            }
+            elseif($form_referral_link == NULL){
+                $this->denyAccessUnlessGranted('ROLE_ADMIN'); 
             }
             
-            //dd($network_referral_link_data);
+                
             $pakegeRepository->add($pakege);
             $unique = $form->get('unique_code')->getData();
         
-            //$user->setUsername($request->get('user')->getUsername());
             return $this->redirectToRoute('app_pakege_new_choice', ['unique' => $unique], Response::HTTP_SEE_OTHER);
         }
 
@@ -79,6 +79,7 @@ class PakegeController extends AbstractController
             'pakege' => $pakege,
             'form' => $form,
             'unique_code' => $collection[0],
+            'user_referral_link' => $user_referral_link
         ]);
     }
 
@@ -127,7 +128,6 @@ class PakegeController extends AbstractController
     #[Route('/new/{unique}/choice', name: 'app_pakege_new_choice', methods: ['GET', 'POST'])]
     public function newChoice (Request $request, PakegeRepository $pakegeRepository,MailerInterface $mailer, ManagerRegistry $doctrine,MailerController $mailerController, string $unique): Response
     {
-        //dd($unique);
         $user = $this -> getUser();
         $user_id = $user -> getId();
         $entityManager = $doctrine->getManager();
@@ -136,42 +136,29 @@ class PakegeController extends AbstractController
         $client_code = $personal_data_table -> getClientCode();
         $pakage_comet = $entityManager->getRepository(Pakege::class)->findOneBy(['unique_code' => $unique]);
         $pakage_comet_name = $pakage_comet -> getName();
-            //dd($unique_code);
-            //$client_code = $personal_data_table -> getClientCode();
             
-            //$client_code = $personal_data_table -> getClientCode();
-            $pakage_table = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $pakage_comet_name]);
-            $token_table =  $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
-            $price_usdt = $pakage_table -> getPricePakage();
-            $price_token = $price_usdt * $token_table;
+        $pakage_table = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $pakage_comet_name]);
+        $token_table =  $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
+        $price_usdt = $pakage_table -> getPricePakage();
+        $price_token = $price_usdt * $token_table;
             
-            //dd($pakage_comet);
-             $pakage_comet -> setUserId($user_id);
-             $pakage_comet -> setPrice($price_usdt);
-             $pakage_comet -> setToken($price_token);
-             $pakage_comet -> setClientCode($client_code);
+            $pakage_comet -> setUserId($user_id);
+            $pakage_comet -> setPrice($price_usdt);
+            $pakage_comet -> setToken($price_token);
+            $pakage_comet -> setClientCode($client_code);
             
-            //dd($pakage_comet);
-            //$pakegeRepository->add($price_usdt);
-            //$pakegeRepository->add($name);
-            
-            //$user->setUsername($request->get('user')->getUsername());
-            //$entityManager->persist($user_table);
-            
-            //$entityManager->persist($pakege_comet);
-            $entityManager->flush();
-            //$email = new Email();
-            $mailerController->sendEmail($mailer);
-            $this->addFlash(
-                'success',
-                'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');
-            $this->addFlash(
-                'info',
-                'Чтобы пакет начал работать вы должны активировать пакет!');     
-            return $this->redirectToRoute('app_pakege_index', [], Response::HTTP_SEE_OTHER);
+        $entityManager->flush();
+        $mailerController->sendEmail($mailer);
+        $this->addFlash(
+            'success',
+            'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');
+        $this->addFlash(
+            'info',
+            'Чтобы пакет начал работать вы должны активировать пакет!');     
+        return $this->redirectToRoute('app_pakege_index', [], Response::HTTP_SEE_OTHER);
     }
     public function random_string ($str_length)
-{
+    {
     $str_characters = array (0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
 
 	// Функция может генерировать случайную строку и с использованием кириллицы
@@ -197,5 +184,5 @@ class PakegeController extends AbstractController
 
     // Возвращаем результат
     return $string;
-}
+    }
 }

@@ -141,6 +141,22 @@ class ReferralNetworkRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
+     */
+    
+    public function findByMemberField($value)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.network_code = :val')
+            ->setParameter('val', $value)
+            ->orderBy ('r.id', 'ASC')
+            ->setMaxResults(100000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function findByBalanceField($value, $balance)
     {
         return $this->createQueryBuilder('r')
@@ -188,7 +204,25 @@ class ReferralNetworkRepository extends ServiceEntityRepository
         ;
     }
 
-    /*
+
+    public function findByStatusField($value,$network_code)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.user_status = :val', 'r.network_code = :network_code')
+            //->where('r.id = ?40')
+            //->where('r.id = ?42')
+            ->setParameter('val', $value)
+            ->setParameter('network_code', $network_code)
+            ->orderBy ('r.id', 'ASC')
+            //->setParameter('id', $id) 
+            //->setFirstResult( 40 )
+            ->setMaxResults(100000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    
     public function findOneBySomeField($value): ?ReferralNetwork
     {
         return $this->createQueryBuilder('r')
@@ -198,7 +232,7 @@ class ReferralNetworkRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
-    */
+    
 
     /**
      * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
@@ -211,8 +245,8 @@ class ReferralNetworkRepository extends ServiceEntityRepository
 
         $query = $entityManager->createQuery(
             'SELECT COUNT (r.id)
-            FROM App\Entity\ReferralNetwork r'
-        )->getSingleScalarResult();
+             FROM App\Entity\ReferralNetwork r'
+            )->getSingleScalarResult();
 
         // returns an array of Product objects
         return $query;
