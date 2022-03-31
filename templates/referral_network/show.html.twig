@@ -5,29 +5,103 @@
 {% block body %}
 <div class="container-xxl">
     <h1>Информация об участнике сети</h1>
-
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
     <table class="table">
         <tbody>
-            <tr>
+            {# <tr>
                 <th>Id</th>
                 <td>{{ referral_network.id }}</td>
-            </tr>
+            </tr> #}
             <tr>
                 <th>Имя пользователя</th>
                 <td>{{ referral_network.name }}</td>
             </tr>
-            <tr>
+            {# <tr>
                 <th>id пользователя</th>
                 <td>{{ referral_network.userId }}</td>
-            </tr>
+            </tr> #}
             <tr>
                 <th>Статус пользователя</th>
                 <td>{{ referral_network.userStatus }}</td>
             </tr>
             <tr>
+                <th>Мой cashback</th>
+                <td>{{ referral_network.cash }} USDT</td>
+            </tr>
+            <tr>
+                <th>Мои начисления за приглашенных пользователей</th>
+                <td>{{ referral_network.direct }} USDT</td>
+            </tr>
+            <tr>
+                <th>Моя команда - колчество участников</th>
+                <td>{{ my_team_count }}</td>
+            </tr>
+            <tr>
+                <th>Моя команда - баланс(общая стоимость пакетов)</th>
+                <td>{{ my_team_summ }} USDT</td>
+            </tr>
+            <tr>
+                {% if(referral_network.cash <= (referral_network.pakage * k_cash_back)) %}
+                <th>Стоимость моего пакета</th>
+                {# <td>{{ pakege_user.name }} , {{ pakege_user.price  }} USDT</td> #}
+                <td>{{ referral_network.pakage }} USDT</td>
+                {% else %}
+                <th>Стоимость моего пакета</th>
+                       {# <td>{{ pakege_user.name }} , {{ pakege_user.price  }} USDT Внимание! достигнут лимит пополнения кошелька бонусами cashback</td> #}
+                       <td class="p-3 mb-2 bg-danger text-white">{{ referral_network.pakage }} USDT Внимание! достигнут лимит пополнения кошелька бонусами cashback</td>
+                       {# <td><a  class="btn btn-warning mb-3" href="{{ path('app_personal_area') }}">Повысить пакет</a></td> #}
+                {% endif %}
+            </tr>
+            {% if is_granted('ROLE_ADMIN') %}
+            <tr>
+                <th>Общее количество начисленных наград</th>
+                <td>{{ referral_network.reward }} USDT</td>
+            </tr>
+            <tr>
+                <th>Личная реферальная ссылка для прилашения участников</th>
+                <td>{{ referral_network.memberCode }}</td>
+            </tr>
+            <tr>
+                <th>Выплата в компанию (проект) в момент активации пакета данного участника</th>
+                <td>{{ referral_network.currentNetworkProfit }} USDT</td>
+            </tr>
+            <tr>
+                <th>Выплата в сеть по программе Direct в момент активации пакета данного пользователя</th>
+                <td>{{ referral_network.paymentsNetwork }} USDT</td>
+            </tr>
+            <tr>
+                <th>Выплата в сеть по программе Cash back в момент активации пакета данного пользователя</th>
+                <td>{{ referral_network.cash }}</td>
+            </tr>
+            <tr>
+                <th>Моя команда - баланс(общая стоимость пакетов)</th>
+                <td>{{ my_team_summ }} USDT</td>
+            </tr>
+            {% endif %}
+            {# <tr>
                 <th>id записи персональных данных</th>
                 <td>{{ referral_network.personalDataId }}</td>
-            </tr>
+            </tr> #}
         </tbody>
     </table>
     <div class="row mb-3">
@@ -62,9 +136,14 @@
         </div>
     </div>
     </div>
-
-    <a  class="btn btn-secondary mb-3" href="{{ path('app_referral_network_index') }}">Назад</a>
-
+    {% if is_granted('ROLE_ADMIN') %}  
+    <a  class="btn btn-secondary mb-3" href="{{ path('app_referral_network_index') }}">К списку всех участников</a>
+    {% else %}
+    <a  class="btn btn-secondary mb-3" href="{{ path('app_personal_area') }}">В личный кабинет</a>
+    {% endif %}
+    <a  class="btn btn-secondary mb-3" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Моя команда</a>
+    <a  class="btn btn-warning mb-3" href="{{ path('app_personal_area') }}">Повысить пакет</a>
+    
     {# <a href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}
 
     {# {{ include('referral_network/_delete_form.html.twig') }} #}

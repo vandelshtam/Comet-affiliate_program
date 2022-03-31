@@ -49,17 +49,17 @@
         <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
             <div class="accordion-body">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
+                {# <li class="nav-item">
                 <a class="nav-link link-secondary" href="">Информация об операциях</a>
-                </li>
+                </li> #}
                 <li class="nav-item">
-                <a class="nav-link link-secondary" href="">история операций</a>
+                <a class="nav-link link-secondary" href="">Информация о пакетах</a>
                 </li>
             </ul> 
             </div>
         </div>
         </div>
-        <div class="accordion-item">
+        {# <div class="accordion-item">
         <h2 class="accordion-header " id="headingThree">
             <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
             Накопительная система 
@@ -83,7 +83,7 @@
             </ul> 
             </div>
         </div>
-        </div>
+        </div> #}
         <div class="accordion-item">
         <h2 class="accordion-header" id="headingFour">
             <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
@@ -94,16 +94,19 @@
             <div class="accordion-body">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                <a class="nav-link" href="{{ path('app_table_pakage_index') }}">Просмотр пакетов</a>
+                <a class="nav-link link-secondary" href="{{ path('app_table_pakage_index') }}">Управление пакетами</a>
                 </li>
                 <li class="nav-item">        
-                <a class="nav-link" href="{{ path('app_referral_network_index') }}">Все участники реферальных сетей</a>
+                <a class="nav-link link-secondary" href="{{ path('app_referral_network_index') }}">Все участники реферальных сетей</a>
                 </li>
                 <li class="nav-item">        
-                <a class="nav-link" href="{{ path('app_list_referral_networks_index') }}">Все реферальные сети</a>
+                <a class="nav-link link-secondary" href="{{ path('app_list_referral_networks_index') }}">Все реферальные сети</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Резерв</a>
+                <a class="nav-link link-secondary" href="{{ path('app_setting_options_index') }}" >Настройки сети</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link link-secondary" href="{{ path('app_token_rate_index') }}" >Управление курсом токена</a>
                 </li>
             </ul> 
             </div>

@@ -145,6 +145,22 @@ class ReferralNetworkRepository extends ServiceEntityRepository
      * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
      */
     
+    public function findByMyTeamField($value)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.my_team = :val')
+            ->setParameter('val', $value)
+            ->orderBy ('r.id', 'ASC')
+            ->setMaxResults(10000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @return ReferralNetwork[] Returns an array of ReferralNetwork objects
+     */
+    
     public function findByMemberField($value)
     {
         return $this->createQueryBuilder('r')

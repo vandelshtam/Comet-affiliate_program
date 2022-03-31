@@ -31,8 +31,14 @@
             <tr>
                 <th>Id</th>
                 <th>Название реферальной сети</th>
-                {# <th>Referral_networks_id</th>
-                <th>Owner_id</th> #}
+                {% if is_granted('ROLE_ADMIN') %}
+                <th>Общая выплата в компанию</th>
+                <th>Общая выплата в сеть по программе Direct</th>
+                <th>Общая выплата в сеть по программе Cash Back</th>
+                <th>Текущий баланс пакетов</th>
+                <th>Общая стоимость приобретенных пакетов</th>
+                <th>Количество приобретенных пакетов в сети</th>
+                {% endif %}
                 <th>Организатор сети</th>
                 <th>Действия</th>
             </tr>
@@ -42,13 +48,18 @@
             <tr>
                 <td>{{ list_referral_network.id }}</td>
                 <td>{{ list_referral_network.name }}</td>
-                {# <td>{{ list_referral_network.referralNetworksId }}</td>
-                <td>{{ list_referral_network.ownerId }}</td> #}
-                <td>{{ list_referral_network.ownerName }}</td>
+                {% if is_granted('ROLE_ADMIN') %}
+                <td>{{ list_referral_network.profitNetwork }}</td>
+                <td>{{ list_referral_network.paymentsDirect }}</td>
+                <td>{{ list_referral_network.paymentsCash }}</td>
+                <td>{{ list_referral_network.currentBalance }}</td>
+                <td>{{ pakage_price_all_summ }}</td>
+                <td>{{ pakage_count }}</td>
+                {% endif %}
                 <td>
                     <a  class="btn btn-secondary mb-3" href="{{ path('app_list_referral_networks_show', {'id': list_referral_network.id}) }}">Посмотреть подробности</a>
                     
-                    <a  class="btn btn-secondary mb-3" href="{{ path('app_list_referral_networks_edit', {'id': list_referral_network.id}) }}">Открыть список участников</a>
+                    <a  class="btn btn-secondary mb-3" href="{{ path('app_referral_network_index') }}">Открыть список участников</a>
                 </td>
             </tr>
         {% else %}

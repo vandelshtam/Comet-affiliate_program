@@ -47,6 +47,9 @@ class ListReferralNetworks
     #[ORM\Column(type: 'integer', nullable: true)]
     private $payments_cash;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $current_balance;
+
 
     public function getId(): ?int
     {
@@ -185,6 +188,18 @@ class ListReferralNetworks
     public function setPaymentsCash(?int $payments_cash): self
     {
         $this->payments_cash = $payments_cash;
+
+        return $this;
+    }
+
+    public function getCurrentBalance(): ?int
+    {
+        return $this->current_balance;
+    }
+
+    public function setCurrentBalance(?int $current_balance): self
+    {
+        $this->current_balance = $current_balance;
 
         return $this;
     }

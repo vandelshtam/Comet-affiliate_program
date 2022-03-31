@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SettingOptions index{% endblock %}
+
+{% block body %}
+    <h1>SettingOptions index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Начисление по программе Сash back (singl line) %</th>
+                <th>Начисление по программе direct (за приглашенного участника) %</th>
+                <th>Лимит начислений Cash_back в линии %</th>
+                <th>Предельная сумма когда наисляются выплаты Сash back tokens local</th>
+                <th>Предельный коэффициент выплат в сеть участникам %</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for setting_option in setting_options %}
+            <tr>
+                <td>{{ setting_option.id }}</td>
+                <td>{{ setting_option.paymentsSingleline }}</td>
+                <td>{{ setting_option.paymentsDirect }}</td>
+                <td>{{ setting_option.cashBack }}</td>
+                <td>{{ setting_option.allPricePakage }}</td>
+                <td>{{ setting_option.accrualLimit }}</td>
+                <td>
+                    <a href="{{ path('app_setting_options_show', {'id': setting_option.id}) }}">show</a>
+                    <a href="{{ path('app_setting_options_edit', {'id': setting_option.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_setting_options_new') }}">Create new</a>
+{% endblock %}

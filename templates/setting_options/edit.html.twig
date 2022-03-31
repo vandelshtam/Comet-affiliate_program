@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit SettingOptions{% endblock %}
+
+{% block body %}
+    <h1>Edit SettingOptions</h1>
+
+    {{ include('setting_options/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_setting_options_index') }}">back to list</a>
+
+    {{ include('setting_options/_delete_form.html.twig') }}
+{% endblock %}

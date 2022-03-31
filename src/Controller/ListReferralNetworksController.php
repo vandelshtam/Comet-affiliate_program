@@ -23,12 +23,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ListReferralNetworksController extends AbstractController
 {
     #[Route('/', name: 'app_list_referral_networks_index', methods: ['GET'])]
-    public function index(ListReferralNetworksRepository $listReferralNetworksRepository): Response
+    public function index(ListReferralNetworksRepository $listReferralNetworksRepository,ManagerRegistry $doctrine): Response
     {
+        $entityManager = $doctrine->getManager();
+        //$pakages = $referralPakegeRepository->findAll();
+        $pakages = $entityManager->getRepository(Pakege::class)->findAll();
+        foreach($pakages as $pakage){
+            $pakage_price_all[] = $pakage -> getPrice();
+        }
+        $pakage_price_all_summ = array_sum($pakage_price_all);
+        $pakage_count = count($pakages);
         return $this->render('list_referral_networks/index.html.twig', [
             'list_referral_networks' => $listReferralNetworksRepository->findAll(),
             'controller_name' => 'Список всех реферальных сетей',
             'title' => 'All network referral list',
+            'pakage_count' => $pakage_count,
+            'pakage_price_all_summ' => $pakage_price_all_summ,
         ]);
     }
 
@@ -38,7 +48,8 @@ class ListReferralNetworksController extends AbstractController
         $user = $this -> getUser();
         $user_id = $user -> getId();
         $entityManager = $doctrine->getManager();
-        
+        $referral_network_all = $referralNetworkRepository->findAll();
+        $referral_network_all_count = count($referral_network_all);
         $referralNetwork = $entityManager->getRepository(ReferralNetwork::class)->findByUserIdField(['user_id' => $user_id]);
         $network_id =[];
         foreach($referralNetwork as $network){
@@ -53,6 +64,7 @@ class ListReferralNetworksController extends AbstractController
             'list_referral_networks' => $listReferralNetworks,
             'controller_name' => 'Список моих реферальных сетей',
             'title' => 'My network referral list',
+            'referral_network_all_count' => $referral_network_all_count,
         ]);
     }
 
@@ -97,10 +109,13 @@ class ListReferralNetworksController extends AbstractController
     }
 
     #[Route('/{id}/list', name: 'app_list_referral_networks_show_list', methods: ['GET'])]
-    public function showList(ListReferralNetworks $listReferralNetwork): Response
+    public function showList(ListReferralNetworks $listReferralNetwork,ReferralNetworkRepository $referralNetworkRepository): Response
     {
+        $referral_network_all = $referralNetworkRepository->findAll();
+        $referral_network_all_count = count($referral_network_all);
         return $this->render('list_referral_networks/show_list.html.twig', [
             'list_referral_network' => $listReferralNetwork,
+            'referral_network_all_count' => $referral_network_all_count,
         ]);
     }
 
@@ -186,6 +201,6 @@ class ListReferralNetworksController extends AbstractController
             'Поздравляем! Вы успешно активировали пакет и создали новую реферальную сеть.');
         
         $listReferralNetworksRepository->add($listReferralNetwork);
-        return $this->redirectToRoute('app_list_referral_networks_index', [], Response::HTTP_SEE_OTHER);        
+        return $this->redirectToRoute('app_referral_network_show', [], Response::HTTP_SEE_OTHER);        
     }
 }

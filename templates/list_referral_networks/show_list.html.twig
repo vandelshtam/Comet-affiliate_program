@@ -4,30 +4,44 @@
 
 {% block body %}
 <div class="container-xxl">
-    <h1>Список участников реферальной сети</h1>
+    <h1>Подобности о  реферальной сети</h1>
 
     <table class="table">
         <tbody>
-            <tr>
+            {# <tr>
                 <th>Id</th>
                 <td>{{ list_referral_network.id }}</td>
-            </tr>
+            </tr> #}
             <tr>
                 <th>Название</th>
                 <td>{{ list_referral_network.name }}</td>
             </tr>
             <tr>
-                <th>Идентификационный номер сети</th>
-                <td>{{ list_referral_network.referralNetworksId }}</td>
+                <th>Сумма выплат по программе cash back</th>
+                <td>{{ list_referral_network.paymentsCash }} USDT</td>
             </tr>
             <tr>
-                <th>ID Владельца</th>
-                <td>{{ list_referral_network.ownerId }}</td>
+                <th>Сумма выплат по программе Direct</th>
+                <td>{{ list_referral_network.paymentsDirect }} USDT</td>
             </tr>
             <tr>
                 <th>Имя владельца</th>
                 <td>{{ list_referral_network.ownerName }}</td>
             </tr>
+            {% if is_granted('ROLE_ADMIN') %}  
+            <tr>
+                <th>Количество участников</th>
+                <td>{{ referral_network_all_count }}</td>
+            </tr>
+            <tr>
+                <th>Текущий баланс стоимости пакетов в сети</th>
+                <td>{{ list_referral_network.currentBalance }} USDT</td>
+            </tr>
+            <tr>
+                <th>Накопление сети</th>
+                <td>{{ list_referral_network.profitNetwork }} USDT</td>
+            </tr>
+            {% endif %}
         </tbody>
     </table>
 

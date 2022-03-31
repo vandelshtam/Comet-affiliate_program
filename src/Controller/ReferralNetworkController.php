@@ -26,6 +26,17 @@ class ReferralNetworkController extends AbstractController
         ]);
     }
 
+
+    #[Route('/{my_team}/myteam', name: 'app_referral_network_myteam', methods: ['GET'])]
+    public function myTeam(ReferralNetworkRepository $referralNetworkRepository,ManagerRegistry $doctrine, string $my_team): Response
+    { 
+        $entityManager = $doctrine->getManager(); 
+        $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]);//получаем объект  участников моей команды (которых пригласил пользователь)       
+        return $this->render('referral_network/index.html.twig', [
+            'referral_networks' => $array_my_team,
+        ]);
+    }
+
     #[Route('/{referral_link}/{id}/new', name: 'app_referral_network_new', methods: ['GET', 'POST'])]
     public function new(Request $request, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine, string $referral_link, int $id): Response
     {
@@ -87,14 +98,27 @@ class ReferralNetworkController extends AbstractController
     #[Route('/{id}', name: 'app_referral_network_show', methods: ['GET'])]
     public function show(ReferralNetwork $referralNetwork,ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine,  int $id,): Response
     {
+
         $entityManager = $doctrine->getManager();
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['id' => $id]);
+        $my_team = $referral_network -> getMyTeam();
         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
-        $user_referral_status = $referral_network -> getUserStatus();
-        $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);
+        $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]);//получаем объект  участников моей команды (которых пригласил пользователь)
+        
+        $user_status = $referral_network -> getUserStatus();
+        $my_team_count = count($array_my_team);
+        foreach($array_my_team as $array){
+            $array_my_team_summ_pakege[] = $array -> getPakage();
+        }
+        $my_team_summ = array_sum($array_my_team_summ_pakege);
+        
+        $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);//объект владельца сети
+        $user_id = $referral_network -> getUserId();
+        $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['user_id' => $user_id]);// получаем оъект пакета  участника реферальной сети
         $owner_array[] = $user_owner;//основатель сети
         $reward = $referral_network -> getReward();
+        $k_cash_back = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getCashBack()/100;//получаем коэффициент начисления cash_back
 
         //построение линии сингл-лайн в виде массива
         $single_line = array_merge($referral_network_left, $owner_array, $referral_network_right);//объеденяем в один массив в  соотвтетсвии с правилом построения линии сингл-лайн
@@ -139,6 +163,10 @@ class ReferralNetworkController extends AbstractController
         return $this->render('referral_network/show.html.twig', [
             'referral_network' => $referralNetwork,
             'data' => $array_data,
+            'pakege_user' => $pakege_user,
+            'k_cash_back' => $k_cash_back,
+            'my_team_count' => $my_team_count,
+            'my_team_summ' => $my_team_summ,
         ]);
     }
 
@@ -272,15 +300,20 @@ class ReferralNetworkController extends AbstractController
         } 
         foreach($list_network_all_new as $payments_network_cash){
             $payments_cash[] = $payments_network_cash -> getPaymentsCash();
-        } 
+        }
+        foreach($list_network_all_new as $price_network){
+            $current_price[] = $price_network -> getBalance();
+        }  
         $curren_network_summ = array_sum($curren_network);
         $payments_direct_summ = array_sum($payments_direct);
         $payments_cash_summ = array_sum($payments_cash);
+        $current_price_summ = array_sum($current_price);
 
         //запись данных начислений во всей сети в родительский объект сети
         $listReferralNetwork -> setProfitNetwork($curren_network_summ);
         $listReferralNetwork -> setPaymentsDirect($payments_direct_summ);
         $listReferralNetwork -> setPaymentsCash($payments_cash_summ);
+        $listReferralNetwork -> setCurrentBalance($current_price_summ);
 
         $entityManager->persist($referral_network);
         $entityManager->persist($referral_network_referral);
@@ -319,6 +352,7 @@ class ReferralNetworkController extends AbstractController
         $k_payments_singl_line = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getPaymentsSingleline();//получаем коеффициент начисления наград в  single-line 
         $k_payments_direct = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getPaymentsDirect();//получаем коэффициент начисления direct
         $k_cash_back = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getCashBack()/100;//получаем коэффициент начисления cash_back
+        $k_accrual_limit = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getAccrualLimit()/100;//получаем коэффициент общей суммы  предела начислений в линии в виде cash-back
         $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//получаем курс внутреннего токена сети
         $user_referral_status = $referral_network_user -> getUserStatus();
         $owner_array[] = $user_owner;//основатель сети
@@ -327,7 +361,7 @@ class ReferralNetworkController extends AbstractController
         foreach($pakege_all as $pakages){
             $pakages_summ[] = $pakages -> getPrice();
         }
-        $all_pakages_summ = array_sum($pakages_summ) * $token_rate;
+        $all_pakages_summ = array_sum($pakages_summ) * $token_rate;//фактическая сумма стоимости приобретенных пакетов в сети переведенная в лакальный токен по курсу
 
 
         //построение линии сингл-лайт
@@ -455,6 +489,7 @@ class ReferralNetworkController extends AbstractController
         if($summ_single_line_left_balance == 0 || $summ_single_line_right_balance == 0){
             //dd('malance 0');
             $not_needed_variable = 0;
+            //сообщение о достижении предела общего баланса сети
             if($price_pakage_all <= $all_pakages_summ){
                 $this->addFlash(
                     'danger',
@@ -479,6 +514,7 @@ class ReferralNetworkController extends AbstractController
                     $entityManager->flush(); 
                     } 
                 $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - $bonus;
+                //информационное сообщение о достижении предела общей стоимости сети (купленных пакетов)
                 if($price_pakage_all <= $all_pakages_summ){
                     $this->addFlash(
                         'danger',
@@ -492,18 +528,60 @@ class ReferralNetworkController extends AbstractController
                     $count_left = count($single_line_left);
                     $count_right = count($single_line_right);
 
-                    
+                    //высчитаем сумму отведенную в проекте для начисления в линии Синг-Лайн
+                    if($summ_single_line_left_balance > $summ_single_line_right_balance){
+                        $summ_ammoutn_all = $summ_single_line_right_balance * 2;
+                    }
+                    else{
+                        $summ_ammoutn_all = $summ_single_line_left_balance * 2;
+                    }
+                    $accrual_limit = $summ_ammoutn_all * $k_accrual_limit;
+
+                    //получение общей суммы начислений в линии в виде cash-back
+
                  
                     //==========вычисляем и записываем награды участникам лини двигаясь в левую сторону ===========
                     array_unshift($single_line_right, $referral_network_user);//добавляем рефовода который предоставил ссылку в массив с права , так как сначала масивы участников строились слева и спава от рефовода, самого рефовода
                     //нет в массивах, теперь чтобы начислять награды двигаясь полинии и сравнивая балансы, рефовода нужно добаить в любой массив, в данном случае добавлен в массив справа
                     $count_left = count($single_line_left);
                     $count_right = count($single_line_right);
-            if($price_pakage_all > $all_pakages_summ){           
+            //условие начисления выплат по линии Сингл-Лайн в зависимсоти от количества проданных пакетов
+            if($price_pakage_all > $all_pakages_summ){ 
+                //условие начисления выплат по линии Сингл-Лайн если общее количество выплат меньше норматива суммы (сейчас 70% от суммы погашения-зачисления к проект сети) 
+                //то начисление производится в размере определенногокоэффициента (сейчас 10%), если общая сумма начислений к выплате превашает установленную сумму (70%) то 
+                //сумма предназначенная для выплат делиться на всех участников , которые должны получить начисление
+
+                //проверяем общее начисление и количество пользователей к начислению КешБэк в линии с помощью методов
+                $cash_back_all_1 = $this -> cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                $cash_back_all_2 = $this -> cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                $cash_back_all_1_summ = array_sum($cash_back_all_1); 
+                $cash_back_all_2_summ = array_sum($cash_back_all_2);
+                $cash_back_all_1_count = count($cash_back_all_1); 
+                $cash_back_all_2_count = count($cash_back_all_2);
+                $cash_back_all_summ = $cash_back_all_1_summ + $cash_back_all_2_summ;
+                $cash_back_all_count = $cash_back_all_1_count + $cash_back_all_2_count;
+
+                if($accrual_limit > $cash_back_all_summ){
                     //теперь проделываем операции по определению наград двигаясь в левую сторону от рефовода по линии 
                     $all_cash_right = $this -> reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back);  
                     //теперь проделываем операции по определению наград двигаясь в правую сторону от рефовода по линии 
-                    $all_cash_left = $this -> reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back); 
+                    $all_cash_left = $this -> reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                    $this->addFlash(
+                        'danger',
+                        'Ограничений по начислению кешбек нет'); 
+                }
+                elseif($accrual_limit <= $cash_back_all_summ){
+                    //сначала высчитаем конечную сумму выплаты по кешбэк каждому участнику 
+                    $payments_cash_back_all_summ = $accrual_limit/$cash_back_all_count; //общую предельную сумму которую можно выплачивать в сеть разделим на количество учтсников которым она причитается
+                    $all_cash_right = $this -> reward_cash_back_limit($single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$payments_cash_back_all_summ);
+                    $all_cash_left = [0];
+                    //проведем начисление кешбэк с помощью специального метода
+
+                    $this->addFlash(
+                        'danger',
+                        'Внимание! Начисление проведено с ограничением по начислению кешбек, чтобы не привысить лимит начислений 70%'); 
+                }
+                    
             } 
             else{
                 $this->addFlash(
@@ -512,6 +590,7 @@ class ReferralNetworkController extends AbstractController
             }       
 
                     //=====запись текущих начислений и выплат в сети ========
+            //условие начисления выплат по линии Сингл-Лайн в зависимсоти от количества проданных пакетов
             if($price_pakage_all > $all_pakages_summ){   
                     $all_cash_right_summ = array_sum($all_cash_right);
                     $all_cash_left_summ = array_sum($all_cash_left);
@@ -751,8 +830,9 @@ class ReferralNetworkController extends AbstractController
                         $user -> setCash($new_cash); 
                         $reward_user1 = $reward_user_new1 + $reward1; 
                         $user -> setReward($reward_user1);
+                        $cash_all[] = $reward_user_new1;
                     }
-                    $cash_all[] = $reward_user_new1;
+                    
                     $entityManager->flush();   
                 }
                 elseif($summ_single_line_left_balance < $summ_single_line_right_balance){
@@ -766,8 +846,9 @@ class ReferralNetworkController extends AbstractController
                         $reward_user2 = $reward_user_new2 + $reward2; 
                         $user -> setReward($reward_user2);
                         $user -> setCash($new_cash2);
+                        $cash_all[] = $reward_user_new2;
                     }
-                    $cash_all[] = $reward_user_new2;
+                    
                     $entityManager->flush();   
                 } 
                 elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
@@ -825,8 +906,9 @@ class ReferralNetworkController extends AbstractController
                         $reward_user3 = $reward_user_new3 + $reward3; 
                         $user -> setReward($reward_user3);
                         $user -> setCash($new_cash3);
+                        $cash_all2[] = $reward_user_new3;
                     }
-                    $cash_all2[] = $reward_user_new3;
+                    
                     $entityManager->flush();   
                 }
                 elseif($summ_single_line_left_balance_new < $summ_single_line_right_balance_new){
@@ -840,8 +922,9 @@ class ReferralNetworkController extends AbstractController
                         $reward_user4 = $reward_user_new4 + $reward4; 
                         $user -> setReward($reward_user4);
                         $user -> setCash($new_cash4);
+                        $cash_all2[] = $reward_user_new4;
                     }
-                    $cash_all2[] = $reward_user_new4;
+                    
                     $entityManager->flush();   
                 }
                 elseif($summ_single_line_left_balance_new == $summ_single_line_right_balance_new){
@@ -867,5 +950,154 @@ class ReferralNetworkController extends AbstractController
         $member_code = $arr1.'-'.$id.'-'.$arr2.'-'.$arr3;
         return $member_code;
     }
+
+
+    private function cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back){
+        
+        //расчет сумм и количества участников путем записи сумм начисления в массив для начислений по кешбэк в линии
+        $i = 1;
+        $single_line_right_r = $single_line_right;
+        $single_line_left_r = $single_line_left;
+        $cash_all = [];
+        while($i < count($single_line_right_r))
+        {
+                $entityManager = $doctrine->getManager();
+                $user = array_shift($single_line_right_r);// убираем одного пользователя с левой  стороны которого достали из массива , относительно которого рассчитываем баланс слева и справа
+                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
+                $single_line_left_balance_new = [];
+                for($j = 0; $j < count($single_line_left_r); $j++){
+                    $single_line_left_balance_new[] = $single_line_left_r[$j] -> getBalance();
+                }
+                $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
+                $single_line_right_balance_new = [];
+                for($k = 0; $k < count($single_line_right_r); $k++){
+                    $single_line_right_balance_new[] = $single_line_right_r[$k] -> getBalance();
+                }
+                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
+
+                if($summ_single_line_left_balance_new > $summ_single_line_right_balance_new){
+                    $reward_user_new1 = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    $user_id_pakege = $user -> getPakage();
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    //$pakege_user_network = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);// получаем оъект пакета  участника реферальной сети
+                    $reward1 = $user -> getReward();
+                    //учитываем начисление КэшБэк если участник не превыисл коэффициент личтных выплат (коэффициент - сейчас 300%)
+                    if($reward1 <= $limit_cash_back){
+                        $cash_all[] = $reward_user_new1;   
+                    }   
+                }
+                elseif($summ_single_line_left_balance < $summ_single_line_right_balance){
+                    $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    
+                    $user_id_pakege = $user -> getPakage();
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    $reward2 = $user -> getReward();
+                    //учитываем начисление КэшБэк если участник не превыисл коэффициент личтных выплат (коэффициент - сейчас 300%)
+                    if($reward2 <= $limit_cash_back){
+                        $cash_all[] = $reward_user_new2;
+                    }
+                        
+                } 
+                elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
+                    $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    // $cash_refovod2 = $user -> getCash();
+                    // $reward2 = $user -> getReward();
+                    // $new_cash2 = $cash_refovod2 + $reward_user_new2; 
+                    // $reward_user2 = $reward_user_new2 + $reward2; 
+                    // $user -> setReward($reward_user2);
+                    // $user -> setCash($new_cash2);
+                    // $entityManager->flush();   
+                } 
+                array_unshift($single_line_left_r, $user);//добавляем  пользователя  в массив с левой стороны
+                
+        }
+        return $cash_all;
+    }
+    
+    private function cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back){
+        //расчет сумм и количества участников путем записи сумм начисления в массив для начислений по кешбэк в линии
+        $i = 1;
+        $i = 1;
+        $single_line_right_l = $single_line_right;
+        $single_line_left_l = $single_line_left;
+        $cash_all2 = [];
+        while($i < count($single_line_left_l))
+        {    
+                $entityManager = $doctrine->getManager();
+                $user = array_shift($single_line_left_l);
+                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
+                
+                //получаем баланс левой и правой части линии
+                $single_line_left_balance_new = [];
+                for($j = 0; $j < count($single_line_left_l); $j++){
+                    $single_line_left_balance_new[] = $single_line_left_l[$j] -> getBalance();
+                }
+                $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
+                    
+                $single_line_right_balance_new = [];
+                for($k = 0; $k < count($single_line_right_l); $k++){
+                    $single_line_right_balance_new[] = $single_line_right_l[$k] -> getBalance();
+                }
+                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
+
+                if($summ_single_line_left_balance_new > $summ_single_line_right_balance_new){
+                    $reward_user_new3 = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    $reward3 = $user -> getReward();
+                    $user_id_pakege = $user -> getPakage();
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    //учитываем начисление КэшБэк если участник не превыисл коэффициент личтных выплат (коэффициент - сейчас 300%)
+                    if($reward3 <= $limit_cash_back){
+                        $cash_all2[] = $reward_user_new3;
+                    }
+                }
+                elseif($summ_single_line_left_balance_new < $summ_single_line_right_balance_new){
+                    $reward_user_new4 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    $reward4 = $user -> getReward();
+                    $user_id_pakege = $user -> getPakage();
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    //учитываем начисление КэшБэк если участник не превыисл коэффициент личтных выплат (коэффициент - сейчас 300%)
+                    if($reward4 <= $limit_cash_back){
+                        $cash_all2[] = $reward_user_new4;
+                    }
+                }
+                elseif($summ_single_line_left_balance_new == $summ_single_line_right_balance_new){
+                    $reward_user_new4 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    // $cash_refovod4 = $user -> getCash();
+                    // $reward4 = $user -> getReward();
+                    // $new_cash4 = $cash_refovod4 + $reward_user_new4;  
+                    // $reward_user4 = $reward_user_new4 + $reward4; 
+                    // $user -> setReward($reward_user4);
+                    // $user -> setCash($new_cash4);
+                    // $entityManager->flush();   
+                }
+                array_unshift($single_line_right_l, $user);//добавляем  пользователя  в массив с правой стороны
+        }
+        return $cash_all2;
+    }
+
+
+    private function reward_cash_back_limit($single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$payments_cash_back_all_summ){
+        $entityManager = $doctrine->getManager();
+        array_pop($single_line); //убираем последнего участника (с правой стороны линии) сети которому не причитается выплата
+        array_shift($single_line);//вырезаем первого участника массива (который имеет крайнюю позицию в линии слева) которому не причитается выплата 
+        $cash_all = [];
+        $reward_user_new1 = $payments_cash_back_all_summ;//контрольная для начисления награды кешбэк
+
+        foreach($single_line as $user){
+            $cash_refovod = $user -> getCash();
+            $user_id_pakege = $user -> getPakage();
+            $limit_cash_back = $k_cash_back * $user_id_pakege;
+            $reward1 = $user -> getReward();
+            if($reward1 <= $limit_cash_back){
+                $new_cash = $cash_refovod + $reward_user_new1;
+                $user -> setCash($new_cash); 
+                $reward_user1 = $reward_user_new1 + $reward1; 
+                $user -> setReward($reward_user1);
+                $cash_all[] = $reward_user_new1;
+                $entityManager->flush();
+            }   
+        }   
+        return $cash_all;
+    } 
 
 }

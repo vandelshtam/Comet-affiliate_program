@@ -25,8 +25,12 @@
                     </div>
                 {% endfor %}
     {% endfor %}
-    <a  class="btn btn-secondary mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
+    {% if is_granted('ROLE_ADMIN') %}  
+    <a  class="btn btn-secondary mb-3" href="{{ path('app_admin') }}">Перейти в  кабинет админа</a> 
     {# <a class="btn btn-success mb-3" href="{{ path('app_referral_network_new') }}">Добавить</a>    #}
+    {% else %}
+    <a  class="btn btn-secondary mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
+    {% endif %}
     <table class="table">
         <thead>
             <tr>
@@ -35,6 +39,13 @@
                 <th>id пользователя</th>
                 <th>Статус пользователя</th>
                 <th>id записи персональных данных</th>
+                {% if is_granted('ROLE_ADMIN') %}
+                <th>Начисление участнику по программе Direct</th>
+                <th>Начисление пользователю по программе Cash back</th>
+                <th>Стоимость пакета участника</th>
+                <th>Общее количество начислений наград</th>
+                <th>Личная реферальная ссылка для приглашения нового участника</th>
+                {% endif %} 
                 <th>Действия</th>
             </tr>
         </thead>
@@ -46,6 +57,13 @@
                 <td>{{ referral_network.userId }}</td>
                 <td>{{ referral_network.userStatus }}</td>
                 <td>{{ referral_network.personalDataId }}</td>
+                {% if is_granted('ROLE_ADMIN') %}
+                <td>{{ referral_network.direct }}</td>
+                <td>{{ referral_network.cash }}</td>
+                <td>{{ referral_network.pakage }}</td>
+                <td>{{ referral_network.reward }}</td>
+                <td>{{ referral_network.memberCode }}</td>
+                {% endif %} 
                 <td>
                     <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">Подробности</a>
                     {# <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}

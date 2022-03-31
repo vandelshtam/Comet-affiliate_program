@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New SettingOptions{% endblock %}
+
+{% block body %}
+    <h1>Create new SettingOptions</h1>
+
+    {{ include('setting_options/_form.html.twig') }}
+
+    <a href="{{ path('app_setting_options_index') }}">back to list</a>
+{% endblock %}

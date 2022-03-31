@@ -25,6 +25,9 @@ class SettingOptions
     #[ORM\Column(type: 'integer', nullable: true)]
     private $all_price_pakage;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $accrual_limit;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -74,6 +77,18 @@ class SettingOptions
     public function setAllPricePakage(?int $all_price_pakage): self
     {
         $this->all_price_pakage = $all_price_pakage;
+
+        return $this;
+    }
+
+    public function getAccrualLimit(): ?int
+    {
+        return $this->accrual_limit;
+    }
+
+    public function setAccrualLimit(?int $accrual_limit): self
+    {
+        $this->accrual_limit = $accrual_limit;
 
         return $this;
     }
