@@ -40,12 +40,15 @@ class RegistrationController extends AbstractController
             
             $referral_link = $form->get('referral_link')->getData();
             $entityManager = $doctrine->getManager();
-            if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]) == false){
-                $this->addFlash(
-                    'danger',
-                    'Вы ошиблись при вводе реферальной ссылки или ввели устаревшую ссылку, пожалуйста поробуйте еще раз или обратитесь за новой ссылкой'); 
-                return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);       
+            if($referral_link != NULL){
+                if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]) == false){
+                    $this->addFlash(
+                        'danger',
+                        'Вы ошиблись при вводе реферальной ссылки или ввели устаревшую ссылку, пожалуйста поробуйте еще раз или обратитесь за новой ссылкой'); 
+                    return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);       
+                }
             }
+            
             
             // encode the plain password
             $user->setPassword(
