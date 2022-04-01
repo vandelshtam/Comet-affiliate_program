@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost:8889
--- Время создания: Мар 23 2022 г., 11:14
+-- Время создания: Апр 01 2022 г., 07:09
 -- Версия сервера: 5.7.34
 -- Версия PHP: 8.0.8
 
@@ -112,7 +112,22 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20220318161110', '2022-03-18 16:11:14', 87),
 ('DoctrineMigrations\\Version20220319105540', '2022-03-19 10:55:45', 94),
 ('DoctrineMigrations\\Version20220319105700', '2022-03-19 10:57:05', 85),
-('DoctrineMigrations\\Version20220322133513', '2022-03-22 13:35:22', 96);
+('DoctrineMigrations\\Version20220322133513', '2022-03-22 13:35:22', 96),
+('DoctrineMigrations\\Version20220325132922', '2022-03-25 13:29:55', 98),
+('DoctrineMigrations\\Version20220328150139', '2022-03-28 15:01:52', 90),
+('DoctrineMigrations\\Version20220328160031', '2022-03-28 16:00:36', 84),
+('DoctrineMigrations\\Version20220328165751', '2022-03-28 16:57:56', 58),
+('DoctrineMigrations\\Version20220329160753', '2022-03-29 16:07:58', 53),
+('DoctrineMigrations\\Version20220330085242', '2022-03-30 08:52:47', 54),
+('DoctrineMigrations\\Version20220330105509', '2022-03-30 10:55:13', 80),
+('DoctrineMigrations\\Version20220330120035', '2022-03-30 12:00:38', 78),
+('DoctrineMigrations\\Version20220330135615', '2022-03-30 13:56:19', 49),
+('DoctrineMigrations\\Version20220330173026', '2022-03-30 17:30:30', 82),
+('DoctrineMigrations\\Version20220331053247', '2022-03-31 05:32:52', 85),
+('DoctrineMigrations\\Version20220331084343', '2022-03-31 08:43:47', 81),
+('DoctrineMigrations\\Version20220331152421', '2022-03-31 15:24:25', 19),
+('DoctrineMigrations\\Version20220331175622', '2022-03-31 17:56:32', 22),
+('DoctrineMigrations\\Version20220331175644', '2022-03-31 17:56:50', 21);
 
 -- --------------------------------------------------------
 
@@ -129,18 +144,19 @@ CREATE TABLE `list_referral_networks` (
   `pakege_id` int(11) NOT NULL,
   `unique_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `network_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `client_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `client_code` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `profit_network` int(11) DEFAULT NULL,
+  `payments_direct` int(11) DEFAULT NULL,
+  `payments_cash` int(11) DEFAULT NULL,
+  `current_balance` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Дамп данных таблицы `list_referral_networks`
 --
 
-INSERT INTO `list_referral_networks` (`id`, `name`, `referral_networks_id`, `owner_id`, `owner_name`, `pakege_id`, `unique_code`, `network_code`, `client_code`) VALUES
-(23, 'My network 1', NULL, 11, 'Nikos', 48, 'qZg78nGIOCPirhHijUxY', '48-qZg78nGIOCPirhHijUxY', '32010652754'),
-(24, 'My network 2', NULL, 2, 'Nik', 48, 'qZg78nGIOCPirhHijUxY', '48-qZg78nGIOCPirhHijUxY', '32010652754'),
-(25, 'My network 3', NULL, 3, 'Moro', 48, 'qZg78nGIOCPirhHijUxY', '48-qZg78nGIOCPirhHijUxY', '32010652754'),
-(26, 'My network 4', NULL, 2, 'Vlad', 48, 'qZg78nGIOCPirhHijUxY', '48-qZg78nGIOCPirhHijUxY', '32010652754');
+INSERT INTO `list_referral_networks` (`id`, `name`, `referral_networks_id`, `owner_id`, `owner_name`, `pakege_id`, `unique_code`, `network_code`, `client_code`, `profit_network`, `payments_direct`, `payments_cash`, `current_balance`) VALUES
+(31, 'оп67па', NULL, 2, NULL, 239, 'On6J4PMaz0IQVr2ioy9z', '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 18595, 2200, 8819, 3363);
 
 -- --------------------------------------------------------
 
@@ -164,7 +180,7 @@ CREATE TABLE `pakege` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `price` int(11) DEFAULT NULL,
-  `referral_networks_id` int(11) DEFAULT NULL,
+  `referral_networks_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `client_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `token` int(11) DEFAULT NULL,
   `activation` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -177,33 +193,37 @@ CREATE TABLE `pakege` (
 --
 
 INSERT INTO `pakege` (`id`, `name`, `user_id`, `price`, `referral_networks_id`, `client_code`, `token`, `activation`, `unique_code`, `referral_link`) VALUES
-(48, 'Starter', 3, 100, NULL, '32010652754', 2000, 'активирован', 'qZg78nGIOCPirhHijUxY', NULL),
-(90, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'ENoTIMe44u4hc6u92Yib', '23-48-48-qZg78nGIOCPirhHijUxY'),
-(91, 'Networker', 2, 1000, NULL, '21497043565', 20000, 'активирован', '7hpm0h27tBa5l4L6gq02', '23-48-48-qZg78nGIOCPirhHijUxY'),
-(92, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'SgPmDrXAwi1pEwcnWta9', '23-90-48-qZg78nGIOCPirhHijUxY'),
-(93, 'Networker', 2, 1000, NULL, '21497043565', 20000, 'активирован', 'jkyruQpjmcBIHXuDbEOK', '23-90-48-qZg78nGIOCPirhHijUxY'),
-(94, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'oTKvW5cBu2q5RiZfeBuB', '23-91-48-qZg78nGIOCPirhHijUxY'),
-(95, 'Networker', 2, 1000, NULL, '21497043565', 20000, 'активирован', 'RPLkD53K9OIjJFXnELIY', '23-91-48-qZg78nGIOCPirhHijUxY'),
-(96, 'Starter', 2, 100, NULL, '21497043565', 2000, 'активирован', 'EgzHmQMrdBo4gYbDviyD', '23-92-48-qZg78nGIOCPirhHijUxY'),
-(97, 'Starter', 2, 100, NULL, '21497043565', 2000, 'активирован', 'xj9ldUP62EsNjHacsIlN', '23-92-48-qZg78nGIOCPirhHijUxY'),
-(98, 'Business', 2, 2500, NULL, '21497043565', 50000, 'активирован', 'qJHOvqNkeoLsAqrWMWtf', '23-92-48-qZg78nGIOCPirhHijUxY'),
-(99, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'waetN1CSnMvpzviNvJV5', '23-96-48-qZg78nGIOCPirhHijUxY'),
-(100, 'Networker', 2, 1000, NULL, '21497043565', 20000, 'активирован', 'wAeNT2XlVZA1T4OqfbRd', '23-96-48-qZg78nGIOCPirhHijUxY'),
-(101, 'Starter', 2, 100, NULL, '21497043565', 2000, 'активирован', 'qCnbRITeS6u4NPcRUW2i', '23-97-48-qZg78nGIOCPirhHijUxY'),
-(102, 'Starter', 2, 100, NULL, '21497043565', 2000, 'активирован', 'gxODYBDPaYQUyOuTWKN5', '23-96-48-qZg78nGIOCPirhHijUxY'),
-(103, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'wn1627FnfRho5ErVCwNd', '23-97-48-qZg78nGIOCPirhHijUxY'),
-(104, 'Starter', 2, 100, NULL, '21497043565', 2000, 'активирован', 'CVua2U3GSQQTwRObbZq7', '23-97-48-qZg78nGIOCPirhHijUxY'),
-(105, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'hl2yVXU6fobe8zTYtxXY', '23-97-48-qZg78nGIOCPirhHijUxY'),
-(106, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'qqmM1kjS53O6EOwekJd1', '23-97-48-qZg78nGIOCPirhHijUxY'),
-(107, 'Starter', 2, 100, NULL, '21497043565', 2000, 'активирован', '4TwFv4oxpwyxlqDsr2lW', '23-97-48-qZg78nGIOCPirhHijUxY'),
-(108, 'Networker', 2, 1000, NULL, '21497043565', 20000, 'активирован', 'DOTfWDbO1qvewTM55xDy', '23-103-48-qZg78nGIOCPirhHijUxY'),
-(109, 'Business', 2, 2500, NULL, '21497043565', 50000, 'активирован', 'AuI4WXiODh02OWUJwivA', '23-103-48-qZg78nGIOCPirhHijUxY'),
-(110, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'jyNP33yG5Kv3jNhTZ1FG', '23-103-48-qZg78nGIOCPirhHijUxY'),
-(111, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', '1RsUQBtPjh3SlAgRXKPb', '23-103-48-qZg78nGIOCPirhHijUxY'),
-(112, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'FF19HRzFeib0sFnagMDc', '23-103-48-qZg78nGIOCPirhHijUxY'),
-(113, 'Business', 2, 2500, NULL, '21497043565', 50000, 'активирован', 'NfjNzs5CALsi3RC3D5XO', '23-103-48-qZg78nGIOCPirhHijUxY'),
-(117, 'Basic', 2, 500, NULL, '21497043565', 10000, 'активирован', 'EZYi7LlL5vlfVPb8tIXc', '23-102-48-qZg78nGIOCPirhHijUxY'),
-(118, 'Networker', 2, 1000, NULL, '21497043565', 20000, 'активирован', 'keCqNTBMu2bO35jVyPfW', '23-102-48-qZg78nGIOCPirhHijUxY');
+(239, 'VIP', 2, 10000, '31-239-239-On6J4PMaz0IQVr2ioy9z', '21497043565', 200000, 'активирован', 'On6J4PMaz0IQVr2ioy9z', NULL),
+(255, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'H50W1HaOr0bvCeR5BXl2', '31-239-239-On6J4PMaz0IQVr2ioy9z'),
+(256, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'QnyQAFuR9Yf142Kg2C2i', '31-239-239-On6J4PMaz0IQVr2ioy9z'),
+(257, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', '7hUyulP3bycQUA16mnj0', '31-239-239-On6J4PMaz0IQVr2ioy9z'),
+(258, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'aoxC02fmwzhqvLlWmcUD', '31-256-239-On6J4PMaz0IQVr2ioy9z'),
+(259, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'mL2CHmcMc7eSw2rnMpbv', '31-256-239-On6J4PMaz0IQVr2ioy9z'),
+(260, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', 'P3JgmXoMmFG1UEgqK1GX', '31-256-239-On6J4PMaz0IQVr2ioy9z'),
+(261, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', 'RDVDCRUDLUInsg1rJ2bL', '31-256-239-On6J4PMaz0IQVr2ioy9z'),
+(262, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', 'ntJW0yhf5l287Jj3s0ek', '31-256-239-On6J4PMaz0IQVr2ioy9z'),
+(263, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', '7xNwEPXvRyK3Hs0BCh7K', '31-257-239-On6J4PMaz0IQVr2ioy9z'),
+(264, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'TQlMpqAflteXgsHPQ9rP', '31-257-239-On6J4PMaz0IQVr2ioy9z'),
+(265, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', '63PwxeczR1s2BWIED29n', '31-257-239-On6J4PMaz0IQVr2ioy9z'),
+(266, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'ELz2n3SUzSme04AL8xD3', '31-259-239-On6J4PMaz0IQVr2ioy9z'),
+(267, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', 'k3FVR5L3jPlRS62XwSGn', '31-259-239-On6J4PMaz0IQVr2ioy9z'),
+(268, 'Business', 2, 2500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 50000, 'активирован', 'fLiZGj6MNJxudc8qpGDw', '31-259-239-On6J4PMaz0IQVr2ioy9z'),
+(269, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', 'P2r5pZlCgYkFDnsJNKPG', '31-262-239-On6J4PMaz0IQVr2ioy9z'),
+(270, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', 'dX03NbmaDx8acz6gInKy', '31-262-239-On6J4PMaz0IQVr2ioy9z'),
+(271, 'Business', 2, 2500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 50000, 'активирован', 'nqzujxB3r3n7HZFLuaAN', '31-264-239-On6J4PMaz0IQVr2ioy9z'),
+(272, 'Trader', 2, 5000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 100000, 'активирован', 'HamtOjlEIVrLFDziVWJW', '31-264-239-On6J4PMaz0IQVr2ioy9z'),
+(273, 'Trader', 2, 5000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 100000, 'активирован', 'KI1XAkOkGBDnJ9Z2wpi1', '31-264-239-On6J4PMaz0IQVr2ioy9z'),
+(274, 'Trader', 2, 5000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 100000, 'активирован', 'VVTP6D46qniRGuCJo6Z0', '31-264-239-On6J4PMaz0IQVr2ioy9z'),
+(275, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'GyLkQUCqJlSllkBooqOf', '31-268-239-On6J4PMaz0IQVr2ioy9z'),
+(276, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'ixLmESc9kjHnCFM9ncSx', '31-268-239-On6J4PMaz0IQVr2ioy9z'),
+(277, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'Ejz9ImwNVDoourSun2kj', '31-262-239-On6J4PMaz0IQVr2ioy9z'),
+(278, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'oIEg89k0nVhiLIu2yWT2', '31-262-239-On6J4PMaz0IQVr2ioy9z'),
+(279, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'ZNLyDHW8t7TtPnXsKMU9', '31-262-239-On6J4PMaz0IQVr2ioy9z'),
+(280, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', 'L2mNDm04LHVTPUbWsvR8', '31-271-239-On6J4PMaz0IQVr2ioy9z'),
+(281, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'eFZkIdSDIv4Uph9QOlXA', '31-276-239-On6J4PMaz0IQVr2ioy9z'),
+(282, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', '5jwrsqQV3TzcHexiCzp2', '31-276-239-On6J4PMaz0IQVr2ioy9z'),
+(283, 'Basic', 2, 500, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 10000, 'активирован', 'yvgrVOlEGIMAU4Pg5ttV', '31-274-239-On6J4PMaz0IQVr2ioy9z'),
+(286, 'Networker', 2, 1000, '239-On6J4PMaz0IQVr2ioy9z', '21497043565', 20000, 'активирован', 'jo2AqRYaMUQhjYmxr5Am', '31-264-239-On6J4PMaz0IQVr2ioy9z');
 
 -- --------------------------------------------------------
 
@@ -272,38 +292,42 @@ CREATE TABLE `referral_network` (
   `user_referral_id` int(11) DEFAULT NULL,
   `network_referral_id` int(11) DEFAULT NULL,
   `reward` int(11) DEFAULT NULL,
-  `koef` double DEFAULT NULL
+  `koef` double DEFAULT NULL,
+  `cash` int(11) DEFAULT NULL,
+  `direct` int(11) DEFAULT NULL,
+  `my_team` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `current_network_profit` int(11) DEFAULT NULL,
+  `payments_network` int(11) DEFAULT NULL,
+  `payments_cash` int(11) DEFAULT NULL,
+  `pakage` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Дамп данных таблицы `referral_network`
 --
 
-INSERT INTO `referral_network` (`id`, `name`, `user_id`, `user_status`, `personal_data_id`, `balance`, `network_code`, `member_code`, `pakege_id`, `network_id`, `user_referral_id`, `network_referral_id`, `reward`, `koef`) VALUES
-(27, 'Anon', 11, 'owner', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-48-48-qZg78nGIOCPirhHijUxY', 48, 23, NULL, NULL, 1553, NULL),
-(96, '1', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-90-48-qZg78nGIOCPirhHijUxY', 90, 23, 11, 27, 1387, NULL),
-(97, '2', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-91-48-qZg78nGIOCPirhHijUxY', 91, 23, 11, 27, 1593, NULL),
-(98, '3', 11, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-92-48-qZg78nGIOCPirhHijUxY', 92, 23, 2, 96, 1496, NULL),
-(99, '4', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-93-48-qZg78nGIOCPirhHijUxY', 93, 23, 2, 96, 1585, NULL),
-(100, '5', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-94-48-qZg78nGIOCPirhHijUxY', 94, 23, 2, 97, 1002, NULL),
-(101, '6', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-95-48-qZg78nGIOCPirhHijUxY', 95, 23, 2, 97, 1703, NULL),
-(102, '7', 3, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-96-48-qZg78nGIOCPirhHijUxY', 96, 23, 2, 98, 1047, 0.0010341261633919),
-(103, '8', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-97-48-qZg78nGIOCPirhHijUxY', 97, 23, 2, 98, 1802, NULL),
-(104, '9', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-98-48-qZg78nGIOCPirhHijUxY', 98, 23, 2, 98, 770, 0.0010298661174047),
-(105, '10', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-99-48-qZg78nGIOCPirhHijUxY', 99, 23, 2, 102, 1932, NULL),
-(106, '12', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-100-48-qZg78nGIOCPirhHijUxY', 100, 23, 2, 102, 655, 0.0019960079840319),
-(107, '13', 3, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-101-48-qZg78nGIOCPirhHijUxY', 101, 23, 2, 103, 2046, NULL),
-(108, '14', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-102-48-qZg78nGIOCPirhHijUxY', 102, 23, 2, 102, 689, 0.0010298661174047),
-(109, '15', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-103-48-qZg78nGIOCPirhHijUxY', 103, 23, 2, 103, 1677, NULL),
-(110, 'ii', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-104-48-qZg78nGIOCPirhHijUxY', 104, 23, 2, 103, 407, 0.0031023784901758),
-(111, 'rr', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-105-48-qZg78nGIOCPirhHijUxY', 105, 23, 2, 103, 2132, 1),
-(112, 'u', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-106-48-qZg78nGIOCPirhHijUxY', 106, 23, 2, 103, 281, 0.066184074457084),
-(113, 'gfgf', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-107-48-qZg78nGIOCPirhHijUxY', 107, 23, 2, 103, 2132, NULL),
-(114, 'g', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-108-48-qZg78nGIOCPirhHijUxY', 108, 23, 2, 109, 156, 0.15925542916236),
-(115, 'sdsdsd', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-109-48-qZg78nGIOCPirhHijUxY', 109, 23, 2, 109, 1427, 1),
-(116, 'g', 2, 'left', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-110-48-qZg78nGIOCPirhHijUxY', 110, 23, 2, 109, 72, 0.25025853154085),
-(120, 'fdfdf', 2, 'right', NULL, 0, '48-qZg78nGIOCPirhHijUxY', '23-117-48-qZg78nGIOCPirhHijUxY', 117, 23, 2, 108, NULL, 0.99800399201597),
-(121, 'kjkjkj', 2, 'left', NULL, 690, '48-qZg78nGIOCPirhHijUxY', '23-118-48-qZg78nGIOCPirhHijUxY', 118, 23, 2, 108, NULL, 1);
+INSERT INTO `referral_network` (`id`, `name`, `user_id`, `user_status`, `personal_data_id`, `balance`, `network_code`, `member_code`, `pakege_id`, `network_id`, `user_referral_id`, `network_referral_id`, `reward`, `koef`, `cash`, `direct`, `my_team`, `current_network_profit`, `payments_network`, `payments_cash`, `pakage`) VALUES
+(304, NULL, 2, 'owner', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-239-239-On6J4PMaz0IQVr2ioy9z', 239, 31, NULL, NULL, 594, 0.94771380186283, 444, 150, '31-239-239-On6J4PMaz0IQVr2ioy9z', NULL, NULL, NULL, 10000),
+(326, 'My name 7', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-256-239-On6J4PMaz0IQVr2ioy9z', 256, 31, 2, 304, 1589, NULL, 1139, 450, '31-239-239-On6J4PMaz0IQVr2ioy9z', 0, 50, 0, 500),
+(327, 'My name 1', 2, 'right', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-257-239-On6J4PMaz0IQVr2ioy9z', 257, 31, 2, 304, 492, 0.052286198137172, 292, 200, '31-239-239-On6J4PMaz0IQVr2ioy9z', 850, 100, 50, 500),
+(330, 'My name 1', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-259-239-On6J4PMaz0IQVr2ioy9z', 259, 31, 2, 326, 1794, NULL, 1394, 400, '31-256-239-On6J4PMaz0IQVr2ioy9z', 850, 50, 100, 1000),
+(333, 'My name 1', 2, 'right', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-262-239-On6J4PMaz0IQVr2ioy9z', 262, 31, 2, 326, 955, NULL, 605, 350, '31-256-239-On6J4PMaz0IQVr2ioy9z', 0, 100, 0, 500),
+(335, 'My name 1', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-264-239-On6J4PMaz0IQVr2ioy9z', 264, 31, 2, 327, 2839, 0.049885263893046, 989, 1850, '31-257-239-On6J4PMaz0IQVr2ioy9z', 1307, 50, 642, 500),
+(337, 'My name 1', 2, 'right', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-266-239-On6J4PMaz0IQVr2ioy9z', 266, 31, 2, 330, 561, 0.041500664010624, 561, NULL, '31-259-239-On6J4PMaz0IQVr2ioy9z', 0, 50, 0, 1000),
+(338, 'My name 1', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-267-239-On6J4PMaz0IQVr2ioy9z', 267, 31, 2, 330, 788, NULL, 788, NULL, '31-259-239-On6J4PMaz0IQVr2ioy9z', 0, 100, 0, 1000),
+(339, 'My name 1', 2, 'right', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-268-239-On6J4PMaz0IQVr2ioy9z', 268, 31, 2, 330, 705, 0.20750332005312, 555, 150, '31-259-239-On6J4PMaz0IQVr2ioy9z', 2650, 250, 0, 500),
+(340, 'My name 1', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-269-239-On6J4PMaz0IQVr2ioy9z', 269, 31, 2, 333, 618, 0.11158594491928, 618, NULL, '31-262-239-On6J4PMaz0IQVr2ioy9z', 2931, 100, 2244, 1000),
+(341, 'My name 7', 2, 'right', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-270-239-On6J4PMaz0IQVr2ioy9z', 270, 31, 2, 333, 455, NULL, 455, NULL, '31-262-239-On6J4PMaz0IQVr2ioy9z', 788, 100, 1111, 1000),
+(342, 'My name 1', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-271-239-On6J4PMaz0IQVr2ioy9z', 271, 31, 2, 335, 414, NULL, 314, 100, '31-264-239-On6J4PMaz0IQVr2ioy9z', 4924, 250, 1011, 2500),
+(345, 'My name 1', 2, 'right', NULL, 1820, '239-On6J4PMaz0IQVr2ioy9z', '31-274-239-On6J4PMaz0IQVr2ioy9z', 274, 31, 2, 335, 377, 0.54089347079038, 327, 50, '31-264-239-On6J4PMaz0IQVr2ioy9z', 0, 500, 0, 5000),
+(346, 'My name 1', 2, 'right', NULL, 180, '239-On6J4PMaz0IQVr2ioy9z', '31-275-239-On6J4PMaz0IQVr2ioy9z', 275, 31, 2, 339, 319, 0.05360824742268, 319, NULL, '31-268-239-On6J4PMaz0IQVr2ioy9z', 1847, 50, 1362, 500),
+(348, 'My name 1', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-276-239-On6J4PMaz0IQVr2ioy9z', 276, 31, 2, 339, 192, NULL, 92, 100, '31-268-239-On6J4PMaz0IQVr2ioy9z', 814, 50, 135, 500),
+(350, 'My name 1', 2, 'right', NULL, 296, '239-On6J4PMaz0IQVr2ioy9z', '31-278-239-On6J4PMaz0IQVr2ioy9z', 278, 31, 2, 333, 230, 0.088201603665521, 230, NULL, '31-262-239-On6J4PMaz0IQVr2ioy9z', 0, 50, 0, 500),
+(351, 'My name 7', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-279-239-On6J4PMaz0IQVr2ioy9z', 279, 31, 2, 333, 92, NULL, 92, NULL, '31-262-239-On6J4PMaz0IQVr2ioy9z', 650, 50, 300, 500),
+(352, 'My name 1', 2, 'right', NULL, 682, '239-On6J4PMaz0IQVr2ioy9z', '31-280-239-On6J4PMaz0IQVr2ioy9z', 280, 31, 2, 342, 50, 0.20274914089347, 50, NULL, '31-271-239-On6J4PMaz0IQVr2ioy9z', 0, 100, 0, 1000),
+(354, 'My name 7', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-282-239-On6J4PMaz0IQVr2ioy9z', 282, 31, 2, 348, 0, NULL, 0, NULL, '31-276-239-On6J4PMaz0IQVr2ioy9z', 250, 50, 699, 500),
+(355, 'My name 1', 2, 'right', NULL, 385, '239-On6J4PMaz0IQVr2ioy9z', '31-283-239-On6J4PMaz0IQVr2ioy9z', 283, 31, 2, 345, NULL, 0.11454753722795, NULL, NULL, '31-274-239-On6J4PMaz0IQVr2ioy9z', 0, 50, 0, 500),
+(356, 'My name 1', 2, 'left', NULL, 0, '239-On6J4PMaz0IQVr2ioy9z', '31-286-239-On6J4PMaz0IQVr2ioy9z', 286, 31, 2, 335, 0, NULL, 0, NULL, '31-264-239-On6J4PMaz0IQVr2ioy9z', 734, 100, 1165, 1000);
 
 -- --------------------------------------------------------
 
@@ -341,6 +365,28 @@ CREATE TABLE `rewards` (
   `personal_data_id` int(11) DEFAULT NULL,
   `referral_network_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `setting_options`
+--
+
+CREATE TABLE `setting_options` (
+  `id` int(11) NOT NULL,
+  `payments_singleline` int(11) DEFAULT NULL,
+  `payments_direct` int(11) DEFAULT NULL,
+  `cash_back` int(11) DEFAULT NULL,
+  `all_price_pakage` int(11) DEFAULT NULL,
+  `accrual_limit` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `setting_options`
+--
+
+INSERT INTO `setting_options` (`id`, `payments_singleline`, `payments_direct`, `cash_back`, `all_price_pakage`, `accrual_limit`) VALUES
+(1, 10, 10, 300, 100000000, 70);
 
 -- --------------------------------------------------------
 
@@ -398,17 +444,19 @@ CREATE TABLE `user` (
   `is_verified` tinyint(1) NOT NULL,
   `personal_data_id` int(11) DEFAULT NULL,
   `username` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `role` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `role` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `referral_link` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Дамп данных таблицы `user`
 --
 
-INSERT INTO `user` (`id`, `email`, `roles`, `password`, `is_verified`, `personal_data_id`, `username`, `role`) VALUES
-(2, 'mvlju977@gmail.com', '[\"ROLE_ADMIN\"]', '$2y$13$OKjO/hiW3BLHx0Q.YabVz.h2z2tJa2cxrWhSC0axTSHO4YKrSzKPy', 1, 40, NULL, 'ROLE_ADMIN'),
-(3, 'asdf@gmail.com', '[\"ROLE_SUPER_ADMIN\"]', '$2y$13$LqI6EzlLI5/34oDlfc82wePoTLSZ4jIKDi58MwIojBmfVQgcB7cGm', 1, 35, 'vandelshtam', 'ROLE_ADMIN'),
-(11, 'bbb123@mail.ru', '[\"ROLE_ADMIN\"]', '$2y$13$iGmjxYHSe.q/3Om/K26Ww.dKCMJO9RKxGwCIS6F8mikfiJGGm9HqS', 1, 41, 'Nikos', NULL);
+INSERT INTO `user` (`id`, `email`, `roles`, `password`, `is_verified`, `personal_data_id`, `username`, `role`, `referral_link`) VALUES
+(2, 'mvlju977@gmail.com', '[\"ROLE_ADMIN\"]', '$2y$13$OKjO/hiW3BLHx0Q.YabVz.h2z2tJa2cxrWhSC0axTSHO4YKrSzKPy', 1, 40, NULL, 'ROLE_ADMIN', NULL),
+(3, 'asdf@gmail.com', '[\"ROLE_SUPER_ADMIN\"]', '$2y$13$LqI6EzlLI5/34oDlfc82wePoTLSZ4jIKDi58MwIojBmfVQgcB7cGm', 1, 35, 'vandelshtam', 'ROLE_ADMIN', NULL),
+(11, 'bbb123@mail.ru', '[\"ROLE_ADMIN\"]', '$2y$13$iGmjxYHSe.q/3Om/K26Ww.dKCMJO9RKxGwCIS6F8mikfiJGGm9HqS', 1, 41, 'Nikos', NULL, NULL),
+(12, '111@gmail.com', '[]', '$2y$13$dJlbrXU9aTpoR41xQOzsvO6c5jIH2qZLiPtXO.18b3j/DLSGgWZ.2', 1, 0, NULL, NULL, NULL);
 
 --
 -- Индексы сохранённых таблиц
@@ -473,6 +521,12 @@ ALTER TABLE `rewards`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `setting_options`
+--
+ALTER TABLE `setting_options`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Индексы таблицы `table_pakage`
 --
 ALTER TABLE `table_pakage`
@@ -499,7 +553,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT для таблицы `list_referral_networks`
 --
 ALTER TABLE `list_referral_networks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT для таблицы `pakages`
@@ -511,7 +565,7 @@ ALTER TABLE `pakages`
 -- AUTO_INCREMENT для таблицы `pakege`
 --
 ALTER TABLE `pakege`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=287;
 
 --
 -- AUTO_INCREMENT для таблицы `personal_data`
@@ -529,7 +583,7 @@ ALTER TABLE `pkege`
 -- AUTO_INCREMENT для таблицы `referral_network`
 --
 ALTER TABLE `referral_network`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=357;
 
 --
 -- AUTO_INCREMENT для таблицы `reset_password_request`
@@ -542,6 +596,12 @@ ALTER TABLE `reset_password_request`
 --
 ALTER TABLE `rewards`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `setting_options`
+--
+ALTER TABLE `setting_options`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `table_pakage`
@@ -559,7 +619,7 @@ ALTER TABLE `token_rate`
 -- AUTO_INCREMENT для таблицы `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
