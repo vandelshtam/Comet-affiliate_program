@@ -2,9 +2,15 @@
     {{ form_row(form.name, {'value': username}) }}<div id="emailHelp" class="form-text">Вы можете изменить его на любое другое, а так же используя любые символы которые вам нравяться!</div>
     {% if is_granted('ROLE_ADMIN') %}
     {{ form_row(form.balance) }}
+    {{ form_row(form.reward) }}
+    {{ form_row(form.cash) }}
+    {{ form_row(form.direct) }}
     {% else %}
     <div class="hidden">  
     {{ form_row(form.balance) }}
+    {{ form_row(form.reward) }}
+    {{ form_row(form.cash) }}
+    {{ form_row(form.direct) }}
     </div>
     {% endif %} 
     <div class="hidden">

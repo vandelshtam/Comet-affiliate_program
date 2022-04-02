@@ -18,9 +18,9 @@ class ReferralNetworkType extends AbstractType
             'required' => true,
             ]) 
             ->add('balance') 
-            //->add('user_id')
-            //->add('user_status')
-            //->add('personal_data_id')
+            ->add('reward')
+            ->add('cash')
+            ->add('direct')
             ->add('member_code')
         ;
     }
