@@ -19,6 +19,15 @@
     {{ form_row(form.referral_link) }}<div id="emailHelp" class="form-text">Если вы ввели реферальную ссылку при регистрации это поле заполнится автоматически, пожалуйста ничего не меняйте в нем.</div> 
     <div id="emailHelp" class="form-text">Eсли вы получили реферальную ссылку после регистрации пожалуйста введите в это поле реферальную ссылку</div> 
     {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
+    {{ form_row(form.price) }}
+    {{ form_row(form.activation) }}
+    {% else %}
+    <div class="hidden">  
+    {{ form_row(form.price) }}
+    {{ form_row(form.activation) }}
+    </div>
+    {% endif %} 
     <div class="hidden">
       {{ form_row(form.unique_code, {'value': unique_code }) }}
     </div>

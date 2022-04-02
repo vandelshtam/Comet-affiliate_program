@@ -171,8 +171,13 @@ class ReferralNetworkController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_referral_network_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ReferralNetwork $referralNetwork, ReferralNetworkRepository $referralNetworkRepository): Response
+    public function edit(Request $request, ReferralNetwork $referralNetwork, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine,int $id): Response
     {
+        $entityManager = $doctrine->getManager();
+        $network = $entityManager->getRepository(ReferralNetwork::class)->find($id);
+        //dd($network);
+        $username = $network -> getName();
+        $member_code = $network -> getMemberCode();
         $form = $this->createForm(ReferralNetworkType::class, $referralNetwork);
         $form->handleRequest($request);
 
@@ -184,6 +189,8 @@ class ReferralNetworkController extends AbstractController
         return $this->renderForm('referral_network/edit.html.twig', [
             'referral_network' => $referralNetwork,
             'form' => $form,
+            'username' => $username,
+            'member_code' => $member_code,
         ]);
     }
 

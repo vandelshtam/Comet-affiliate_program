@@ -144,8 +144,8 @@
     <a  class="btn btn-secondary mb-3" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Моя команда</a>
     <a  class="btn btn-warning mb-3" href="{{ path('app_personal_area') }}">Повысить пакет</a>
     
-    {# <a href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}
+    <a href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a>
 
-    {# {{ include('referral_network/_delete_form.html.twig') }} #}
+    {{ include('referral_network/_delete_form.html.twig') }}
 </div>
 {% endblock %}

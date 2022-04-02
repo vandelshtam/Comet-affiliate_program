@@ -99,6 +99,7 @@ class PakegeController extends AbstractController
         $entityManager = $doctrine->getManager();
         $pakage_comet = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
         $unique = $pakage_comet -> getUniqueCode();
+        $user_referral_link = $pakage_comet -> getReferralLink();
 
         if ($form->isSubmitted() && $form->isValid()) {
             $pakegeRepository->add($pakege);
@@ -109,6 +110,7 @@ class PakegeController extends AbstractController
             'pakege' => $pakege,
             'form' => $form,
             'unique_code' => $unique,
+            'user_referral_link' => $user_referral_link,
         ]);
     }
 

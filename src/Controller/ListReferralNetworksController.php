@@ -201,6 +201,6 @@ class ListReferralNetworksController extends AbstractController
             'Поздравляем! Вы успешно активировали пакет и создали новую реферальную сеть.');
         
         $listReferralNetworksRepository->add($listReferralNetwork);
-        return $this->redirectToRoute('app_referral_network_show', [], Response::HTTP_SEE_OTHER);        
+        return $this->redirectToRoute('app_list_referral_networks_index', [], Response::HTTP_SEE_OTHER);        
     }
 }

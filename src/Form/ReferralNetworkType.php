@@ -16,7 +16,8 @@ class ReferralNetworkType extends AbstractType
         ->add('name', TextType::class, [
             'label' => 'Ваше имя участника рефералной сети, его будут видеть другие участники проекта',
             'required' => true,
-            ])  
+            ]) 
+            ->add('balance') 
             //->add('user_id')
             //->add('user_status')
             //->add('personal_data_id')

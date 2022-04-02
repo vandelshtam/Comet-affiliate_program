@@ -47,6 +47,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $referral_link;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Wallet::class, cascade: ['persist', 'remove'])]
+    private $wallet;
+
 
     public function __construct()
     {
@@ -214,5 +217,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getWallet(): ?Wallet
+    {
+        return $this->wallet;
+    }
+
+    public function setWallet(Wallet $wallet): self
+    {
+        // set the owning side of the relation if necessary
+        if ($wallet->getUser() !== $this) {
+            $wallet->setUser($this);
+        }
+
+        $this->wallet = $wallet;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+      return $this->getId();
+    }
     
 }
