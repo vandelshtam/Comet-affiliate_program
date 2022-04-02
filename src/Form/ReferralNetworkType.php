@@ -21,6 +21,7 @@ class ReferralNetworkType extends AbstractType
             ->add('reward')
             ->add('cash')
             ->add('direct')
+            ->add('pakage')
             ->add('member_code')
         ;
     }
