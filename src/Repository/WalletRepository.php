@@ -45,14 +45,14 @@ class WalletRepository extends ServiceEntityRepository
         }
     }
 
-    // /**
-    //  * @return Wallet[] Returns an array of Wallet objects
-    //  */
-    /*
+    /**
+     * @return Wallet[] Returns an array of Wallet objects
+     */
+    
     public function findByExampleField($value)
     {
         return $this->createQueryBuilder('w')
-            ->andWhere('w.exampleField = :val')
+            ->andWhere('w.user_id = :val')
             ->setParameter('val', $value)
             ->orderBy('w.id', 'ASC')
             ->setMaxResults(10)
@@ -60,17 +60,17 @@ class WalletRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    */
+    
 
-    /*
+    
     public function findOneBySomeField($value): ?Wallet
     {
         return $this->createQueryBuilder('w')
-            ->andWhere('w.exampleField = :val')
+            ->andWhere('w.user_id = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
+    
 }

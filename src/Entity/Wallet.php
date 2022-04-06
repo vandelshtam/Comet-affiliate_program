@@ -25,6 +25,9 @@ class Wallet
     #[ORM\Column(type: 'float', nullable: true)]
     private $cometpoin;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $user_id;
+
     #[ORM\OneToOne(inversedBy: 'wallet', targetEntity: User::class, cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
@@ -99,6 +102,10 @@ class Wallet
         return $this;
     }
 
+    public function getUser_id(): ?int
+    {
+        return $this->usdt;
+    }
     
 
     

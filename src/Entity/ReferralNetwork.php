@@ -74,6 +74,12 @@ class ReferralNetwork
     #[ORM\Column(type: 'integer', nullable: true)]
     private $pakage;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $reward_wallet;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $withdrawal_to_wallet;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -321,6 +327,30 @@ class ReferralNetwork
     public function setPakage(?int $pakage): self
     {
         $this->pakage = $pakage;
+
+        return $this;
+    }
+
+    public function getRewardWallet(): ?int
+    {
+        return $this->reward_wallet;
+    }
+
+    public function setRewardWallet(?int $reward_wallet): self
+    {
+        $this->reward_wallet = $reward_wallet;
+
+        return $this;
+    }
+
+    public function getWithdrawalToWallet(): ?int
+    {
+        return $this->withdrawal_to_wallet;
+    }
+
+    public function setWithdrawalToWallet(?int $withdrawal_to_wallet): self
+    {
+        $this->withdrawal_to_wallet = $withdrawal_to_wallet;
 
         return $this;
     }

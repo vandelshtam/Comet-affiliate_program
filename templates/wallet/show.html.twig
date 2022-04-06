@@ -3,36 +3,136 @@
 {% block title %}Wallet{% endblock %}
 
 {% block body %}
-    <h1>Wallet</h1>
+<div class="container-xxl">
+    <h1>Мой кошелёк</h1>
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
+    <div class="col-xs-12 text-center shadow p-3 mb-5 bg-white rounded">
+      <h2>Структура вашего кошелька  в пересчете на USDT</h2>
+    </div>
+    <div class="mb-3" id="donut-chart"></div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ wallet.id }}</td>
-            </tr>
-            <tr>
-                <th>Usdt</th>
-                <td>{{ wallet.usdt }}</td>
-            </tr>
-            <tr>
-                <th>Etherium</th>
-                <td>{{ wallet.etherium }}</td>
-            </tr>
-            <tr>
-                <th>Bitcoin</th>
-                <td>{{ wallet.bitcoin }}</td>
-            </tr>
-            <tr>
-                <th>Cometpoin</th>
-                <td>{{ wallet.cometpoin }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="row justify-content-center">
+                <div class="col-sm-4 mb-1 ">
+                    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">USDT</h5>
+                        <p class="card-text">{{ wallet.usdt }}</p>
+                        <a href="{{ path('app_wallet_adddeposit', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Пополнить</a>
+                        <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Обменять</a>
+                        {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
+                        <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Вывести</a>
+                    </div>
+                    </div>
+                </div>
+    </div>           
+{#             
+                <div class="col-sm-8">
+                    <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Etherium</h5>
+                        <p class="card-text">{{ wallet.etherium }}</p>
+                        <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Пополнить</a>
+                        <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Обменять</a>
+                        
+                        <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Вывести</a>
+                    </div>
+                    </div>
+                </div>
+                
+                <div class="col-sm-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Bitcoin</h5>
+                            <p class="card-text">{{ wallet.bitcoin }}</p>
+                            <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Пополнить</a>
+                            <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Обменять</a>
+                            
+                            <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Вывести</a>
+                        </div>
+                    </div>
+                </div> #}
+                
+    <div class="row justify-content-center">        
+                <div class="col-sm-4 mb-1">
+                    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
+                        <div class="card-body">
+                            <h5 class="card-title">Cometpoin</h5>
+                            <p class="card-text">{{ wallet.cometpoin }}</p>
+                            <a href="{{ path('app_wallet_exchange_wallet_comet', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Пополнить</a>
+                            <a href="{{ path('app_wallet_exchange_comet', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Обменять</a>
+                            {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
+                            {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Вывести</a> #}
+                        </div>
+                    </div>
+                </div>
+    </div>
 
-    <a href="{{ path('app_wallet_index') }}">back to list</a>
+    <div class="row justify-content-center">
+        <div class="col-sm-4 mb-1">
+            <div class="card text-center shadow p-3 mb-1 bg-white rounded">
+            
+                <div class="card-body">
+                    <a class="btn btn-secondary mb-1" href="{{ path('app_wallet_index') }}">Назад</a>
+        
+    
+        {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}">edit</a> #}
 
-    <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}">edit</a>
-
-    {{ include('wallet/_delete_form.html.twig') }}
+                    {{ include('wallet/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+      var chart = bb.generate({
+        data: {
+          columns: [
+            ["Blue USDT", {{ wallet.usdt }}],
+            ["orange Cometpoin", {{ wallet.cometpoin }}/{{ token_rate }}],
+            //["green", 0], 
+          ],
+          type: "donut",
+          onclick: function (d, i) {
+            console.log("onclick", d, i);
+          },
+          onover: function (d, i) {
+            console.log("onover", d, i);
+          },
+          onout: function (d, i) {
+            console.log("onout", d, i);
+          },
+        },
+        donut: {
+          title: "100%",
+        },
+        bindto: "#donut-chart",
+      });
+</script>
 {% endblock %}

@@ -4,7 +4,34 @@
 
 {% block body %}
     <h1>Wallet index</h1>
-
+{% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
     <table class="table">
         <thead>
             <tr>
@@ -19,8 +46,8 @@
         <tbody>
         {% for wallet in wallets %}
             <tr>
-                <td>{{ wallet.id }}</td>
-                <td>{{ wallet.usdt }}</td>
+                <td>{{ wallet.Id }}</td>
+                <td>{{ wallet.Usdt }}</td>
                 <td>{{ wallet.etherium }}</td>
                 <td>{{ wallet.bitcoin }}</td>
                 <td>{{ wallet.cometpoin }}</td>

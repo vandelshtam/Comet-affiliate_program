@@ -1,9 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Wallet{% endblock %}
+{% block title %}Wallet deposit usdt{% endblock %}
 
 {% block body %}
-    <h1>Create new Wallet</h1>
+<div class="container-xxl">
+    <h1>Конвертация Cometpoin</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -32,7 +33,10 @@
                     </div>
                 {% endfor %}            
     {% endfor %}
-    {{ include('wallet/_form.html.twig') }}
+    {{ include('wallet/_form_exchange_usdt.html.twig', {'button_label': 'Подтвердить'}) }}
 
-    <a href="{{ path('app_wallet_index') }}">back to list</a>
+    <a class="btn btn-secondary mb-3" href="{{ path('app_wallet_user') }}">Назад</a>
+
+    {{ include('wallet/_delete_form.html.twig') }}
+</div>
 {% endblock %}

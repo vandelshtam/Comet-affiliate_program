@@ -4,8 +4,35 @@
 
 {% block body %}
     <h1>Edit Wallet</h1>
-
-    {{ include('wallet/_form.html.twig', {'button_label': 'Update'}) }}
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
+    {{ include('wallet/_form.html.twig', {'button_label': 'Подтвердить'}) }}
 
     <a href="{{ path('app_wallet_index') }}">back to list</a>
 

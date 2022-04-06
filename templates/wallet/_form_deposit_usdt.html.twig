@@ -1,0 +1,7 @@
+{{ form_start(form) }}
+    {{ form_row(form.usdt) }}<div id="emailHelp" class="form-text">Введите сумму USDT для внесения на кошелек </div> 
+    <div class="hidden">
+      {{ form_row(form.user) }}
+    </div>
+    <button class="btn btn-warning mb-3">{{ button_label|default('Подтвердить') }}</button>
+{{ form_end(form) }}

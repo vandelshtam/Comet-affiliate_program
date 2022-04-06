@@ -248,6 +248,16 @@ class ReferralNetworkRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
+    public function findOneByReferralField($value): ?ReferralNetwork
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.user_id = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
     
 
     /**

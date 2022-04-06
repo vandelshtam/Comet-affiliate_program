@@ -263,6 +263,8 @@ class ReferralNetworkController extends AbstractController
         $referral_network -> setPaymentsCash(0);
         $referral_network -> setCurrentNetworkProfit(0);
         $referral_network -> setPakage($balance);
+        $referral_network -> setReward($reward);
+        $referral_network -> setRewardWallet($reward);
         $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
         $referralNetworkRepository->add($referral_network);
         $old_profit_network = $list_network -> getProfitNetwork();
@@ -754,10 +756,13 @@ class ReferralNetworkController extends AbstractController
             $referral_network_left -> setBalance(0);
             $referral_network_right -> setBalance($balance_right);
             $reward_user = $referral_network_user -> getReward();
+            $reward_user_wallet = $referral_network_user -> getRewardWallet();
             $balance = $balance_pred_left * 0.1;
             $reward = $reward_user + $balance;
+            $reward_wallet = $reward_user_wallet + $balance;
             $new_cash = $cash_refovod + $balance;
             $referral_network_user ->  setReward($reward);
+            $referral_network_user ->  setRewardWallet($reward_wallet);
             $referral_network_user -> setCash($new_cash);
             $new_profit_network = $repayment_balance - ($bonus + $balance);
             //$list_network ->setProfitNetwork($new_profit_network);
@@ -775,9 +780,12 @@ class ReferralNetworkController extends AbstractController
             $referral_network_left -> setBalance($balance_left);
             $referral_network_right -> setBalance(0);
             $reward_user = $referral_network_user ->  getReward();
+            $reward_user_wallet = $referral_network_user -> getRewardWallet();
             $balance = $balance_pred_right * 0.1;
             $reward = $reward_user + $balance;
+            $reward_wallet = $reward_user_wallet + $balance;
             $referral_network_user ->  setReward($reward);
+            $referral_network_user ->  setRewardWallet($reward_wallet);
             $new_cash = $cash_refovod + $balance;
             $referral_network_user -> setCash($new_cash);
             $new_profit_network = $repayment_balance - ($bonus + $balance);
@@ -793,11 +801,14 @@ class ReferralNetworkController extends AbstractController
     private function where_is_balance($referral_network_user,$summ_single_line_right_balance){
         //вычислим и запишем награду участнику относительно которого выстроена линия (рефовод)
         $reward_refovod = $referral_network_user -> getReward();
+        $reward_user_wallet = $referral_network_user -> getRewardWallet();
         $cash_refovod = $referral_network_user -> getCash();
         $reward_right_user = $summ_single_line_right_balance *0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-        $reward_user = $reward_refovod + $reward_right_user; 
+        $reward_user = $reward_refovod + $reward_right_user;
+        $reward_wallet = $reward_user_wallet + $reward_right_user; 
         $new_cash = $cash_refovod + $reward_right_user;
         $referral_network_user -> setReward($reward_user);
+        $referral_network_user ->  setRewardWallet($reward_wallet);
         $referral_network_user -> setCash($new_cash);
     }
 
@@ -832,11 +843,14 @@ class ReferralNetworkController extends AbstractController
                     $limit_cash_back = $k_cash_back * $user_id_pakege;
                     //$pakege_user_network = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);// получаем оъект пакета  участника реферальной сети
                     $reward1 = $user -> getReward();
+                    $reward_wallet = $user -> getRewardWallet();
                     if($reward1 <= $limit_cash_back){
                         $new_cash = $cash_refovod + $reward_user_new1;
                         $user -> setCash($new_cash); 
-                        $reward_user1 = $reward_user_new1 + $reward1; 
+                        $reward_user1 = $reward_user_new1 + $reward1;
+                        $reward_user_wallet = $reward_user_new1 + $reward_wallet;  
                         $user -> setReward($reward_user1);
+                        $user -> setRewardWallet($reward_user_wallet);
                         $cash_all[] = $reward_user_new1;
                     }
                     
@@ -846,12 +860,15 @@ class ReferralNetworkController extends AbstractController
                     $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
                     $cash_refovod2 = $user -> getCash();
                     $user_id_pakege = $user -> getPakage();
+                    $reward_wallet = $user -> getRewardWallet();
                     $limit_cash_back = $k_cash_back * $user_id_pakege;
                     $reward2 = $user -> getReward();
                     if($reward2 <= $limit_cash_back){
                         $new_cash2 = $cash_refovod2 + $reward_user_new2; 
-                        $reward_user2 = $reward_user_new2 + $reward2; 
+                        $reward_user2 = $reward_user_new2 + $reward2;
+                        $reward_user_wallet = $reward_user_new2 + $reward_wallet;   
                         $user -> setReward($reward_user2);
+                        $user -> setRewardWallet($reward_user_wallet);
                         $user -> setCash($new_cash2);
                         $cash_all[] = $reward_user_new2;
                     }
@@ -906,12 +923,15 @@ class ReferralNetworkController extends AbstractController
                     $reward_user_new3 = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
                     $cash_refovod3 = $user -> getCash();
                     $reward3 = $user -> getReward();
+                    $reward_wallet = $user -> getRewardWallet();
                     $user_id_pakege = $user -> getPakage();
                     $limit_cash_back = $k_cash_back * $user_id_pakege;
                     if($reward3 <= $limit_cash_back){
                         $new_cash3 = $cash_refovod3 + $reward_user_new3; 
-                        $reward_user3 = $reward_user_new3 + $reward3; 
+                        $reward_user3 = $reward_user_new3 + $reward3;
+                        $reward_user_wallet = $reward_user_new3 + $reward_wallet;    
                         $user -> setReward($reward_user3);
+                        $user -> setRewardWallet($reward_user_wallet);
                         $user -> setCash($new_cash3);
                         $cash_all2[] = $reward_user_new3;
                     }
@@ -922,12 +942,15 @@ class ReferralNetworkController extends AbstractController
                     $reward_user_new4 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
                     $cash_refovod4 = $user -> getCash();
                     $reward4 = $user -> getReward();
+                    $reward_wallet = $user -> getRewardWallet();
                     $user_id_pakege = $user -> getPakage();
                     $limit_cash_back = $k_cash_back * $user_id_pakege;
                     if($reward4 <= $limit_cash_back){
                         $new_cash4 = $cash_refovod4 + $reward_user_new4;  
                         $reward_user4 = $reward_user_new4 + $reward4; 
+                        $reward_user_wallet = $reward_user_new4 + $reward_wallet;    
                         $user -> setReward($reward_user4);
+                        $user -> setRewardWallet($reward_user_wallet);
                         $user -> setCash($new_cash4);
                         $cash_all2[] = $reward_user_new4;
                     }
