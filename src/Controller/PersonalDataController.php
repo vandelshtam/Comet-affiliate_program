@@ -6,9 +6,15 @@ use App\Entity\User;
 use App\Entity\PersonalData;
 use App\Form\PersonalDataType;
 
+use App\Entity\FastConsultation;
+use App\Form\FastConsultationType;
+use App\Controller\MailerController;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\PersonalDataRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +35,7 @@ class PersonalDataController extends AbstractController
     }
 
     #[Route('/{user_id}/new', name: 'app_personal_data_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine, int $user_id): Response
+    public function new(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine,EntityManagerInterface $entityManager, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $user_id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
@@ -49,8 +55,9 @@ class PersonalDataController extends AbstractController
             $personalData = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
             $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user -> getId()]);
             $user_table->setPersonalDataId($personalData -> getId());
-            $random_code = mt_rand();
+            $random_code = 'CP'.mt_rand();
             $client_code = $user -> getId().$random_code;
+            $user_table->setPesonalCode($client_code);
             $personalData->setClientCode($client_code);
             $entityManager->persist($user_table);
             $entityManager->flush();
@@ -61,17 +68,29 @@ class PersonalDataController extends AbstractController
             return $this->redirectToRoute('app_personal_data_show', ['personal_user_id' => $user -> getId()], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            //dd($fast_consultation->getName());
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->renderForm('personal_data/new.html.twig', [
             'personal_datum' => $personalDatum,
             'form' => $form,
             'user_id' => $user_id,
             'new_user_make' => true,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
     
     #[Route('/{personal_user_id}/show', name: 'app_personal_data_show', methods: ['GET', 'POST'])]
-    public function show(ManagerRegistry $doctrine,int $personal_user_id): Response
+    public function show(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,int $personal_user_id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
@@ -87,14 +106,26 @@ class PersonalDataController extends AbstractController
         $repository = $doctrine->getRepository(PersonalData::class);
         $personalDatum = $doctrine->getRepository(PersonalData::class)->findOneBySomeField($user -> getId());
         
-        return $this->render('personal_data/show.html.twig', [
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            //dd($fast_consultation->getName());
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('personal_data/show.html.twig', [
             'personal_datum' => $personalDatum,
             'user' => $user,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_personal_data_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, PersonalData $personalDatum, PersonalDataRepository $personalDataRepository,int $id): Response
+    public function edit(Request $request, PersonalData $personalDatum, PersonalDataRepository $personalDataRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         if($this->getUser()->getPersonalDataId() != $id)
@@ -110,11 +141,22 @@ class PersonalDataController extends AbstractController
             return $this->redirectToRoute('app_personal_data_show', ['personal_user_id' => $id], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->renderForm('personal_data/edit.html.twig', [
             'personal_datum' => $personalDatum,
             'form' => $form,
             'new_user_make' => false,
             'user_id' => $user->getId(),
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 

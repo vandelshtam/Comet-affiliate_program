@@ -3,8 +3,8 @@
 {% block title %}Edit PersonalData{% endblock %}
 
 {% block body %}
-<div class="container">
-    <h1>Страница редактирования персональных данных</h1>
+<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Страница редактирования персональных данных</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -19,11 +19,11 @@
                 </div>
             {% endfor %}
     {% endfor %}
-    {{ include('personal_data/_form.html.twig', {'button_label': 'Редактировать'}) }}
+    {{ include('personal_data/_form.html.twig', {'button_label': 'Обновить'}) }}
     {% if is_granted('ROLE_ADMIN') %}
-    <a class="btn btn-primary" href="{{ path('app_personal_data_index') }}">Назад</a>
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_data_index') }}">Назад</a>
     {% else %}
-    <a class="btn btn-primary" href="{{ path('app_personal_data_show', {'personal_user_id': personal_datum.id}) }}">Назад</a>
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_data_show', {'personal_user_id': personal_datum.id}) }}">Назад</a>
     {% endif %}
     <br><br>
     {% if is_granted('ROLE_ADMIN') %}

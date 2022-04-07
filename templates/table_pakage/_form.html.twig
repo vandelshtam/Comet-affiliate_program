@@ -5,11 +5,39 @@
 {% endif %}
 
 {{ form_start(form) }}
-<div class="form_box-inner">   
-    <div class="form_box-left">
+{# <div class="form_box-inner">   
+    <div class="form_box-left"> #}
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
     {{ form_widget(form) }}
-    <button class="btn btn-warning">{{ button_label|default('Сохранить') }}</button>
-    </div>
-</div>
+    <button class="btn btn-warning rounded-0 mb-1">{{ button_label|default('Сохранить') }}</button>
+    {# </div>
+</div> #}
 {{ form_end(form) }}
 

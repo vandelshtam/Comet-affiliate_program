@@ -7,12 +7,18 @@ use App\Form\WalletType;
 use App\Entity\TokenRate;
 use App\Form\WalletUsdtType;
 use App\Entity\ReferralNetwork;
+use App\Entity\FastConsultation;
 use App\Form\WalletExchangeType;
+use App\Form\FastConsultationType;
+use App\Controller\MailerController;
 use App\Form\WalletExchangeUsdtType;
 use App\Repository\WalletRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Form\WalletDepositFromSingllineType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,17 +30,8 @@ class WalletController extends AbstractController
     public function index(WalletRepository $walletRepository,ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        //if($this->denyAccessUnlessGranted('ROLE_ADMIN')){
-            $wallet = $walletRepository->findAll();
-        // }
-        // else{
-        //     $user_id = $this -> getUser() -> getId();
-        //     //dd($user_id);
-        //     $entityManager = $doctrine->getManager();
-        //     $wallet = $walletRepository->findAll();
-        //     //$wallet = $entityManager->getRepository(Wallet::class)->findOneBySomeField($user_id);
-        //     //dd($wallet);
-        // }
+        
+        $wallet = $walletRepository->findAll();
         
         return $this->render('wallet/index.html.twig', [
             'wallets' => $wallet,
@@ -44,6 +41,7 @@ class WalletController extends AbstractController
     #[Route('/new', name: 'app_wallet_new', methods: ['GET', 'POST'])]
     public function new(Request $request, WalletRepository $walletRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $wallet = new Wallet();
         $form = $this->createForm(WalletType::class, $wallet);
         $form->handleRequest($request);
@@ -60,16 +58,42 @@ class WalletController extends AbstractController
     }
 
     #[Route('/show', name: 'app_wallet_user', methods: ['GET'])]
-    public function showUser(ManagerRegistry $doctrine): Response
+    public function showUser(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
-        $user_id = $this -> getUser() -> getId();
-        //dd($user_id);
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
-        $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//получаем курс внутреннего токена сети
+        $user_id = $this -> getUser() -> getId();
+        
+        if($entityManager->getRepository(Wallet::class)->findOneBySomeField($user_id) == NULL){
+            $this->addFlash(
+                'info',
+                'Вы не приобрели ни одного пакета, к сожалению у вас нет данных и нет доступа к кошельку.');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+        
         $wallet = $entityManager->getRepository(Wallet::class)->findOneBySomeField($user_id);
+        
+        if($wallet -> getUserId() != $user_id){
+            $this->addFlash(
+                'warning',
+                'У вас нет прав доступа к кошельку.');
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+        $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//получаем курс внутреннего токена сети
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->render('wallet/show.html.twig', [
             'wallet' => $wallet,
             'token_rate' => $token_rate,
+            'fast_consultation_form' => $fast_consultation_form->createView(),
         ]);
     }
 
@@ -86,6 +110,7 @@ class WalletController extends AbstractController
     #[Route('/{id}/edit', name: 'app_wallet_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Wallet $wallet, WalletRepository $walletRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $form = $this->createForm(WalletType::class, $wallet);
         $form->handleRequest($request);
 
@@ -103,6 +128,7 @@ class WalletController extends AbstractController
     #[Route('/{id}/deposit', name: 'app_wallet_adddeposit', methods: ['GET', 'POST'])]
     public function deposit(Request $request, Wallet $wallet, WalletRepository $walletRepository,ManagerRegistry $doctrine, int $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
         $table_wallet = $entityManager->getRepository(Wallet::class)->findOneBy(['id' => $id]);
         $table_usdt = $wallet -> getUsdt();
@@ -135,6 +161,7 @@ class WalletController extends AbstractController
     #[Route('/{id}/exchangecomet', name: 'app_wallet_exchange_comet', methods: ['GET', 'POST'])]
     public function exchange(Request $request, Wallet $wallet, WalletRepository $walletRepository,ManagerRegistry $doctrine, int $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
         $table_wallet = $entityManager->getRepository(Wallet::class)->findOneBy(['id' => $id]);
         $table_usdt = $wallet -> getUsdt();
@@ -218,6 +245,7 @@ class WalletController extends AbstractController
     #[Route('/{id}/exchangeusdt', name: 'app_wallet_exchange_usdt', methods: ['GET', 'POST'])]
     public function exchangeUsdt(Request $request, Wallet $wallet, WalletRepository $walletRepository,ManagerRegistry $doctrine, int $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
         $table_wallet = $entityManager->getRepository(Wallet::class)->findOneBy(['id' => $id]);
         $table_usdt = $wallet -> getUsdt();
@@ -302,6 +330,7 @@ class WalletController extends AbstractController
     #[Route('/{id}/exchangecometwallet', name: 'app_wallet_exchange_wallet_comet', methods: ['GET', 'POST'])]
     public function exchangeCometWallet(Request $request, Wallet $wallet, WalletRepository $walletRepository,ManagerRegistry $doctrine, int $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
         $table_wallet = $entityManager->getRepository(Wallet::class)->findOneBy(['id' => $id]);
         $user_id = $wallet -> getUser() -> getId();
@@ -350,6 +379,7 @@ class WalletController extends AbstractController
     #[Route('/{id}/delete', name: 'app_wallet_delete', methods: ['POST'])]
     public function delete(Request $request, Wallet $wallet, WalletRepository $walletRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($this->isCsrfTokenValid('delete'.$wallet->getId(), $request->request->get('_token'))) {
             $walletRepository->remove($wallet);
         }

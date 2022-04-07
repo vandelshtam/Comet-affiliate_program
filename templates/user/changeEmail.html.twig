@@ -9,8 +9,8 @@
     {{ form_errors(form) }}
 </div>
 {% endif %}
-<div class="container">
-    <h1>Страница редактирования электронной почты</h1>
+<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Страница редактирования электронной почты</h1>
     {% for label, messages in app.flashes(['danger', 'notice']) %}
         {% for message in messages %}
             <div class="alert alert-danger" role="alert">
@@ -39,8 +39,8 @@
             <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="confirm_email">
             <div id="emailHelp" class="form-text">Пожалуйста повторите новую электронную почту</div>
         </div>  
-        <button class="btn btn-warning">{{ button_label|default('Сохранить') }}</button>
-        <a class="btn btn-primary" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
+        <button class="btn btn-warning rounded-0 mb-1">{{ button_label|default('Сохранить') }}</button>
+        <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
         </div>
         <div class="hidden">
         {{ form_row(form.username) }}

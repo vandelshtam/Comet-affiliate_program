@@ -5,7 +5,7 @@
 
 {% block body %}
 
-<div class="example-wrapper container-xxl">
+<div class="example-wrapper container-xxl container-xxl col-sm-6  shadow p-3 mb-1 mt-3 rounded-0">
 {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -27,7 +27,7 @@
                     </div>
                 {% endfor %}
     {% endfor %}
-    <h1>Привет! Это -  {{ controller_name }}</h1>
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;"> {{ controller_name }}</h1>
     <div class="card mb-3" style="max-width: 1140px;">
     <div class="row g-0">
         <div class="col-md-4">
@@ -35,7 +35,7 @@
         </div>
         <div class="col-md-8">
         <div class="card-body">
-            <h5 class="card-title">Пакеты для участия в программе</h5>
+            <h5 class="card-title d-flex justify-content-center text-white mb-5">Пакеты для участия в программе</h5>
             <p class="card-text">Ниже приведено описание пакетов, вы сможете подобрать для себя оптимальный пакет.</p>
             <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
         </div>
@@ -62,10 +62,10 @@
                 <td>{{ table_pakage.pricePakage }}</td>
                 <td>
                     {# {% if is_granted('IS_AUTHENTICATED_FULLY') %}    #}
-                    <a class="btn btn-secondary" href="{{ path('app_table_pakage_show', {'id': table_pakage.id}) }}">Посмотреть</a>
+                    <a class="btn btn-secondary rounded-0 mb-1" href="{{ path('app_table_pakage_show', {'id': table_pakage.id}) }}">Посмотреть</a>
                     {# {% endif %} #}
                     {% if is_granted('ROLE_ADMIN') %}   
-                    <a class="btn btn-warning" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
+                    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
                     {% endif %}
                 </td>
             </tr>
@@ -77,7 +77,7 @@
         </tbody>
     </table>
     {% if is_granted('ROLE_ADMIN') %}   
-    <a class="btn btn-success" href="{{ path('app_table_pakage_new') }}">Добавить новый пакет</a>
+    <a class="btn btn-success rounded-0 mb-1" href="{{ path('app_table_pakage_new') }}">Добавить новый пакет</a>
     {% endif %}
 </div>
 {% endblock %}

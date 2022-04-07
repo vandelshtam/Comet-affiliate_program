@@ -50,6 +50,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: Wallet::class, cascade: ['persist', 'remove'])]
     private $wallet;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $pesonal_code;
+
 
     public function __construct()
     {
@@ -237,6 +240,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString()
     {
       return $this->getId();
+    }
+
+    public function getPesonalCode(): ?string
+    {
+        return $this->pesonal_code;
+    }
+
+    public function setPesonalCode(?string $pesonal_code): self
+    {
+        $this->pesonal_code = $pesonal_code;
+
+        return $this;
     }
     
 }

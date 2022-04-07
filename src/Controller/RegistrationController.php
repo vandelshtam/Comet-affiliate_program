@@ -5,13 +5,18 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\ReferralNetwork;
 use App\Security\EmailVerifier;
+use App\Entity\FastConsultation;
+use App\Form\FastConsultationType;
 use App\Form\RegistrationFormType;
 use Symfony\Component\Mime\Address;
+use App\Controller\MailerController;
 use App\Security\LoginFormAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,8 +33,8 @@ class RegistrationController extends AbstractController
         $this->emailVerifier = $emailVerifier;
     }
 
-    #[Route('/register', name: 'app_register')]
-    public function register(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
+    #[Route('/register/{referral?}', name: 'app_register')]
+    public function register(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager,FastConsultationController $fast_consultation_meil, MailerController $mailerController,MailerInterface $mailer, ?string $referral): Response
     {
         
         $user = new User();
@@ -37,7 +42,13 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
+            //dd($request->get('password'));
+            if($request->get('password') != $form->get('plainPassword')->getData()){
+                $this->addFlash(
+                    'danger',
+                    'Пароль и его подтверждение не совпадают, введите еще раз.'); 
+                return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);      
+            }
             $referral_link = $form->get('referral_link')->getData();
             $entityManager = $doctrine->getManager();
             if($referral_link != NULL){
@@ -59,6 +70,7 @@ class RegistrationController extends AbstractController
             );
             // $roles[] = 'ROLE_ADMIN';
             // $user->setRoles($roles);
+            $user->setReferralLink($referral);
             $entityManager->persist($user);
             $entityManager->flush();
             $this->addFlash(
@@ -85,8 +97,20 @@ class RegistrationController extends AbstractController
             );
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
+            'fast_consultation_form' => $fast_consultation_form->createView(),
+            'referral_link' => $referral,
         ]);
     }
 

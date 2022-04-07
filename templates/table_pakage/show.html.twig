@@ -43,10 +43,10 @@
         </tbody>
     </table>
     {# {% if is_granted('IS_AUTHENTICATED_FULLY') %}    #}
-    <a class="btn btn-secondary" href="{{ path('app_table_pakage_index') }}">Назад</a>
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_table_pakage_index') }}">Назад</a>
     {# {% endif %} #}
     {% if is_granted('ROLE_ADMIN') %}   
-    <a class="btn btn-warning" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
+    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
 
     {{ include('table_pakage/_delete_form.html.twig') }}
     {% endif %}

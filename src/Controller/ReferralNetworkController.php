@@ -3,14 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\Pakege;
-use App\Entity\ReferralNetwork;
-use App\Form\ReferralNetworkType;
-use App\Entity\ListReferralNetworks;
-use App\Entity\SettingOptions;
 use App\Entity\TokenRate;
+use App\Entity\SettingOptions;
+use App\Entity\ReferralNetwork;
+use App\Entity\FastConsultation;
+use App\Form\ReferralNetworkType;
+use App\Form\ReferralToEmailType;
+use App\Form\FastConsultationType;
+use App\Entity\ListReferralNetworks;
+use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,11 +23,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/referral/network')]
 class ReferralNetworkController extends AbstractController
 {
-    #[Route('/', name: 'app_referral_network_index', methods: ['GET'])]
-    public function index(ReferralNetworkRepository $referralNetworkRepository,ManagerRegistry $doctrine): Response
-    {         
-        return $this->render('referral_network/index.html.twig', [
+    #[Route('/', name: 'app_referral_network_index', methods: ['GET', 'POST'])]
+    public function index(ReferralNetworkRepository $referralNetworkRepository,Request $request,  MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine): Response
+    { 
+        $entityManager = $doctrine->getManager(); 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            dd($fast_consultation->getName());
+            $textSendMail = $mailerController -> textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_referral_network_show', [], Response::HTTP_SEE_OTHER);
+        }        
+        return $this->renderForm('referral_network/index.html.twig', [
             'referral_networks' => $referralNetworkRepository->findAll(),
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
@@ -95,13 +112,16 @@ class ReferralNetworkController extends AbstractController
     }
 
 
-    #[Route('/{id}', name: 'app_referral_network_show', methods: ['GET'])]
-    public function show(ReferralNetwork $referralNetwork,ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine,  int $id,): Response
+    #[Route('/{id}/show', name: 'app_referral_network_show', methods: ['GET', 'POST'])]
+    public function show(Request $request, ReferralNetwork $referralNetwork,ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine,  int $id,): Response
     {
 
         $entityManager = $doctrine->getManager();
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['id' => $id]);
         $my_team = $referral_network -> getMyTeam();
+        $referral_link = $referral_network -> getMemberCode();
+        $user_id = $referral_network -> getUserId();
+        $email_user = $entityManager->getRepository(User::class)->findOneBy(['id' => $user_id]) -> getEmail();
         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
         $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]);//получаем объект  участников моей команды (которых пригласил пользователь)
@@ -160,13 +180,37 @@ class ReferralNetworkController extends AbstractController
                        'count_left' => $count_single_line_left, 'count_right' => $count_single_line_right,
                        'my_summ' => $reward];
 
-        return $this->render('referral_network/show.html.twig', [
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            //dd($fast_consultation->getName());
+            $textSendMail = $mailerController -> textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_referral_network_show', ['id' => $id], Response::HTTP_SEE_OTHER);
+        }
+
+           
+        $referral_link_to_email_form = $this->createForm(ReferralToEmailType::class);
+        $referral_link_to_email_form->handleRequest($request);
+        if ($referral_link_to_email_form->isSubmitted() && $referral_link_to_email_form->isValid()) {
+            $email_to_client = $referral_link_to_email_form -> get('email_to_client')->getData();
+             
+            //dd($referral_link);
+            $textSendToReferralMail = $mailerController->textReferralToEmailMail($referral_link);
+            $mailerController -> sendReferralToEmail($mailer,$email_to_client,$email_user,$referral_link); 
+            return $this->redirectToRoute('app_referral_network_show', ['id' => $id], Response::HTTP_SEE_OTHER);
+        }
+        return $this->renderForm('referral_network/show.html.twig', [
             'referral_network' => $referralNetwork,
             'data' => $array_data,
             'pakege_user' => $pakege_user,
             'k_cash_back' => $k_cash_back,
             'my_team_count' => $my_team_count,
             'my_team_summ' => $my_team_summ,
+            'fast_consultation_form' => $fast_consultation_form,
+            'referral_link_to_email_form' => $referral_link_to_email_form,
         ]);
     }
 

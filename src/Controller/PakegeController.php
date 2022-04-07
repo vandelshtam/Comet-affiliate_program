@@ -9,12 +9,16 @@ use App\Entity\TokenRate;
 use App\Entity\TablePakage;
 use App\Entity\PersonalData;
 use App\Entity\ReferralNetwork;
+use App\Entity\FastConsultation;
+use App\Form\FastConsultationType;
 use App\Controller\MailerController;
 use App\Repository\PakegeRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
+use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,20 +28,32 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class PakegeController extends AbstractController
 {
     #[Route('/', name: 'app_pakege_index', methods: ['GET'])]
-    public function index(PakegeRepository $pakegeRepository, ManagerRegistry $doctrine): Response
+    public function index(PakegeRepository $pakegeRepository, Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->render('pakege/index.html.twig', [
             'pakeges' => $pakegeRepository->findAll(),
             'controller_name' => 'Список всех приобретенных пакетов в сети',
             'title' => 'Pakages',
+            'fast_consultation_form' => $fast_consultation_form -> createView(),
         ]);
     }
 
     #[Route('/new', name: 'app_pakege_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PakegeRepository $pakegeRepository, ManagerRegistry $doctrine,ReferralNetworkRepository $referralNetworkRepository): Response
+    public function new(Request $request, PakegeRepository $pakegeRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,ReferralNetworkRepository $referralNetworkRepository): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $pakege = new Pakege();
         $form = $this->createForm(PakegeType::class, $pakege);
         $form->handleRequest($request);
@@ -71,28 +87,60 @@ class PakegeController extends AbstractController
                 
             $pakegeRepository->add($pakege);
             $unique = $form->get('unique_code')->getData();
-        
-            return $this->redirectToRoute('app_pakege_new_choice', ['unique' => $unique], Response::HTTP_SEE_OTHER);
+
+            $pakage_comet_id = $this -> newChoice ($request,$pakegeRepository,$doctrine,$unique);
+            $entityManager->flush();
+            $mailerController->sendEmail($mailer);
+            $this->addFlash(
+                'success',
+                'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');
+            $this->addFlash(
+                'info',
+                'Чтобы пакет начал работать вы должны активировать пакет!'); 
+                
+            return $this->redirectToRoute('app_pakege_show', ['id' => $pakage_comet_id], Response::HTTP_SEE_OTHER);
+        }
+
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('pakege/new.html.twig', [
             'pakege' => $pakege,
             'form' => $form,
             'unique_code' => $collection[0],
-            'user_referral_link' => $user_referral_link
+            'user_referral_link' => $user_referral_link,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
     #[Route('/{id}', name: 'app_pakege_show', methods: ['GET'])]
-    public function show(Pakege $pakege): Response
+    public function show(Pakege $pakege,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->render('pakege/show.html.twig', [
             'pakege' => $pakege,
+            'fast_consultation_form' => $fast_consultation_form -> createView(),
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_pakege_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository, ManagerRegistry $doctrine, int $id): Response
+    public function edit(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
         $form = $this->createForm(PakegeType::class, $pakege);
         $form->handleRequest($request);
@@ -106,11 +154,22 @@ class PakegeController extends AbstractController
             return $this->redirectToRoute('app_pakege_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->renderForm('pakege/edit.html.twig', [
             'pakege' => $pakege,
             'form' => $form,
             'unique_code' => $unique,
             'user_referral_link' => $user_referral_link,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
@@ -127,8 +186,8 @@ class PakegeController extends AbstractController
         return $this->redirectToRoute('app_pakege_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/new/{unique}/choice', name: 'app_pakege_new_choice', methods: ['GET', 'POST'])]
-    public function newChoice (Request $request, PakegeRepository $pakegeRepository,MailerInterface $mailer, ManagerRegistry $doctrine,MailerController $mailerController, string $unique): Response
+    //#[Route('/new/{unique}/choice', name: 'app_pakege_new_choice', methods: ['GET', 'POST'])]
+    private function newChoice ($request, $pakegeRepository, $doctrine, $unique)
     {
         $user = $this -> getUser();
         $user_id = $user -> getId();
@@ -138,27 +197,23 @@ class PakegeController extends AbstractController
         $client_code = $personal_data_table -> getClientCode();
         $pakage_comet = $entityManager->getRepository(Pakege::class)->findOneBy(['unique_code' => $unique]);
         $pakage_comet_name = $pakage_comet -> getName();
+        $pakage_comet_id = $pakage_comet -> getId();
             
         $pakage_table = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $pakage_comet_name]);
         $token_table =  $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
         $price_usdt = $pakage_table -> getPricePakage();
         $price_token = $price_usdt * $token_table;
             
-            $pakage_comet -> setUserId($user_id);
-            $pakage_comet -> setPrice($price_usdt);
-            $pakage_comet -> setToken($price_token);
-            $pakage_comet -> setClientCode($client_code);
-            
-        $entityManager->flush();
-        $mailerController->sendEmail($mailer);
-        $this->addFlash(
-            'success',
-            'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');
-        $this->addFlash(
-            'info',
-            'Чтобы пакет начал работать вы должны активировать пакет!');     
-        return $this->redirectToRoute('app_pakege_index', [], Response::HTTP_SEE_OTHER);
+        $pakage_comet -> setUserId($user_id);
+        $pakage_comet -> setPrice($price_usdt);
+        $pakage_comet -> setToken($price_token);
+        $pakage_comet -> setClientCode($client_code);
+         
+        return $pakage_comet_id;
     }
+
+
+
     public function random_string ($str_length)
     {
     $str_characters = array (0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');

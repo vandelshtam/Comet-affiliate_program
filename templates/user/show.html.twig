@@ -3,8 +3,8 @@
 {% block title %}User{% endblock %}
 
 {% block body %}
-<div class="container-xxl">
-    <h1>Страница безопасности</h1>
+<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Страница безопасности</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
         {% for message in messages %}
             <div class="alert alert-success" role="alert">
@@ -28,7 +28,7 @@
             {% else %}
             <p class="card-text">У вас пока не создан -  username</p>
             {% endif %}
-            <a href="{{ path('app_user_change_username', {'id': user.id}) }}" class="btn btn-primary">Изменить</a>
+            <a href="{{ path('app_user_change_username', {'id': user.id}) }}" class="btn btn-warning rounded-0">Изменить</a>
         </div>
     </div>
     <table class="table">
@@ -41,7 +41,7 @@
                 <th>Email</th>
                 <td>{{ user.email }}</td>
                 <td>
-                    <a class="btn btn-warning" href="{{ path('app_user_change_email', {'id': user.id}) }}">Изменить email</a>
+                    <a class="btn btn-warning rounded-0" href="{{ path('app_user_change_email', {'id': user.id}) }}">Изменить email</a>
                 </td>
             </tr>
                 
@@ -79,8 +79,8 @@
             </tr>
         </tbody>
     </table>
-    <a class="btn btn-primary" href="{{ path('app_personal_area') }}">Назад</a>
-    <a class="btn btn-primary" href="{{ path('app_user_edit', {'id': user.id}) }}">Редактировать</a>
+    <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_area') }}">Назад</a>
+    <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_user_edit', {'id': user.id}) }}">Редактировать</a>
     <br><br>
     {{ include('user/_delete_form.html.twig') }}
 </div>

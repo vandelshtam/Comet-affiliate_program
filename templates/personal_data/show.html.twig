@@ -3,8 +3,8 @@
 {% block title %}PersonalData{% endblock %}
 
 {% block body %}
-<div class="container-xxl">
-    <h1>Страница персоанльных данных</h1>
+<div class="container-xxl col-sm-6 shadow p-3 mb-1 mt-3 bg-white rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">Страница персоанльных данных</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
         {% for message in messages %}
             <div class="alert alert-success" role="alert">
@@ -80,11 +80,11 @@
         </tbody>
     </table>
     {% if is_granted('ROLE_ADMIN') %}
-    <a type="submit" class="btn btn-primary" href="{{ path('app_personal_data_index') }}">Назад</a>
+    <a type="submit" class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_data_index') }}">Назад</a>
     {% else %}
-    <a type="submit" class="btn btn-primary" href="{{ path('app_personal_area') }}">Назад</a>
+    <a type="submit" class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_area') }}">Назад</a>
     {% endif %}
-    <a type="submit" class="btn btn-warning" href="{{ path('app_personal_data_edit', {'id': personal_datum.id}) }}">Редактировать</a>
+    <a type="submit" class="btn btn-warning rounded-0 mb-3" href="{{ path('app_personal_data_edit', {'id': personal_datum.id}) }}">Редактировать</a>
     <br><br>
      {% if is_granted('IS_AUTHENTICATED_FULLY') %}
         {% if is_granted('ROLE_ADMIN') %}

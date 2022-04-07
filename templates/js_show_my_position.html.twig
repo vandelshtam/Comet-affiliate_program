@@ -1,0 +1,53 @@
+{% block javascripts %}
+ 
+<script>
+var chart_position = bb.generate({
+        data: {
+          columns: [
+            ["Blue Direct", {{ referral_network.direct }}],
+            ["Orange CashBack", {{ referral_network.cash }}],
+            //["green", 3],
+          ],
+          type: "donut",
+          onclick: function (d, i) {
+            console.log("onclick", d, i);
+          },
+          onover: function (d, i) {
+            console.log("onover", d, i);
+          },
+          onout: function (d, i) {
+            console.log("onout", d, i);
+          },
+        },
+        donut: {
+          title: "Всего {{ referral_network.reward }}",
+        },
+        bindto: "#donut-chart-my-position",
+      });
+</script>
+{# <script>
+      var chart = bb.generate({
+        data: {
+          columns: [
+            ["Blue USDT", {{ wallet.usdt }}],
+            ["Orange Cometpoin", {{ wallet.cometpoin }}/{{ token_rate }}],
+            //["green", 0], 
+          ],
+          type: "donut",
+          onclick: function (d, i) {
+            console.log("onclick", d, i);
+          },
+          onover: function (d, i) {
+            console.log("onover", d, i);
+          },
+          onout: function (d, i) {
+            console.log("onout", d, i);
+          },
+        },
+        donut: {
+          title: "100%",
+        },
+        bindto: "#donut-chart",
+      });
+</script> #}
+{% endblock %}

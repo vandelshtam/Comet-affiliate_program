@@ -4,19 +4,18 @@
 
 {% block body %}
     
-<div class="container">
-    <h1>Страница регистрации</h1>
+<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Страница регистрации</h1>
     {% for flash_error in app.flashes('verify_email_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
-    
     {# {% if form_errors(form) %}
         <div class="my-custom-class-for-errors">
             {{ form_errors(form) }}
         </div>
     {% endif %} #}
     {{ form_start(registrationForm) }}
-        <div class="form_box-inner">
+        <div class="form_box-inner d-flex justify-content-center">
             <div class="form_box-left">
             {% for label, messages in app.flashes(['success', 'notice']) %}
                     {% for message in messages %}
@@ -39,27 +38,44 @@
                             </div>
                         {% endfor %}
             {% endfor %}
+            {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+            {% endfor %}
                     {# <label for="exampleInputEmail1" class="form-label">Email address</label> #}
                     {# <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"> #}
                     
                     {{ form_row(registrationForm.email) }}
-                    <div id="emailHelp" class="form-text">Мы никогда не будем делиться вашей электронной почтой с кем-либо еще.</div>
-                
-                
-                    {# <label for="exampleInputPassword1" class="form-label">Password</label> #}
-                    {# <input type="password" class="form-control" id="exampleInputPassword1"> #}
+                    <div id="emailHelp" class="form-text mb-5">Мы никогда не будем делиться вашей электронной почтой с кем-либо еще.</div>
+                    
                     {{ form_row(registrationForm.plainPassword, {
                                                 label: 'Password'
                                             }) }}
-                    <div id="emailHelp" class="form-text">Пароль должен иметь не менее 6 и не более 20 символов, должен содержать хотябы один специальный символ, одну цифру и одну главную букву.</div>
+                    <label for="exampleInputPassword1" class="form-label">Password confirm</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" name="password">                        
+                    <div id="emailHelp" class="form-text mb-5">Пароль должен иметь не менее 6 и не более 20 символов, должен содержать хотябы один специальный символ, одну цифру и одну главную букву.</div>
                     {# <input type="checkbox" class="form-check-input" id="exampleCheck1"> #}
+                    {% if referral_link == NULL %}
                     {{ form_row(registrationForm.referral_link) }}
-                    <div id="emailHelp" class="form-text">Если у вас есть рефералная ссылка, пожалуйста введите ее в это поле, если ссылки нет, то пожалуйста не заполняйте это поле.</div>
+                    <div id="emailHelp" class="form-text mb-5">Если у вас есть рефералная ссылка, пожалуйста введите ее в это поле, если ссылки нет, то пожалуйста не заполняйте это поле.</div>
+                    {% else %}
+                    <div class="hidden">
+                    {{ form_row(registrationForm.referral_link, {'value': referral_link }) }}
+                    </div>
+                    {% endif %}
+                    
+                    
+                    
                     <label class="form-check-label" for="exampleCheck1">{{ form_row(registrationForm.agreeTerms) }}</label>
+                    <div id="emailHelp" class="form-text">Согласие с условиями обязательный параметр для пегистрации.</div>
                     <div class="hidden">
                         {{ form_row(registrationForm.personal_data_id, {'value': 0 }) }}
-                    </div>    
-                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                    </div> 
+                     
+                <button type="submit" class="btn btn-info rounded-0">Зарегистрироваться</button>
             </div>
         </div>
     {{ form_end(registrationForm) }}

@@ -3,7 +3,7 @@
 {% block title %}Страница аутентификации{% endblock %}
 
 {% block body %}
-<form class="container" method="post">
+<form class="container container-xxl col-sm-4 shadow p-3 mb-1 mt-3 bg-white rounded-0" method="post">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
@@ -15,28 +15,28 @@
     {% endif %}
     <p>Забыли пароль?  <a href="{{ path('app_forgot_password_request') }}">перейдите по ссылке</a></p>
     <p>У вас еще нет аккаунта, хотите пройти регистрацию?  <a href="{{ path('app_register') }}">перейдите по ссылке</a></p>
-    <h1 class="h3 mb-3 font-weight-normal">Пожалуйста войдите в систему</h1>
+    <h1 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">Пожалуйста войдите в систему</h1>
     <label for="inputEmail">Емайл</label>
     <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <div id="emailHelp" class="form-text">Мы никогда не будем делиться вашей электронной почтой с кем-либо еще.</div>
+    <div id="emailHelp" class="form-text mb-3">Мы никогда не будем делиться вашей электронной почтой с кем-либо еще.</div>
     <label for="inputPassword">Пароль</label>
     <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-    <div id="emailHelp" class="form-text">Ваша конфиденциальность защищена.</div>
+    <div id="emailHelp" class="form-text mb-3">Ваша конфиденциальность защищена.</div>
     <input type="hidden" name="_csrf_token"
            value="{{ csrf_token('authenticate') }}">
 
-    {#
-        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+    
+        {# Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
         See https://symfony.com/doc/current/security/remember_me.html
 
         <div class="checkbox mb-3">
             <label>
                 <input type="checkbox" name="_remember_me"> Remember me
             </label>
-        </div>
-    #}
+        </div> #}
+   
 
-    <button class="btn btn-lg btn-primary" type="submit">
+    <button class="btn btn-lg btn-info rounded-0 d-flex justify-content-center text-white mb-1 mt-3" type="submit">
         Войти
     </button>
 </form>

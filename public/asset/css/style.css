@@ -58,6 +58,13 @@
     padding-left: 17px;
 }
 
+.form_box-inner.personaldata select{
+    outline: none;
+    height: 40px;
+    border: 1px solid#e6e6e6;
+    padding-left: 17px;
+}
+
 
 .form_box-inner textarea{
     outline: none;
@@ -225,12 +232,51 @@ div#consultation{
     outline: none;
 } */
 
-body {
+/* body {
     text-align: center;
     color: green;
-  }
+  }  */
+
   h2 {
     text-align: center;
     font-family: "Verdana", sans-serif;
     font-size: 40px;
   }
+
+  
+  #hidden-content,
+  #hidden-content-referral{
+    display: none;  
+    width: 400px;
+}
+
+#hidden-content input,
+#hidden-content textarea,
+#hidden-content-referral input{
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    margin-bottom: 8px;
+    outline: none;
+    border: 1px solid#e6e6e6;
+    padding: 0px 10px;
+    border-radius: 0%;
+}
+#hidden-content input[type="submit"],
+.btn-popup,
+#hidden-content-referral input[type="submit"]{
+    background-color: #5eabeb;
+    border: none;
+} 
+#hidden-content textarea{
+    height: 120px;
+}
+#hidden-content input,
+#hidden-content-referral input{
+    height: 40px;
+} 
+
+.button_main{
+    background: #5eabeb;
+}
+

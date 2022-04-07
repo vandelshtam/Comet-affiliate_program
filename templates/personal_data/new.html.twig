@@ -3,10 +3,10 @@
 {% block title %}New PersonalData{% endblock %}
 
 {% block body %}
-<div class="container">
-    <h1>Страница регистрации персональных данных</h1>
+<div class="container-xxl col-sm-4 shadow p-3 mb-1 mt-3 bg-white rounded-0">
+    <h2 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">Страница регистрации персональных данных</h2>
 
     {{ include('personal_data/_form.html.twig') }}
-    <a type="submit" class="btn btn-primary" href="{{ path('app_personal_area') }}">Назад</a>
+    <a type="submit" class="btn btn-info rounded-0 mb-3 mt-1" href="{{ path('app_personal_area') }}">Назад</a>
 </div>
 {% endblock %}
