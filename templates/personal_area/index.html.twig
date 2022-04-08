@@ -14,18 +14,32 @@
     </div>
     {% endif %}
     {% for label, messages in app.flashes(['success', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-success" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
+            {% for message in messages %}
+                <div class="alert alert-success rounded-0" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['info', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-info" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
+                {% for message in messages %}
+                    <div class="alert alert-info rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
     {% endfor %}
   <div class="example-wrapper">
       <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">{{ controller_name }}</h1>
@@ -59,14 +73,23 @@
       <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
         <div class="accordion-body">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              {% if app.user.pakageStatus == 0 %}           
               <li class="nav-item">
               <a class="nav-link link-secondary" href="{{ path('app_pakege_new') }}">Купить пакет</a>
               </li>
+              {% elseif app.user.pakageStatus == 1  %}
+              <li class="nav-item">
+              <a class="nav-link link-secondary" href="{{ path('app_pakege_new') }}">Повысить пакет</a>
+              </li>
+              {% endif %}
               {# <li class="nav-item">
               <a class="nav-link link-secondary" href="">Информация об операциях (не активно)</a>
               </li> #}
               <li class="nav-item">
-              <a class="nav-link link-secondary" href="{{ path('app_pakege_index') }}">История операций (мои пакеты)</a>
+              <a class="nav-link link-secondary" href="{{ path('app_pakege_index') }}">История операций (для админа все пакеты)</a>
+              </li>
+              <li class="nav-item">
+              <a class="nav-link link-secondary" href="{{ path('app_pakege_show',{'id': pakege_id}) }}">Мой пакет</a>
               </li>
               <li class="nav-item">
               <a class="nav-link link-secondary" href="{{ path('app_wallet_user') }}">Мой кошелек</a>

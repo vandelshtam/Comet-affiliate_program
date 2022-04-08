@@ -5,14 +5,20 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Pakege;
 use App\Entity\ReferralNetwork;
+use App\Entity\FastConsultation;
+use App\Form\FastConsultationType;
+use App\Controller\MailerController;
 use App\Entity\ListReferralNetworks;
 use App\Form\ListReferralNetworksType;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+
 use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
 use App\Repository\ListReferralNetworksRepository;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,7 +29,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ListReferralNetworksController extends AbstractController
 {
     #[Route('/', name: 'app_list_referral_networks_index', methods: ['GET'])]
-    public function index(ListReferralNetworksRepository $listReferralNetworksRepository,ManagerRegistry $doctrine): Response
+    public function index(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $entityManager = $doctrine->getManager();
         //$pakages = $referralPakegeRepository->findAll();
@@ -33,17 +39,29 @@ class ListReferralNetworksController extends AbstractController
         }
         $pakage_price_all_summ = array_sum($pakage_price_all);
         $pakage_count = count($pakages);
+
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->render('list_referral_networks/index.html.twig', [
             'list_referral_networks' => $listReferralNetworksRepository->findAll(),
             'controller_name' => 'Список всех реферальных сетей',
             'title' => 'All network referral list',
             'pakage_count' => $pakage_count,
             'pakage_price_all_summ' => $pakage_price_all_summ,
+            'fast_consultation_form' => $fast_consultation_form->createView(),
         ]);
     }
 
     #[Route('/list', name: 'app_list_referral_networks_index_list', methods: ['GET'])]
-    public function indexList(ListReferralNetworksRepository $listReferralNetworksRepository,ReferralNetworkRepository $referralNetworkRepository,ManagerRegistry $doctrine): Response
+    public function indexList(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository,ReferralNetworkRepository $referralNetworkRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $user = $this -> getUser();
         $user_id = $user -> getId();
@@ -60,16 +78,28 @@ class ListReferralNetworksController extends AbstractController
         foreach($array as $value){
             $listReferralNetworks[] = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['id' => $value]);
         }
+
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->render('list_referral_networks/index_list.html.twig', [
             'list_referral_networks' => $listReferralNetworks,
             'controller_name' => 'Список моих реферальных сетей',
             'title' => 'My network referral list',
             'referral_network_all_count' => $referral_network_all_count,
+            'fast_consultation_form' => $fast_consultation_form->createView(),
         ]);
     }
 
     #[Route('/{id}/new', name: 'app_list_referral_networks_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ManagerRegistry $doctrine, ListReferralNetworksRepository $listReferralNetworksRepository,int $id): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ListReferralNetworksRepository $listReferralNetworksRepository,int $id): Response
     {
         $entityManager = $doctrine->getManager();
         $pakege = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
@@ -93,35 +123,78 @@ class ListReferralNetworksController extends AbstractController
             return $this->redirectToRoute('app_referral_network_new', ['referral_link' => $referral_link, 'id' => $id], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->renderForm('list_referral_networks/new.html.twig', [
             'list_referral_network' => $listReferralNetwork,
             'form' => $form,
             'pakege_id' => $id,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
     #[Route('/{id}', name: 'app_list_referral_networks_show', methods: ['GET'])]
-    public function show(ListReferralNetworks $listReferralNetwork): Response
+    public function show(Request $request,ListReferralNetworks $listReferralNetwork,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->render('list_referral_networks/show.html.twig', [
             'list_referral_network' => $listReferralNetwork,
+            'fast_consultation_form' => $fast_consultation_form->createView(),
         ]);
     }
 
     #[Route('/{id}/list', name: 'app_list_referral_networks_show_list', methods: ['GET'])]
-    public function showList(ListReferralNetworks $listReferralNetwork,ReferralNetworkRepository $referralNetworkRepository): Response
+    public function showList(Request $request,ListReferralNetworks $listReferralNetwork,ReferralNetworkRepository $referralNetworkRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         $referral_network_all = $referralNetworkRepository->findAll();
         $referral_network_all_count = count($referral_network_all);
         return $this->render('list_referral_networks/show_list.html.twig', [
             'list_referral_network' => $listReferralNetwork,
             'referral_network_all_count' => $referral_network_all_count,
+            'fast_consultation_form' => $fast_consultation_form->createView(),
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_list_referral_networks_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ListReferralNetworks $listReferralNetwork, ListReferralNetworksRepository $listReferralNetworksRepository): Response
+    public function edit(Request $request, ListReferralNetworks $listReferralNetwork, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         $form = $this->createForm(ListReferralNetworksType::class, $listReferralNetwork);
         $form->handleRequest($request);
 
@@ -133,6 +206,7 @@ class ListReferralNetworksController extends AbstractController
         return $this->renderForm('list_referral_networks/edit.html.twig', [
             'list_referral_network' => $listReferralNetwork,
             'form' => $form,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
@@ -157,11 +231,13 @@ class ListReferralNetworksController extends AbstractController
         $listReferralNetwork = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['pakege' => $id]);
         $pakege = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);//пакет основателя сети
         $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user_id]);
+        //$wallet_table = $entityManager->getRepository(Wallet::class)->findOneBy(['id' => $user_id]);
         $owner_name = $user_table -> getUsername();
         $pakege_id = $pakege -> getId();//id пакета основателя сети
         //$id переданный в агрументе id пакета пользователя пришедшего для записи в качестве члена сети, в данном случае совпадает с владельцем сети
 
         $balance = $pakege -> getPrice();
+        //$current_wallet_usdt = $wallet_table -> getUsdt();
         $client_code = $pakege -> getClientCode();
         $unique_code = $pakege -> getUniqueCode();//уникальный код сети генерировался на этапе начального создания 
         $listReferralNetwork_id = $listReferralNetwork -> getId();// id реферальной сети
@@ -175,6 +251,7 @@ class ListReferralNetworksController extends AbstractController
         $listReferralNetwork -> setClientCode($client_code);
         $listReferralNetwork -> setNetworkCode($network_code);
         $listReferralNetwork -> setUniqueCode($unique_code);
+        //$user_table -> setPakageStatus(1);
         //$listReferralNetwork -> setProfitNetwork($balance);
         $pakege -> setActivation('активирован');
         $pakege -> setReferralNetworksId($member_code);

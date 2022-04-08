@@ -54,9 +54,11 @@
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true" href="{{ path('app_admin') }}">Вы Администратор</a>
                 </li>
                 {% endif %}
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <li class="nav-item">
                 <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Вы : {{ app.user.pesonalCode }}</a>
                 </li>
+                {% endif %}
                 <li class="nav-item">
                 {# <a class="btn btn-warning" href="#" tabindex="-1" aria-disabled="true">Быстрая консультация</a> #}
                 <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn btn-popup text-light rounded-0">Быстрая консультация</a>    
@@ -121,7 +123,11 @@
                         {# <li><a class="dropdown-item" href="{{ path('app_current_balance') }}">Текущий баланс</a></li> #}
                         <li><a class="dropdown-item" href="{{ path('app_referral_network_myplace') }}">Мой баланс</a></li>
                         {# <li><a class="dropdown-item" href="#">История транзакций</a></li> #}
+                        {% if app.user.pakageStatus == 0 %}
                         <li><a class="dropdown-item" href="{{ path('app_pakege_new') }}">Купить пакет</a></li>
+                        {% elseif app.user.pakageStatus == 1  %}
+                         <li><a class="dropdown-item" href="{{ path('app_pakege_new') }}">Повысить пакет</a></li>
+                        {% endif %} 
                         {# <li><a class="dropdown-item" href="{{ path('app_referral_network_index') }}">Участники реферальных сетей</a></li>
                         <li><a class="dropdown-item" href="{{ path('app_list_referral_networks_index') }}">Реферальные сети</a></li> #}
                         {# <li><a class="dropdown-item" href="#">Вывод</a></li> #}

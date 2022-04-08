@@ -5,7 +5,34 @@
 {% block body %}
 <div class="container-xxl">
     <h1>Список участников реферальной сети</h1>
-
+{% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success rounded-0" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
     <table class="table">
         <tbody>
             <tr>

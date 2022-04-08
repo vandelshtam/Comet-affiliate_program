@@ -1,5 +1,9 @@
 {{ form_start(form) }}
-    {{ form_row(form.name, {'value': username}) }}<div id="emailHelp" class="form-text">Вы можете изменить его на любое другое, а так же используя любые символы которые вам нравяться!</div>
+    {% if username == NULL %}
+    {{ form_row(form.name) }}<div id="emailHelp" class="form-text mb-3">У вас еще нет имени в сети, вы можете ввести свое имя</div>
+    {% else %}
+    {{ form_row(form.name, {'value': username}) }}<div id="emailHelp" class="form-text mb-3">Вы можете изменить его на любое другое, а так же используя любые символы которые вам нравяться!</div>
+    {% endif %} 
     {% if is_granted('ROLE_ADMIN') %}
     {{ form_row(form.balance) }}
     {{ form_row(form.reward) }}
@@ -18,5 +22,5 @@
     <div class="hidden">
       {{ form_row(form.member_code, {'value': member_code }) }}
     </div>
-    <button class="btn">{{ button_label|default('Сохранить') }}</button>
+    <button class="btn btn-info rounded-0 mb-1">{{ button_label|default('Купить') }}</button>
 {{ form_end(form) }}

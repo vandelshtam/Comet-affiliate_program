@@ -27,19 +27,28 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class WalletController extends AbstractController
 {
     #[Route('/', name: 'app_wallet_index', methods: ['GET'])]
-    public function index(WalletRepository $walletRepository,ManagerRegistry $doctrine): Response
+    public function index(WalletRepository $walletRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
         $wallet = $walletRepository->findAll();
-        
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
         return $this->render('wallet/index.html.twig', [
             'wallets' => $wallet,
+            'fast_consultation_form' => $fast_consultation_form->createView(),
         ]);
     }
 
     #[Route('/new', name: 'app_wallet_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, WalletRepository $walletRepository): Response
+    public function new(Request $request, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $wallet = new Wallet();
@@ -51,9 +60,20 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_wallet_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->renderForm('wallet/new.html.twig', [
             'wallet' => $wallet,
             'form' => $form,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
@@ -64,16 +84,16 @@ class WalletController extends AbstractController
         $entityManager = $doctrine->getManager();
         $user_id = $this -> getUser() -> getId();
         
-        if($entityManager->getRepository(Wallet::class)->findOneBySomeField($user_id) == NULL){
-            $this->addFlash(
-                'info',
-                'Вы не приобрели ни одного пакета, к сожалению у вас нет данных и нет доступа к кошельку.');
-            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
-        }
+        // if($entityManager->getRepository(Wallet::class)->findOneBySomeField($user_id) == NULL){
+        //     $this->addFlash(
+        //         'info',
+        //         'Вы не приобрели ни одного пакета, к сожалению у вас нет данных и нет доступа к кошельку.');
+        //     return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        // }
         
-        $wallet = $entityManager->getRepository(Wallet::class)->findOneBySomeField($user_id);
-        
-        if($wallet -> getUserId() != $user_id){
+        $wallet = $entityManager->getRepository(Wallet::class)->findOneBy(['user_id' => $user_id]);
+        //dd($wallet);
+        if($wallet == false){
             $this->addFlash(
                 'warning',
                 'У вас нет прав доступа к кошельку.');
@@ -98,17 +118,27 @@ class WalletController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_wallet_show', methods: ['GET'])]
-    public function show(Wallet $wallet): Response
+    public function show(Wallet $wallet,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
         return $this->render('wallet/show.html.twig', [
             'wallet' => $wallet,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
     
 
     #[Route('/{id}/edit', name: 'app_wallet_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Wallet $wallet, WalletRepository $walletRepository): Response
+    public function edit(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $form = $this->createForm(WalletType::class, $wallet);
@@ -119,14 +149,24 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_wallet_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
         return $this->renderForm('wallet/edit.html.twig', [
             'wallet' => $wallet,
             'form' => $form,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
     #[Route('/{id}/deposit', name: 'app_wallet_adddeposit', methods: ['GET', 'POST'])]
-    public function deposit(Request $request, Wallet $wallet, WalletRepository $walletRepository,ManagerRegistry $doctrine, int $id): Response
+    public function deposit(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -151,15 +191,25 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_wallet_user', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
         return $this->renderForm('wallet/deposit_usdt.html.twig', [
             'wallet' => $wallet,
             'form' => $form,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
 
     #[Route('/{id}/exchangecomet', name: 'app_wallet_exchange_comet', methods: ['GET', 'POST'])]
-    public function exchange(Request $request, Wallet $wallet, WalletRepository $walletRepository,ManagerRegistry $doctrine, int $id): Response
+    public function exchange(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -235,15 +285,25 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_wallet_user', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
         return $this->renderForm('wallet/exchange_comet.html.twig', [
             'wallet' => $wallet,
             'form' => $form,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
 
     #[Route('/{id}/exchangeusdt', name: 'app_wallet_exchange_usdt', methods: ['GET', 'POST'])]
-    public function exchangeUsdt(Request $request, Wallet $wallet, WalletRepository $walletRepository,ManagerRegistry $doctrine, int $id): Response
+    public function exchangeUsdt(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -319,16 +379,26 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_wallet_user', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
         return $this->renderForm('wallet/exchange_usdt.html.twig', [
             'wallet' => $wallet,
             'form' => $form,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
 
 
     #[Route('/{id}/exchangecometwallet', name: 'app_wallet_exchange_wallet_comet', methods: ['GET', 'POST'])]
-    public function exchangeCometWallet(Request $request, Wallet $wallet, WalletRepository $walletRepository,ManagerRegistry $doctrine, int $id): Response
+    public function exchangeCometWallet(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -369,10 +439,20 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_wallet_user', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
         return $this->renderForm('wallet/deposit_reward_wallet.html.twig', [
             'wallet' => $wallet,
             'form' => $form,
             'reward_wallet' => $reward_wallet * $token_rate,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 

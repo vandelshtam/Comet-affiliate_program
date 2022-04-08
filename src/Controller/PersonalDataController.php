@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Wallet;
 use App\Entity\PersonalData;
-use App\Form\PersonalDataType;
 
+use App\Form\PersonalDataType;
 use App\Entity\FastConsultation;
 use App\Form\FastConsultationType;
 use App\Controller\MailerController;
+use App\Repository\WalletRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\PersonalDataRepository;
@@ -35,7 +37,7 @@ class PersonalDataController extends AbstractController
     }
 
     #[Route('/{user_id}/new', name: 'app_personal_data_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine,EntityManagerInterface $entityManager, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $user_id): Response
+    public function new(Request $request, PersonalDataRepository $personalDataRepository, WalletRepository $walletRepository,ManagerRegistry $doctrine,EntityManagerInterface $entityManager, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $user_id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
@@ -46,12 +48,15 @@ class PersonalDataController extends AbstractController
         }
 
         $personalDatum = new PersonalData();
+        $wallet = new Wallet();
         $form = $this->createForm(PersonalDataType::class, $personalDatum);
         $form->handleRequest($request);
         $entityManager = $doctrine->getManager();
 
         if ($form->isSubmitted() && $form->isValid()) {
             $personalDataRepository->add($personalDatum);
+            $wallet -> setUser($user);
+            $walletRepository->add($wallet);
             $personalData = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
             $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user -> getId()]);
             $user_table->setPersonalDataId($personalData -> getId());
@@ -64,8 +69,8 @@ class PersonalDataController extends AbstractController
             $this->addFlash(
                 'success',
                 'Вы успешно зарегистрировали персональные данные');
-        
-            return $this->redirectToRoute('app_personal_data_show', ['personal_user_id' => $user -> getId()], Response::HTTP_SEE_OTHER);
+            $personal_data_id = $personalData -> getId();
+            return $this->redirectToRoute('app_personal_data_show', ['personal_user_id' => $personal_data_id], Response::HTTP_SEE_OTHER);
         }
 
         $fast_consultation = new FastConsultation();       
@@ -94,16 +99,37 @@ class PersonalDataController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
+        $entityManager = $doctrine->getManager();
+
         $repository = $doctrine->getRepository(PersonalData::class);
+        //dd($repository->findOneBy(['user_id' => $personal_user_id]));
         if($personal_user_id != NULL)
         {
-            if($repository->findOneBy(['user_id' => $user -> getId()])->getUserId() == false)
+
+            if($repository->findOneBy(['id' => $personal_user_id]) == NULL)
             {
+                
                 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+            
+            //if($doctrine->getRepository(PersonalData::class)->findOneBy(['id' => $personal_user_id]) == NULL){
+                // $this->addFlash(
+                //     'danger',
+                //     'У вас нет прав доступа');
+            
+                // return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
             }
+
+        }
+        else{
+
+            $this->addFlash(
+                'danger',
+                'У вас нет прав доступа');
+        
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
             
-        $repository = $doctrine->getRepository(PersonalData::class);
+        //$repository = $doctrine->getRepository(PersonalData::class);
         $personalDatum = $doctrine->getRepository(PersonalData::class)->findOneBySomeField($user -> getId());
         
         $fast_consultation = new FastConsultation();       

@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Pakege;
+use App\Entity\Wallet;
 use App\Entity\TokenRate;
 use App\Entity\SettingOptions;
 use App\Entity\ReferralNetwork;
@@ -10,12 +12,13 @@ use App\Entity\FastConsultation;
 use App\Form\ReferralNetworkType;
 use App\Form\ReferralToEmailType;
 use App\Form\FastConsultationType;
+use App\Controller\MailerController;
 use App\Entity\ListReferralNetworks;
-use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
+use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +48,7 @@ class ReferralNetworkController extends AbstractController
 
 
     #[Route('/{my_team}/myteam', name: 'app_referral_network_myteam', methods: ['GET'])]
-    public function myTeam(ReferralNetworkRepository $referralNetworkRepository,ManagerRegistry $doctrine, string $my_team): Response
+    public function myTeam(ReferralNetworkRepository $referralNetworkRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, string $my_team): Response
     { 
         $entityManager = $doctrine->getManager(); 
         $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]);//получаем объект  участников моей команды (которых пригласил пользователь)       
@@ -55,13 +58,24 @@ class ReferralNetworkController extends AbstractController
     }
 
     #[Route('/{referral_link}/{id}/new', name: 'app_referral_network_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ReferralNetworkRepository $referralNetworkRepository, ManagerRegistry $doctrine, string $referral_link, int $id): Response
+    public function new(Request $request, ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, string $referral_link, int $id): Response
     {
         $entityManager = $doctrine->getManager();
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['network_code' => $referral_link]);
         $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
+        $user_id = $pakege_user -> getUserId();
         $arr = explode('-', $referral_link);//уникальный персональный код участника сети со статусом владелец сети преобразуем в массив для извлечения информации об участнике предоставившегго реферальную ссылку (рефовод)
     
+        //проверка баланса кошелька для покупки нового пакета
+        $wallet = $entityManager->getRepository(Wallet::class)->findOneBySomeField($user_id);
+        //dd($user_id);
+        if( $wallet == NULL){
+            $this->addFlash(
+                'warning',
+                'Вы не пополнили кошелек, у вас нет средств на балансе, перейти к пополнению' .'<a href="http://164.92.159.123/wallet/new">пополнить?</a>'. 'oo');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+
         //создание уникального персонального кода  нового участника сети пришедшего по реферальной ссылке (рефовода)
         $arr1 = $arr[0]; $arr2 = $arr[2]; $arr3 = $arr[3];
         $member_code = $this -> makeMemberCode($arr1,$id,$arr2,$arr3);
@@ -80,9 +94,19 @@ class ReferralNetworkController extends AbstractController
             $this->addFlash(
                          'success',
                          'Поздравляем! Вы успешно активировали пакет и вступили в  реферальную сеть.');
-                        
-            return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
+            $referral_network_id = $referral_network -> getId();           
+            return $this->redirectToRoute('app_referral_network_show', ['id' => $referral_network_id], Response::HTTP_SEE_OTHER);
 
+        }
+
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('referral_network/new.html.twig', [
@@ -90,6 +114,7 @@ class ReferralNetworkController extends AbstractController
             'form' => $form,
             'username' => $username,
             'member_code' => $member_code,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
@@ -106,7 +131,7 @@ class ReferralNetworkController extends AbstractController
         else{
             $this->addFlash(
                 'danger',
-                'Такого пользователя нет.');
+                'Вы еще не приобрели и не активировали пакет, или такого пользователя нет.');
             return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
     }
@@ -278,21 +303,24 @@ class ReferralNetworkController extends AbstractController
         //построение первичной линии при количестве учстников менее 3-х
         //данные пользователя который предоставил реферальную ссылку
         $network_referral_id = $referral_network_referral -> getId();//айди записи участника реферальной сети предоставившего ссылку (рефовода)
-        $user_referral_id = $referral_network_referral -> getUserId();//пользователя системы участвующего в реферальной сети и предоставившего реферальную ссылку
+        $user_referral_id = $referral_network_referral -> getUserId();//id пользователя системы участвующего в реферальной сети и предоставившего реферальную ссылку (рефовода)
 
         //расчет награды за приглашенного участника члену сети предоставишему реферальную ссылку (рефовода) DIRECT
         $bonus = $balance * 0.1;//direct начисление за приглашенного участника
         //dd($bonus);
-        $referral_network_referral_bonus = $referral_network_referral -> getReward();
-        $referral_network_referral_direct = $referral_network_referral -> getDirect();
+        $referral_network_referral_bonus = $referral_network_referral -> getReward();//текущие начисления общие у рефовода
+        $referral_network_referral_Rewardwallet = $referral_network_referral -> getRewardWallet();//текущие доступные общие начисления для вывода на кошелек у рефовода
+        $referral_network_referral_direct = $referral_network_referral -> getDirect();//директ бонусы текущие у рефовода 
         $reward = $bonus + $referral_network_referral_bonus;
+        $reward_wallet = $bonus + $referral_network_referral_Rewardwallet;
         $direct = $bonus + $referral_network_referral_direct;
         $profit_network_advance = $balance - $bonus;
         //dd($direct);
         $referral_network_referral -> setReward($reward);
         $referral_network_referral -> setDirect($direct);
+        $referral_network_referral -> setRewardWallet($reward_wallet);
         
-        //записываем и сохраняем в таблицу участника реферальной сети все дополнительные и обязательные данные
+        //записываем и сохраняем в таблицу участника реферальной сети и все дополнительные и обязательные данные
         $user = $this -> getUser();    
         $referral_network -> setUserId($user_id);
         $referral_network -> setUserStatus($status);
@@ -307,8 +335,8 @@ class ReferralNetworkController extends AbstractController
         $referral_network -> setPaymentsCash(0);
         $referral_network -> setCurrentNetworkProfit(0);
         $referral_network -> setPakage($balance);
-        $referral_network -> setReward($reward);
-        $referral_network -> setRewardWallet($reward);
+        //$referral_network -> setReward($reward);
+        //$referral_network_referral -> setRewardWallet($reward);
         $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
         $referralNetworkRepository->add($referral_network);
         $old_profit_network = $list_network -> getProfitNetwork();
@@ -323,7 +351,7 @@ class ReferralNetworkController extends AbstractController
         $referral_network_user_id = $referral_network_referral -> getId();
 
     //dd($list_network_all_count);
-        //первое построение линии из трех участников реферальной сети
+        //первое построение линии из трех участников реферальной сети. Когда происходит активация пакета 3-го участника в сети числится еще 2 участника, поэтому в условии установлена цифра 2 участника активных 
         if($list_network_all_count == 2){
             $referral_network_user = $referral_network_referral;
             $this -> singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus);
@@ -331,9 +359,8 @@ class ReferralNetworkController extends AbstractController
             $entityManager->persist($referral_network_referral);
             $entityManager->flush();
         }
-
-        //построение линии при количестве участников более 3-х
-        if($list_network_all_count > 2){
+        //построение линии при количестве участников более 3-х. При активации 4 го участника и выше. Условие установлено более 3 ативных участников чьи пакету уже активированы
+        elseif($list_network_all_count > 2){
             $referral_network_user = $referral_network_referral;
             $referral_network_user_new = $referral_network;
             $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
@@ -769,9 +796,10 @@ class ReferralNetworkController extends AbstractController
 
 
     
+    
     private function singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus)
     {
-        //первое выстраиваивание линии из трех участников реферальной сети  и начисление вознаграждений       
+        //первое выстраиваивание линии из двух участников реферальной сети  и начисление вознаграждений       
         if($referral_network_left -> getBalance() == $referral_network_right -> getBalance()){
             $balance_pakege_right = $referral_network_right -> getBalance();
             $balance_pred = $referral_network_left -> getBalance();

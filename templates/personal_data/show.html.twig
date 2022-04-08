@@ -6,18 +6,32 @@
 <div class="container-xxl col-sm-6 shadow p-3 mb-1 mt-3 bg-white rounded-0">
     <h1 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">Страница персоанльных данных</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-success" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
+            {% for message in messages %}
+                <div class="alert alert-success rounded-0" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['info', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-info" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
+                {% for message in messages %}
+                    <div class="alert alert-info rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
     {% endfor %}
     {% if personal_datum == NULL %}
     <div class="alert alert-warning" role="alert">

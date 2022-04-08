@@ -53,6 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $pesonal_code;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $pakage_status;
+
 
     public function __construct()
     {
@@ -250,6 +253,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPesonalCode(?string $pesonal_code): self
     {
         $this->pesonal_code = $pesonal_code;
+
+        return $this;
+    }
+
+    public function getPakageStatus(): ?int
+    {
+        return $this->pakage_status;
+    }
+
+    public function setPakageStatus(?int $pakage_status): self
+    {
+        $this->pakage_status = $pakage_status;
 
         return $this;
     }

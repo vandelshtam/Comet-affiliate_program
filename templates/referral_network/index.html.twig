@@ -3,27 +3,35 @@
 {% block title %}ReferralNetwork index{% endblock %}
 
 {% block body %}
-    <h1>Список всех участников реферальных сетей</h1>
+    <div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Список всех участников сети</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
-                <div class="alert alert-success" role="alert">
+                <div class="alert alert-success rounded-0" role="alert">
                     {{ message }}
                 </div>
             {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['info', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-info rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['danger', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-danger rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
     {% endfor %}
     {% if is_granted('ROLE_ADMIN') %}  
     <a  class="btn btn-secondary mb-3" href="{{ path('app_admin') }}">Перейти в  кабинет админа</a> 
@@ -65,7 +73,7 @@
                 <td>{{ referral_network.memberCode }}</td>
                 {% endif %} 
                 <td>
-                    <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">Подробности</a>
+                    <a class="btn btn-secondary rounded-0 mb-3" href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">Подробности</a>
                     {# <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}
                 </td>
             </tr>
@@ -78,4 +86,5 @@
     </table>
 
     {# <a href="{{ path('app_referral_network_new') }}">Create new</a> #}
+</div>
 {% endblock %}

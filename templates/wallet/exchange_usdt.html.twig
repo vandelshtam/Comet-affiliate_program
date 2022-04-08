@@ -7,36 +7,37 @@
     <h1>Конвертация Cometpoin</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
-                <div class="alert alert-success" role="alert">
+                <div class="alert alert-successrounded-0" role="alert">
                     {{ message }}
                 </div>
             {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['info', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-inforounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['danger', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-dangerrounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['warning', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-dangerrounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}            
     {% endfor %}
     {{ include('wallet/_form_exchange_usdt.html.twig', {'button_label': 'Подтвердить'}) }}
 
-    <a class="btn btn-secondary mb-3" href="{{ path('app_wallet_user') }}">Назад</a>
-
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_user') }}">Назад</a>
+    {% if is_granted('ROLE_ADMIN') %}
     {{ include('wallet/_delete_form.html.twig') }}
+    {% endif %}
 </div>
 {% endblock %}

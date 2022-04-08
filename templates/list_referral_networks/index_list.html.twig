@@ -6,24 +6,31 @@
     <h1>{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
-                <div class="alert alert-success" role="alert">
+                <div class="alert alert-success rounded-0" role="alert">
                     {{ message }}
                 </div>
             {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['info', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-info rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
     {% endfor %}
     {% for label, messages in app.flashes(['danger', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">
+                    <div class="alert alert-danger rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
     {% endfor %}
     <a  class="btn btn-secondary mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a>
     <table class="table">

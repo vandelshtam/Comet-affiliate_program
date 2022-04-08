@@ -3,8 +3,8 @@
 {% block title %}Wallet{% endblock %}
 
 {% block body %}
-<div class="container-xxl">
-    <h1>Мой кошелёк</h1>
+<div class="container-xxl container-xxl col-sm-4  mt-3">
+    <h1 class="d-flex justify-content-center text-white mb-3" style="background: #5eabeb;">Мой кошелёк</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -33,21 +33,32 @@
                     </div>
                 {% endfor %}            
     {% endfor %}
-    <div class="col-xs-12 text-center shadow p-3 mb-5 bg-white rounded">
-      <h2>Структура вашего кошелька  в пересчете на USDT</h2>
-    </div>
-    <div class="mb-3" id="donut-chart"></div>
 
     <div class="row justify-content-center">
-                <div class="col-sm-4 mb-1 ">
-                    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
+                <div class="mb-1 ">
+                    <div class="card text-center shadow p-3 mb-3 bg-white rounded">
+                    <div class="card-body">
+                        {% if  wallet.usdt  == NULL  and  wallet.cometpoin == NULL %}
+                        <h4 class=" mb-3">Ваш кошелек пустой, пополните кошелек.</h4>
+                        {% else %}
+                        <h4 class=" mb-3">Структура вашего кошелька  в пересчете на USDT</h4>
+                        <div class="mb-3" id="donut-chart"></div>
+                        {% endif %}
+                    </div>
+                    </div>
+                </div>
+    </div>           
+    <div class="row justify-content-center">
+                <div class="mb-1 ">
+                    <div class="card text-center shadow p-3 mb-3 bg-white rounded">
                     <div class="card-body">
                         <h5 class="card-title">USDT</h5>
+                        
                         <p class="card-text">{{ wallet.usdt }}</p>
-                        <a href="{{ path('app_wallet_adddeposit', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Пополнить</a>
-                        <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Обменять</a>
+                        <a href="{{ path('app_wallet_adddeposit', {'id': wallet.id}) }}" class="btn btn-info rounded-0 mb-1">Пополнить</a>
+                        <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="btn btn-info rounded-0 mb-1">Обменять</a>
                         {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
-                        <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Вывести</a>
+                        <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-info rounded-0 mb-1">Вывести</a>
                     </div>
                     </div>
                 </div>
@@ -80,13 +91,14 @@
                 </div> #}
                 
     <div class="row justify-content-center">        
-                <div class="col-sm-4 mb-1">
-                    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
+                <div class=" mb-1">
+                    <div class="card text-center shadow p-3 mb-3 bg-white rounded">
                         <div class="card-body">
                             <h5 class="card-title">Cometpoin</h5>
+        
                             <p class="card-text">{{ wallet.cometpoin }}</p>
-                            <a href="{{ path('app_wallet_exchange_wallet_comet', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Пополнить</a>
-                            <a href="{{ path('app_wallet_exchange_comet', {'id': wallet.id}) }}" class="btn btn-secondary mb-3">Обменять</a>
+                            <a href="{{ path('app_wallet_exchange_wallet_comet', {'id': wallet.id}) }}" class="btn btn-info rounded-0 mb-1">Пополнить</a>
+                            <a href="{{ path('app_wallet_exchange_comet', {'id': wallet.id}) }}" class="btn btn-info rounded-0 mb-1">Обменять</a>
                             {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
                             {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Вывести</a> #}
                         </div>
@@ -95,16 +107,17 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-sm-4 mb-1">
+        <div class=" mb-1">
             <div class="card text-center shadow p-3 mb-1 bg-white rounded">
             
                 <div class="card-body">
-                    <a class="btn btn-secondary mb-1" href="{{ path('app_wallet_index') }}">Назад</a>
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_index') }}">Назад</a>
         
     
         {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}">edit</a> #}
-
+                {% if is_granted('ROLE_ADMIN') %}
                     {{ include('wallet/_delete_form.html.twig') }}
+                {% endif %}
                 </div>
             </div>
         </div>
@@ -130,7 +143,7 @@
           },
         },
         donut: {
-          title: "100%",
+          title: "{{ wallet.usdt }}",
         },
         bindto: "#donut-chart",
       });

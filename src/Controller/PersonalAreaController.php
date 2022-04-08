@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Pakege;
 use App\Entity\ReferralNetwork;
 use App\Entity\FastConsultation;
 use App\Form\FastConsultationType;
@@ -30,7 +31,14 @@ class PersonalAreaController extends AbstractController
         $entityManager = $doctrine->getManager();
         $user_id = $user -> getId();
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $user_id]);
-        //dd($referral_network);
+        $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['user_id'=>$user_id]);
+        if($pakege_user != NULL){
+            $pakege_id = $pakege_user -> getId();
+        }
+        else{
+            $pakege_id = 0;
+        }
+        
         if($referral_network != NULL){
             $my_team = $referral_network -> getMyTeam();
         }
@@ -45,7 +53,6 @@ class PersonalAreaController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            //dd($fast_consultation->getName());
             $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
             $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
             return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
@@ -56,6 +63,7 @@ class PersonalAreaController extends AbstractController
             'title' => 'Personal Area',
             'user' => $user,
             'my_team' => $my_team,
+            'pakege_id' => $pakege_id,
             'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
