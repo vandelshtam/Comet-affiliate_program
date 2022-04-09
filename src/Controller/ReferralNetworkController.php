@@ -48,12 +48,24 @@ class ReferralNetworkController extends AbstractController
 
 
     #[Route('/{my_team}/myteam', name: 'app_referral_network_myteam', methods: ['GET'])]
-    public function myTeam(ReferralNetworkRepository $referralNetworkRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, string $my_team): Response
+    public function myTeam(Request $request, ReferralNetworkRepository $referralNetworkRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, string $my_team): Response
     { 
         $entityManager = $doctrine->getManager(); 
-        $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]);//получаем объект  участников моей команды (которых пригласил пользователь)       
-        return $this->render('referral_network/index.html.twig', [
+        $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]);//получаем объект  участников моей команды (которых пригласил пользователь) 
+        
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('referral_network/index_my_team.html.twig', [
             'referral_networks' => $array_my_team,
+            'fast_consultation_form' => $fast_consultation_form -> createView(),
         ]);
     }
 
@@ -61,7 +73,9 @@ class ReferralNetworkController extends AbstractController
     public function new(Request $request, ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, string $referral_link, int $id): Response
     {
         $entityManager = $doctrine->getManager();
-        $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['network_code' => $referral_link]);
+        $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['network_code' => $referral_link]);//выяснить необходим ли этот запрос????
+        //$referral_network_id = $referral_network -> getId(); 
+        //dd($referral_network);  
         $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
         $user_id = $pakege_user -> getUserId();
         $arr = explode('-', $referral_link);//уникальный персональный код участника сети со статусом владелец сети преобразуем в массив для извлечения информации об участнике предоставившегго реферальную ссылку (рефовод)
@@ -90,13 +104,12 @@ class ReferralNetworkController extends AbstractController
             //проводим предварительное создание записи в таблицу строки нового участника реферальной сети 
             $referralNetworkRepository->add($referralNetwork);
             //запись нового участника в линию single_line
-            $this -> newConfirm($request,$referralNetworkRepository, $doctrine,$member_code,$id,$referral_link);
+            $referral_network_id = $this -> newConfirm($request,$referralNetworkRepository, $doctrine,$member_code,$id,$referral_link);
             $this->addFlash(
                          'success',
                          'Поздравляем! Вы успешно активировали пакет и вступили в  реферальную сеть.');
-            $referral_network_id = $referral_network -> getId();           
+            //dd($referral_network_id);          
             return $this->redirectToRoute('app_referral_network_show', ['id' => $referral_network_id], Response::HTTP_SEE_OTHER);
-
         }
 
         $fast_consultation = new FastConsultation();       
@@ -255,6 +268,16 @@ class ReferralNetworkController extends AbstractController
             return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->renderForm('referral_network/edit.html.twig', [
             'referral_network' => $referralNetwork,
             'form' => $form,
@@ -290,7 +313,10 @@ class ReferralNetworkController extends AbstractController
         $pakege_user_id = $arr[1];//айди пакета нового участника сети
         $user_id = $pakege_user -> getUserId();//айди нвого участника сети
         $balance = $pakege_user -> getPrice();//стоимость пакета нового участника сети
+        $referral_network_id = $referral_network -> getId();//id записи нового участника реферральной сети 
         $list_network_all_count = count($list_network_all);
+
+        //dd($referral_network_id);
         
 	    //получаем объект записи родительской реферальной сети и получем из нее код этой сети
         $listReferralNetwork = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['id' => $listReferralNetwork_id]);
@@ -397,7 +423,9 @@ class ReferralNetworkController extends AbstractController
 
         $entityManager->persist($referral_network);
         $entityManager->persist($referral_network_referral);
-        $entityManager->flush();    
+        $entityManager->flush();
+        
+        return $referral_network_id;
     }
 
     

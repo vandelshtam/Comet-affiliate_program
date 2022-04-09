@@ -3,7 +3,8 @@
 {% block title %}Wallet index{% endblock %}
 
 {% block body %}
-    <h1>Wallet index</h1>
+<div class="container-xxl col-sm-8  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Админ все кошельки пользователей</h1>
 {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -52,8 +53,8 @@
                 <td>{{ wallet.bitcoin }}</td>
                 <td>{{ wallet.cometpoin }}</td>
                 <td>
-                    <a href="{{ path('app_wallet_show', {'id': wallet.id}) }}">show</a>
-                    <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}">edit</a>
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_show', {'id': wallet.id}) }}">Открыть</a>
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_edit', {'id': wallet.id}) }}">Редактировать</a>
                 </td>
             </tr>
         {% else %}
@@ -64,5 +65,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_wallet_new') }}">Create new</a>
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_new') }}">Создать новый</a>
 {% endblock %}

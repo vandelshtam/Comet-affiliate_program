@@ -3,7 +3,37 @@
 {% block title %}TokenRate{% endblock %}
 
 {% block body %}
-    <h1>TokenRate</h1>
+    <div class="container-xxl col-sm-6  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Курс токена Cometpoin</h1>
+    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в кабинет Администратора</a>
+{% for label, messages in app.flashes(['success', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-success" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['info', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-info" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['danger', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+            {% endfor %}
 
     <table class="table">
         <tbody>
@@ -18,9 +48,10 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_token_rate_index') }}">back to list</a>
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_token_rate_index') }}">Назад</a>
 
-    <a href="{{ path('app_token_rate_edit', {'id': token_rate.id}) }}">edit</a>
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_token_rate_edit', {'id': token_rate.id}) }}">Редактировать</a>
 
     {{ include('token_rate/_delete_form.html.twig') }}
+</div>
 {% endblock %}

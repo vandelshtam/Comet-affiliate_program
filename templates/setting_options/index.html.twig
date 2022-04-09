@@ -3,8 +3,37 @@
 {% block title %}SettingOptions index{% endblock %}
 
 {% block body %}
-    <h1>SettingOptions index</h1>
-
+<div class=" col-sm-12  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Настройка опций управления сетью</h1>
+    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в кабинет Администратора</a>
+{% for label, messages in app.flashes(['success', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-success" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['info', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-info" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['danger', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+            {% endfor %}
     <table class="table">
         <thead>
             <tr>
@@ -27,8 +56,8 @@
                 <td>{{ setting_option.allPricePakage }}</td>
                 <td>{{ setting_option.accrualLimit }}</td>
                 <td>
-                    <a href="{{ path('app_setting_options_show', {'id': setting_option.id}) }}">show</a>
-                    <a href="{{ path('app_setting_options_edit', {'id': setting_option.id}) }}">edit</a>
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_setting_options_show', {'id': setting_option.id}) }}">Посмотреть</a>
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_setting_options_edit', {'id': setting_option.id}) }}">Редкатировать</a>
                 </td>
             </tr>
         {% else %}
@@ -39,5 +68,6 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_setting_options_new') }}">Create new</a>
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_setting_options_new') }}">Создать новую опцию</a>
+</div>
 {% endblock %}

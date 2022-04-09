@@ -52,7 +52,7 @@ class ListReferralNetworksController extends AbstractController
 
         return $this->render('list_referral_networks/index.html.twig', [
             'list_referral_networks' => $listReferralNetworksRepository->findAll(),
-            'controller_name' => 'Список всех реферальных сетей',
+            'controller_name' => 'Информация о реферральной сети',
             'title' => 'All network referral list',
             'pakage_count' => $pakage_count,
             'pakage_price_all_summ' => $pakage_price_all_summ,

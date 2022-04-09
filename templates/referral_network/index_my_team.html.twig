@@ -3,8 +3,8 @@
 {% block title %}ReferralNetwork index{% endblock %}
 
 {% block body %}
-    <div class=" col-sm-12  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Список всех участников сети</h1>
+<div class="container-xxl col-sm-12  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Список всех участников моей команды</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success rounded-0" role="alert">
@@ -53,9 +53,6 @@
                 <th>Стоимость пакета участника</th>
                 <th>Общее количество начислений наград</th>
                 <th>Личная реферальная ссылка для приглашения нового участника</th>
-                <th>Общая сумма отчислений в сеть на момент активации каждого пакета</th>
-                <th>Сумма начисления в сеть по программе  Direct  при активации каждого пакета</th>
-                <th>Сумма начисления в сеть по программе  CashBack  при активации каждого пакета</th>
                 {% endif %} 
                 <th>Действия</th>
             </tr>
@@ -74,9 +71,6 @@
                 <td>{{ referral_network.pakage }}</td>
                 <td>{{ referral_network.reward }}</td>
                 <td>{{ referral_network.memberCode }}</td>
-                <td>{{ referral_network.currentNetworkProfit }}</td>
-                <td>{{ referral_network.paymentsNetwork }}</td>
-                <td>{{ referral_network.paymentsCash }}</td>
                 {% endif %} 
                 <td>
                     <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">Подробности</a>
@@ -92,5 +86,68 @@
     </table>
 
     {# <a href="{{ path('app_referral_network_new') }}">Create new</a> #}
+
+<div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active" data-bs-interval="10000">
+      <div class="card ml-6" style="width: 18rem;">
+        <img src="..." class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">Название карточки</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Метка первого слайда</h5>
+        <p>Некоторый репрезентативный заполнитель для первого слайда.</p>
+      </div>
+    </div>
+    <div class="carousel-item" data-bs-interval="2000">
+      <div class="card ml-6" style="width: 18rem;">
+        <img src="..." class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">Название карточки</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Метка второго слайда</h5>
+        <p>Некоторый репрезентативный заполнитель для второго слайда.</p>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="card ml-6" style="width: 18rem;">
+        <img src="..." class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">Название карточки</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Метка третьего слайда</h5>
+        <p>Некоторый репрезентативный заполнитель для третьего слайда.</p>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark"  data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Предыдущий</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark"  data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Следующий</span>
+  </button>
+</div>
+
+
+
 </div>
 {% endblock %}

@@ -3,27 +3,41 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl">
+<div class="container-xxl col-sm-6  shadow p-3 mb-1 mt-3 rounded-0">
     <div class="example-wrapper">
-        <h1>{{ controller_name }}! ✅</h1>
+        <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">{{ controller_name }}</h1>
         {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
-                <div class="alert alert-success" role="alert">
+                <div class="alert alert-success rounded-0" role="alert">
                     {{ message }}
                 </div>
             {% endfor %}
-            {% endfor %}
-            {% for label, messages in app.flashes(['info', 'notice']) %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-info rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
-        {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
         <div class="accordion" id="accordionExample">
         <div class="accordion-item">
         <h2 class="accordion-header" id="headingOne">
-            <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color: #5eabeb;">
             Информация об учетных записях пользователей 
             </button>
         </h2>
@@ -42,8 +56,8 @@
         </div>
         <div class="accordion-item">
         <h2 class="accordion-header" id="headingTwo">
-            <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-            Мои операции
+            <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style="color: #5eabeb;">
+            Операции в сети
             </button>
         </h2>
         <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
@@ -89,7 +103,7 @@
         </div> #}
         <div class="accordion-item">
         <h2 class="accordion-header" id="headingFour">
-            <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour" style="color: #5eabeb;">
             Управление опциями 
             </button>
         </h2>
@@ -103,7 +117,7 @@
                 <a class="nav-link link-secondary" href="{{ path('app_referral_network_index') }}">Все участники реферальных сетей</a>
                 </li>
                 <li class="nav-item">        
-                <a class="nav-link link-secondary" href="{{ path('app_list_referral_networks_index') }}">Все реферальные сети</a>
+                <a class="nav-link link-secondary" href="{{ path('app_list_referral_networks_index') }}">Информация о реферральной сети сети</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link link-secondary" href="{{ path('app_setting_options_index') }}" >Настройки сети</a>

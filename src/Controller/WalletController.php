@@ -27,7 +27,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class WalletController extends AbstractController
 {
     #[Route('/', name: 'app_wallet_index', methods: ['GET'])]
-    public function index(WalletRepository $walletRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function index(Request $request, WalletRepository $walletRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
@@ -118,8 +118,9 @@ class WalletController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_wallet_show', methods: ['GET'])]
-    public function show(Wallet $wallet,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function show(Request $request, Wallet $wallet,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//получаем курс внутреннего токена сети
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -131,7 +132,8 @@ class WalletController extends AbstractController
         }
         return $this->render('wallet/show.html.twig', [
             'wallet' => $wallet,
-            'fast_consultation_form' => $fast_consultation_form,
+            'token_rate' => $token_rate,
+            'fast_consultation_form' => $fast_consultation_form->createView(),
         ]);
     }
 
