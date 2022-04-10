@@ -24,14 +24,7 @@
         {% block javascripts %}
             {{ include('js.html.twig') }}
         {% endblock %}
-        {% block fast_consultation %}
-            {# {% if form_errors(fast_consultation_form) %}
-                <div class="my-custom-class-for-errors">
-                    {{ form_errors(fast_consultation_form) }}
-                </div>
-            {% endif %} #}
-            {{ include('fast_consultation.html.twig') }}
-    {% endblock %}
+        
 
     </head>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
@@ -172,7 +165,14 @@
     <body>
         {% block body %}{% endblock %}
     </body>
-    
+    {% block fast_consultation %}
+            {# {% if form_errors(fast_consultation_form) %}
+                <div class="my-custom-class-for-errors">
+                    {{ form_errors(fast_consultation_form) }}
+                </div>
+            {% endif %} #}
+            {{ include('fast_consultation.html.twig') }}
+    {% endblock %}
     {# {% block javascripts %}
             {{ include('js.html.twig') }}
     {% endblock %} #}
