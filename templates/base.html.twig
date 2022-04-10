@@ -9,7 +9,7 @@
         <link rel="preconnect" href="{{ asset('https://fonts.googleapis.com') }}">
         <link rel="preconnect" href="{{ asset('https://fonts.gstatic.com') }}" crossorigin>
         <link rel="stylesheet" href="{{ asset('asset/css/normalize.css') }}">
-        <link rel="stylesheet" href="{{ asset('asset/css/fonts.css') }}">
+        {# <link rel="stylesheet" href="{{ asset('asset/css/fonts.css') }}"> #}
         <link rel = "stylesheet"  href="{{ asset('asset/css/jquery.fancybox.css') }}">
         <link rel="stylesheet" href="{{ asset('asset/css/style.css') }}">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css"/>
@@ -21,9 +21,7 @@
         {% block stylesheets %}
             {# {{ encore_entry_link_tags('app') }} #}
         {% endblock %}
-        {% block javascripts %}
-            {{ include('js.html.twig') }}
-        {% endblock %}
+        
         
 
     </head>
@@ -64,7 +62,7 @@
                 {% endif %}
                 <li class="nav-item">
                 {# <a class="btn btn-warning" href="#" tabindex="-1" aria-disabled="true">Быстрая консультация</a> #}
-                <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn btn-popup text-light rounded-0">Быстрая консультация</a>    
+                <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn text-light rounded-0" style="background: #5eabeb;">Быстрая консультация</a>    
                 </li>
             </ul>
             {# <form class="d-flex">
@@ -165,6 +163,9 @@
     <body>
         {% block body %}{% endblock %}
     </body>
+    {% block javascripts %}
+            {{ include('js.html.twig') }}
+        {% endblock %}
     {% block fast_consultation %}
             {# {% if form_errors(fast_consultation_form) %}
                 <div class="my-custom-class-for-errors">
