@@ -79,7 +79,7 @@
     float: right;
 }
 .hidden{
-    display: none;
+    display: none !important;
 }
 /*==============================*/
 /* .form{
@@ -245,7 +245,7 @@ div#consultation{
   
   #hidden-content,
   #hidden-content-referral{
-    display: none;  
+    display: none !important;  
     width: 400px;
 }
 
