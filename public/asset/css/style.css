@@ -3,7 +3,7 @@
     border: 1px solid#ad800d;
     border-right-width: 20px;  
 } */
-.form{
+/* .form{
     padding: 30px;
 }
 .form_inner{
@@ -77,7 +77,7 @@
     background-color: transparent;
     color:#282828;
     float: right;
-}
+} */
 .hidden{
     display: none !important;
 }
@@ -245,11 +245,11 @@ div#consultation{
   
   #hidden-content,
   #hidden-content-referral{
-    display: none !important;  
+    display: none ;  
     width: 400px;
 }
 
-#hidden-content input,
+/* #hidden-content input,
 #hidden-content textarea,
 #hidden-content-referral input{
     display: block;
@@ -260,8 +260,8 @@ div#consultation{
     border: 1px solid#e6e6e6;
     padding: 0px 10px;
     border-radius: 0%;
-}
-#hidden-content input[type="submit"],
+} */
+/* #hidden-content input[type="submit"],
 .btn-popup,
 #hidden-content-referral input[type="submit"]{
     background-color: #5eabeb;
@@ -277,58 +277,5 @@ div#consultation{
 
 .button_main{
     background: #5eabeb;
-}
+} */
 
-/*slider*/
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol';
-}
-
-.container {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.slider__wrapper {
-  overflow: hidden;
-}
-
-.slider__item {
-  flex: 0 0 50%;
-  max-width: 50%;
-  height: 250px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: rgba(255,255,255, 0.8);
-  font-size: 7rem;
-}
-
-.slider__item:nth-child(1) {
-  background-color: #f44336;
-}
-
-.slider__item:nth-child(2) {
-  background-color: #9c27b0;
-}
-
-.slider__item:nth-child(3) {
-  background-color: #3f51b5;
-}
-
-.slider__item:nth-child(4) {
-  background-color: #03a9f4;
-}
-
-.slider__item:nth-child(5) {
-  background-color: #4caf50;
-}

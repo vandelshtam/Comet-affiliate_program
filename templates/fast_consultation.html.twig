@@ -1,16 +1,16 @@
 {% block fast_consultation %}
 <div id="hidden-content">
     {{ form_start(fast_consultation_form) }}
-    <div class="form_box-inner">
-        <div class="form_box-left">
+    {# <div class="form_box-inner">
+        <div class="form_box-left"> #}
             {# {{ form_widget(fast_consultation_form) }} #}
             {{ form_row(fast_consultation_form.name) }}
             {{ form_row(fast_consultation_form.email) }}
             {{ form_row(fast_consultation_form.phone) }}
             {{ form_row(fast_consultation_form.question) }}
             <input type="submit" value="Отправить">
-        </div>
-    </div>
+        {# </div>
+    </div> #}
     {{ form_end(fast_consultation_form) }}
 </div>
 {% endblock %}
