@@ -54,11 +54,10 @@
 .form_box-inner select{
     outline: none;
     height: 40px;
-    border: 1px solid#e6e6e6;
+    border: 1px solid#d5edf7;
     padding-left: 17px;
 }
-
-.form_box-inner.personaldata select{
+.form_box-inner select{
     outline: none;
     height: 40px;
     border: 1px solid#e6e6e6;
@@ -280,3 +279,56 @@ div#consultation{
     background: #5eabeb;
 }
 
+/*slider*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol';
+}
+
+.container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.slider__wrapper {
+  overflow: hidden;
+}
+
+.slider__item {
+  flex: 0 0 50%;
+  max-width: 50%;
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(255,255,255, 0.8);
+  font-size: 7rem;
+}
+
+.slider__item:nth-child(1) {
+  background-color: #f44336;
+}
+
+.slider__item:nth-child(2) {
+  background-color: #9c27b0;
+}
+
+.slider__item:nth-child(3) {
+  background-color: #3f51b5;
+}
+
+.slider__item:nth-child(4) {
+  background-color: #03a9f4;
+}
+
+.slider__item:nth-child(5) {
+  background-color: #4caf50;
+}
