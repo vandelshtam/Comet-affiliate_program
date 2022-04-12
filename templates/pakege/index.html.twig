@@ -3,7 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <h1>{{ controller_name }}</h1>
+    <h1 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success rounded-0" role="alert">
@@ -32,8 +32,21 @@
                     </div>
                 {% endfor %}            
     {% endfor %}
-    <a class="btn btn-success" href="{{ path('app_pakege_new') }}">Добавить новый пакет</a>
-    <table class="table">
+    <div class="col-sm-4 mb-3 mt-3">
+            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
+                <div class="card-body d-flex justify-content-between">    
+                    <span><h6 class="card-title">Количество пакетов в сети</h6></span>
+                    <span><h6 class="card-title text-info">{{ count }}</h6></span>    
+                </div>
+                <div class="card-body d-flex justify-content-between">    
+                    <span><h6 class="card-title">Количество пакетов в сети</h6></span>
+                    <span><h6 class="card-title text-info">{{ pakage_summ_usdt }} USDT</h6></span>    
+                </div>
+            </div>
+    </div>
+    <a class="btn btn-success rounded-0 mb-3" href="{{ path('app_pakege_new') }}">Добавить новый пакет</a>
+    <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">Назад</a>
+    <table class="table shadow p-3 mb-1 mt-3 rounded-0">
         <thead>
             <tr>
                 <th>Id</th>
@@ -67,10 +80,10 @@
                 <td>{{ pakege.clientCode }}</td>
                 <td>{{ pakege.uniqueCode }}</td>
                 <td>
-                    <a class="btn btn-secondary" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
                     {# <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a> #}
                     {% if pakege.activation == NULL %}
-                    <a href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
+                    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
                      {% endif %}
                 </td>
             </tr>

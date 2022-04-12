@@ -28,7 +28,7 @@
             {% else %}
             <p class="card-text">У вас пока не создан -  username</p>
             {% endif %}
-            <a href="{{ path('app_user_change_username', {'id': user.id}) }}" class="btn btn-warning rounded-0">Изменить</a>
+            <a href="{{ path('app_user_change_username', {'id': user.id}) }}" class="btn btn-warning rounded-0 btn-sm mb-1">Изменить</a>
         </div>
     </div>
     <table class="table">
@@ -41,7 +41,7 @@
                 <th>Email</th>
                 <td>{{ user.email }}</td>
                 <td>
-                    <a class="btn btn-warning rounded-0" href="{{ path('app_user_change_email', {'id': user.id}) }}">Изменить email</a>
+                    <a class="btn btn-warning rounded-0 btn-sm mb-1" href="{{ path('app_user_change_email', {'id': user.id}) }}">Изменить email</a>
                 </td>
             </tr>
                 
@@ -55,7 +55,7 @@
                 </td>
                 <td>
                 {% if is_granted('ROLE_ADMIN') %}    
-                    <a class="btn btn-warning" href="{{ path('app_user_role_edit', {'id': user.id}) }}">Изменить роль пользователя</a>
+                    <a class="btn btn-warning rounded-0 btn-sm mb-1" href="{{ path('app_user_role_edit', {'id': user.id}) }}">Изменить роль пользователя</a>
                 {% endif %}
                 </td>
             </tr>

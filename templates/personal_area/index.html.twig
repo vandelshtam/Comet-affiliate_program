@@ -79,15 +79,15 @@
               </li>
               {% elseif app.user.pakageStatus == 1  %}
               <li class="nav-item">
-              <a class="nav-link link-secondary" href="{{ path('app_pakege_new') }}">Повысить пакет</a>
+              <a class="nav-link link-secondary" href="{{ path('app_pakege_edit', {'id': pakege_id}) }}">Повысить пакет</a>
               </li>
               {% endif %}
               {# <li class="nav-item">
               <a class="nav-link link-secondary" href="">Информация об операциях (не активно)</a>
               </li> #}
-              <li class="nav-item">
+              {# <li class="nav-item">
               <a class="nav-link link-secondary" href="{{ path('app_pakege_index') }}">История операций (для админа все пакеты)</a>
-              </li>
+              </li> #}
               <li class="nav-item">
               <a class="nav-link link-secondary" href="{{ path('app_pakege_show',{'id': pakege_id}) }}">Мой пакет</a>
               </li>
@@ -95,9 +95,9 @@
               <a class="nav-link link-secondary" href="{{ path('app_wallet_user') }}">Мой кошелек</a>
               </li>
               
-              <li class="nav-item">
+              {# <li class="nav-item">
               <a class="nav-link link-secondary" href="{{ path('app_list_referral_networks_index') }}">Вывод (не активно)</a>
-              </li>
+              </li> #}
           </ul> 
         </div>
       </div>
@@ -114,9 +114,9 @@
               {# <li class="nav-item">
               <a class="nav-link link-secondary" href="{{ path('app_list_referral_networks_index') }}">Все реферальные сети</a>
               </li> #}
-              <li class="nav-item">
+              {# <li class="nav-item">
               <a class="nav-link link-secondary" href="{{ path('app_list_referral_networks_index_list') }}">Моя реферальная сеть (где я учавствую)</a>
-              </li>
+              </li> #}
               <li class="nav-item">
               <a class="nav-link link-secondary" href="{{ path('app_referral_network_myteam',{'my_team': my_team}) }}">Моя команда</a>
               </li>
@@ -127,7 +127,7 @@
         </div>
       </div>
     </div>
-    <div class="accordion-item">
+    {# <div class="accordion-item">
       <h2 class="accordion-header" id="headingThree">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" style="color: #5eabeb;">
           Накопительная система 
@@ -151,7 +151,7 @@
           </ul> 
         </div>
       </div>
-    </div>
+    </div> #}
   </div>
 </div>
 {% endblock %}

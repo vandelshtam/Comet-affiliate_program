@@ -20,7 +20,7 @@ class ListReferralNetworksType extends AbstractType
                 ])
             //->add('referral_networks_id')
             //->add('owner_id')
-            //->add('owner_name')
+            ->add('owner_name')
             ->add('pakege')
             // ->add('pakege', IntegerType::class,[
             //     'label' => 'pakege_id',

@@ -28,9 +28,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/list/referral')]
 class ListReferralNetworksController extends AbstractController
 {
-    #[Route('/', name: 'app_list_referral_networks_index', methods: ['GET'])]
+    #[Route('/admin', name: 'app_list_referral_networks_index', methods: ['GET'])]
     public function index(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $entityManager = $doctrine->getManager();
         //$pakages = $referralPakegeRepository->findAll();
         $pakages = $entityManager->getRepository(Pakege::class)->findAll();
@@ -60,9 +62,11 @@ class ListReferralNetworksController extends AbstractController
         ]);
     }
 
-    #[Route('/list', name: 'app_list_referral_networks_index_list', methods: ['GET'])]
+    #[Route('/list/admin', name: 'app_list_referral_networks_index_list', methods: ['GET'])]
     public function indexList(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository,ReferralNetworkRepository $referralNetworkRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $user = $this -> getUser();
         $user_id = $user -> getId();
         $entityManager = $doctrine->getManager();
@@ -98,14 +102,31 @@ class ListReferralNetworksController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/new', name: 'app_list_referral_networks_new', methods: ['GET', 'POST'])]
+    #[Route('/{id}/new/admin', name: 'app_list_referral_networks_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ListReferralNetworksRepository $listReferralNetworksRepository,int $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $user = $this -> getUser();
+        $user_id = $user -> getId();
         $entityManager = $doctrine->getManager();
+        
+        if($entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]) == false){
+            $this->addFlash(
+                'warning',
+                'Нет такого пользователя');
+                return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
         $pakege = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
+        if($user_id != $pakege -> getUserId()){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        }
+
         $referral_link = $pakege -> getReferralLink();//она же код реферальной сети network_code
 
         if($referral_link == NULL){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN');
             $listReferralNetwork = new ListReferralNetworks();
             $form = $this->createForm(ListReferralNetworksType::class, $listReferralNetwork);
             $form->handleRequest($request);
@@ -120,6 +141,7 @@ class ListReferralNetworksController extends AbstractController
             }
         }
         else{
+            
             return $this->redirectToRoute('app_referral_network_new', ['referral_link' => $referral_link, 'id' => $id], Response::HTTP_SEE_OTHER);
         }
 
@@ -141,9 +163,11 @@ class ListReferralNetworksController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_list_referral_networks_show', methods: ['GET'])]
+    #[Route('/{id}/admin', name: 'app_list_referral_networks_show', methods: ['GET'])]
     public function show(Request $request,ListReferralNetworks $listReferralNetwork,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -160,9 +184,11 @@ class ListReferralNetworksController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/list', name: 'app_list_referral_networks_show_list', methods: ['GET'])]
+    #[Route('/{id}/list/admin', name: 'app_list_referral_networks_show_list', methods: ['GET'])]
     public function showList(Request $request,ListReferralNetworks $listReferralNetwork,ReferralNetworkRepository $referralNetworkRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -182,9 +208,16 @@ class ListReferralNetworksController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_list_referral_networks_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ListReferralNetworks $listReferralNetwork, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    #[Route('/{id}/edit/admin', name: 'app_list_referral_networks_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, ListReferralNetworks $listReferralNetwork, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $entityManager = $doctrine->getManager();
+        $listReferralNetwork = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['id' => $id]);
+        
+        $pakege_id = $listReferralNetwork -> getPakege() -> getId();
+
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -207,12 +240,15 @@ class ListReferralNetworksController extends AbstractController
             'list_referral_network' => $listReferralNetwork,
             'form' => $form,
             'fast_consultation_form' => $fast_consultation_form,
+            'pakege_id' => $pakege_id,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_list_referral_networks_delete', methods: ['POST'])]
+    #[Route('/{id}/admin', name: 'app_list_referral_networks_delete', methods: ['POST'])]
     public function delete(Request $request, ListReferralNetworks $listReferralNetwork, ListReferralNetworksRepository $listReferralNetworksRepository): Response
     {
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($this->isCsrfTokenValid('delete'.$listReferralNetwork->getId(), $request->request->get('_token'))) {
             $listReferralNetworksRepository->remove($listReferralNetwork);
         }
@@ -221,9 +257,12 @@ class ListReferralNetworksController extends AbstractController
     }
 
 
-    #[Route('/{id}/new/confirm', name: 'app_list_referral_networks_new_confirm', methods: ['GET', 'POST'])]
+    #[Route('/{id}/new/confirm/admin', name: 'app_list_referral_networks_new_confirm', methods: ['GET', 'POST'])]
     public function newConfirm(Request $request,  ManagerRegistry $doctrine, ListReferralNetworksRepository $listReferralNetworksRepository, ReferralNetworkRepository $referralNetworkRepository, int $id): Response
     {  
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
         $user = $this -> getUser();
         $user_id = $user -> getId();
         
@@ -251,6 +290,10 @@ class ListReferralNetworksController extends AbstractController
         $listReferralNetwork -> setClientCode($client_code);
         $listReferralNetwork -> setNetworkCode($network_code);
         $listReferralNetwork -> setUniqueCode($unique_code);
+        $listReferralNetwork -> setProfitNetwork(0);//общая сумма очислений в проект (владельцам проекта)
+        $listReferralNetwork -> setPaymentsDirect(0);//общая сумма начисленных доходов в сеть по программе Директ
+        $listReferralNetwork -> setPaymentsCash(0);//общая сумма начисленных в сети доходов по программе КешБек
+        $listReferralNetwork -> setCurrentBalance(0);//общая сумма стоимости пакетов в сети (не погашенных)
         //$user_table -> setPakageStatus(1);
         //$listReferralNetwork -> setProfitNetwork($balance);
         $pakege -> setActivation('активирован');
@@ -264,9 +307,20 @@ class ListReferralNetworksController extends AbstractController
         $referral_network -> setNetworkId($listReferralNetwork_id);
         $referral_network -> setUserStatus('owner');
         $referral_network -> setBalance($balance);
+        $referral_network -> setPakage($balance);
         $referral_network -> setNetworkCode($network_code);
         $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
         $referral_network -> setMyTeam($member_code);
+
+        $referral_network -> setReward(0);//сумма начислений дохода пользователя в сети
+        $referral_network -> setCash(0);//сумма начисления  дохода пользователю  по системе КэшБек
+        $referral_network -> setDirect(0);//сумма начислений в сети пользователю по программе Директ
+        $referral_network -> setCurrentNetworkProfit(0);//текщее отчисление  в доход проекта от погашения пакетов в момент активации пакета нвого пользователя
+        $referral_network -> setPaymentsNetwork(0);//начисление в сеть по программе Директ в момент активации нового пакета
+        $referral_network -> setPaymentsCash(0);//начисление в сеть по программе КешБек в момент активации нового пакета 
+        $referral_network -> setRewardWallet(0);//остаток начислений доступных для вывода на кошелек пользователя
+        $referral_network -> setWithdrawalToWallet(0);//общая сумма выведенных на кошелек начисленых доходов пользователя
+
         $referralNetworkRepository->add($referral_network);
         
         $entityManager->persist($referral_network);

@@ -70,7 +70,7 @@ class RegistrationController extends AbstractController
             );
             // $roles[] = 'ROLE_ADMIN';
             // $user->setRoles($roles);
-            $user->setReferralLink($referral);
+            $user->setReferralLink($referral_link);
             $user->setPakageStatus(0);
             $entityManager->persist($user);
             $entityManager->flush();

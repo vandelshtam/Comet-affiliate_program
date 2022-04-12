@@ -21,7 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/user')]
 class UserController extends AbstractController
 {
-    #[Route('/', name: 'app_user_index', methods: ['GET'])]
+    #[Route('/', name: 'app_user_index_admin', methods: ['GET'])]
     public function index(UserRepository $userRepository,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -38,12 +38,13 @@ class UserController extends AbstractController
         }
         return $this->render('user/index.html.twig', [
             'users' => $userRepository->findAll(),
+            'count' => count($userRepository->findAll()),
             'fast_consultation_form' => $fast_consultation_form->createView(),
         ]);
     }
 
-    #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, UserRepository $userRepository): Response
+    #[Route('/new/admin', name: 'app_user_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, UserRepository $userRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -57,9 +58,20 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->renderForm('user/new.html.twig', [
             'user' => $user,
             'form' => $form,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
@@ -67,6 +79,7 @@ class UserController extends AbstractController
     public function show(User $user,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $user_id = $this->getUser() -> getId();
     
         if($user_id != $id)

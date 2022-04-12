@@ -35,7 +35,10 @@
     {% endfor %}
     
     {{ include('pakege/_form.html.twig') }}
-
-    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_index') }}">назад</a>
+    {% if is_granted('ROLE_ADMIN') %}   
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_index_admin') }}">назад</a>
+    {% else %}
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">В личный кабинет</a>
+    {% endif %}
 <div>
 {% endblock %}

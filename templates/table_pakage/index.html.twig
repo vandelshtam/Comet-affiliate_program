@@ -28,10 +28,11 @@
                 {% endfor %}
     {% endfor %}
     <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;"> {{ controller_name }}</h1>
-    <div class="card mb-3" style="max-width: 1140px;">
+    
+    <div class=" mb-3" style="max-width: 1140px;">
     <div class="row g-0">
         <div class="col-md-4">
-        <img src="{{ asset('asset/img/pakages-cometa-1.jpeg') }}" class="img-fluid rounded-start" alt="...">
+        <img src="{{ asset('asset/img/icone-portf-1.png') }}" class="img-fluid rounded-start" alt="...">
         </div>
         <div class="col-md-8">
         <div class="card-body">
@@ -42,8 +43,10 @@
         </div>
     </div>
     </div>
-
-<h1>Таблица актуальных пакетов</h1>
+    {% if is_granted('ROLE_ADMIN') %}   
+    <a class="btn btn-success rounded-0 mb-3 mt-3" href="{{ path('app_table_pakage_new_admin') }}">Добавить новый пакет</a>
+    {% endif %}
+<h3>Актуальные пакеты</h3>
 
     <table class="table">
         <thead>
@@ -62,10 +65,10 @@
                 <td>{{ table_pakage.pricePakage }}</td>
                 <td>
                     {# {% if is_granted('IS_AUTHENTICATED_FULLY') %}    #}
-                    <a class="btn btn-secondary rounded-0 mb-1" href="{{ path('app_table_pakage_show', {'id': table_pakage.id}) }}">Посмотреть</a>
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_table_pakage_show', {'id': table_pakage.id}) }}">Посмотреть</a>
                     {# {% endif %} #}
                     {% if is_granted('ROLE_ADMIN') %}   
-                    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
+                    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_table_pakage_edit_admin', {'id': table_pakage.id}) }}">Редактировать</a>
                     {% endif %}
                 </td>
             </tr>
@@ -76,8 +79,5 @@
         {% endfor %}
         </tbody>
     </table>
-    {% if is_granted('ROLE_ADMIN') %}   
-    <a class="btn btn-success rounded-0 mb-1" href="{{ path('app_table_pakage_new') }}">Добавить новый пакет</a>
-    {% endif %}
 </div>
 {% endblock %}

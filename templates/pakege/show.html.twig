@@ -61,13 +61,16 @@
             </tr>
         </tbody>
     </table>
-
-    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_index') }}">Назад</a>
+    {% if is_granted('ROLE_ADMIN') %}  
+    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_index_admin') }}">Назад</a>
+    {% else %}
+    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">Назад</a>
+    {% endif %}
     {% if pakege.activation == NULL %}
         <a class="btn btn-danger rounded-0 mb-1" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать пакет</a>
     {% endif %}
     {% if is_granted('ROLE_ADMIN') %}   
-    <a  class="btn btn-warning rounded-0 mb-1" href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">Редактировать</a>
+    <a  class="btn btn-warning rounded-0 mb-1" href="{{ path('app_pakege_edit_admin', {'id': pakege.id}) }}">Редактировать</a>
 
     {{ include('pakege/_delete_form.html.twig') }}
     {% endif %}

@@ -56,6 +56,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer', nullable: true)]
     private $pakage_status;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Pkege::class, cascade: ['persist', 'remove'])]
+    private $pkege;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $pakage_id;
+
 
     public function __construct()
     {
@@ -265,6 +271,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPakageStatus(?int $pakage_status): self
     {
         $this->pakage_status = $pakage_status;
+
+        return $this;
+    }
+
+    public function getPkege(): ?Pkege
+    {
+        return $this->pkege;
+    }
+
+    public function setPkege(Pkege $pkege): self
+    {
+        // set the owning side of the relation if necessary
+        if ($pkege->getUser() !== $this) {
+            $pkege->setUser($this);
+        }
+
+        $this->pkege = $pkege;
+
+        return $this;
+    }
+
+    public function getPakageId(): ?int
+    {
+        return $this->pakage_id;
+    }
+
+    public function setPakageId(?int $pakage_id): self
+    {
+        $this->pakage_id = $pakage_id;
 
         return $this;
     }

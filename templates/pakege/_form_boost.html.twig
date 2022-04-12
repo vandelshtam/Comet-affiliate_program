@@ -1,0 +1,56 @@
+
+{% if form_errors(form) %}
+<div class="alert alert-danger" role="alert">
+    {{ form_errors(form) }}
+</div>
+{% endif %}
+{# {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+{% endif %} #}
+
+{{ form_start(form) }}
+<div class="form_box-inner">   
+    <div class="form_box-left">
+    <div id="emailHelp mt-6" class="form-text">Ваш текущий пакет</div>
+    {{ form_row(form.name) }}
+    <div id="emailHelp mt-6" class="form-text">Стоимость вашего текущего пакета</div>
+    {{ form_row(form.price) }}
+    {# {% if user_referral_link != NULL%}
+    <div class="hidden">  
+    {{ form_row(form.referral_link, {'value': user_referral_link }) }}
+    </div>
+    {% else %}
+    {{ form_row(form.referral_link) }}<div id="emailHelp" class="form-text mb-3">Введите реферальную ссылку.</div> 
+    {% endif %} #}
+    <div id="emailHelp" class="form-text mt-3">Выберите валюту покупки.</div> 
+    <select class="form-select mb-3" aria-label="Default select example" name="select">
+      <option selected>Выберите валюту покупки</option>
+      <option value="1">USDT</option>
+      <option value="2">Cometpoin</option>
+    </select>
+    <div id="emailHelp" class="form-text mt-3">Пакеты для повышения.</div> 
+    <select class="form-select mb-3" aria-label="Default select example" name="pakage">
+    
+      <option selected>Выберите пакет для повышения.</option>
+      {% for chois in choise  %}
+      <option value="{{ chois }}">{{ chois }}</option>
+      {% endfor %}
+    </select>
+    {# {% if is_granted('ROLE_ADMIN') %}
+    
+    
+    {% else %}
+    <div class="hidden">  
+    
+   
+    </div>
+    {% endif %} 
+    <div class="hidden">
+     
+    </div> #}
+    <button class="btn btn-info rounded-0 mb-1 mt-3">{{ button_label|default('Купить') }}</button>
+    </div>
+</div>
+
+{{ form_end(form) }}
+

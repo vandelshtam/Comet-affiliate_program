@@ -3,8 +3,8 @@
 {% block title %}TablePakage{% endblock %}
 
 {% block body %}
-<div class="example-wrapper container-xxl">
-    <h1>Обзор пакета</h1>
+<div class="example-wrapper container-xxl container-xxl col-sm-6  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Обзор пакета</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success" role="alert">
@@ -46,9 +46,9 @@
     <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_table_pakage_index') }}">Назад</a>
     {# {% endif %} #}
     {% if is_granted('ROLE_ADMIN') %}   
-    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_table_pakage_edit', {'id': table_pakage.id}) }}">Редактировать</a>
+    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_table_pakage_edit_admin', {'id': table_pakage.id}) }}">Редактировать</a>
 
     {{ include('table_pakage/_delete_form.html.twig') }}
     {% endif %}
-</div>
+</>
 {% endblock %}

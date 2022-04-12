@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class="container-xxl col-sm-12  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Список всех участников моей команды</h1>
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Моя команда</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success rounded-0" role="alert">
@@ -39,7 +39,7 @@
     {% else %}
     <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
     {% endif %}
-    <table class="table">
+    {# <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
@@ -75,7 +75,7 @@
                 <td>
                     <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">Подробности</a>
                     {# <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}
-                </td>
+                {# </td>
             </tr>
         {% else %}
             <tr>
@@ -83,151 +83,236 @@
             </tr>
         {% endfor %}
         </tbody>
-    </table>
+    </table>  #}
 
     {# <a href="{{ path('app_referral_network_new') }}">Create new</a> #}
 
-<div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
-  </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active" data-bs-interval="10000">
-      <div class="card ml-6" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Название карточки</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-        </div>
+<div class="col-sm-12 mb-1">
+            <div class=" text-secondary rounded-0">
+                <div class="card-body d-flex justify-content-between">    
+                    <span><h6 class="card-title">Моя команда - количество участников</h6></span>
+                    <span><h6 class="card-title text-dark">{{ my_team_count }}</h6></span>    
+                </div>
+                <div class="card-body d-flex justify-content-between">    
+                    <span><h6 class="card-title">Моя команда - баланс</h6></span>
+                    <span><h6 class="card-title">{{ my_team_summ }} USDT</h6></span>    
+                </div>
+                
+                
+            </div>
     </div>
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Метка первого слайда</h5>
-        <p>Некоторый репрезентативный заполнитель для первого слайда.</p>
-      </div>
-    </div>
-    <div class="carousel-item" data-bs-interval="2000">
-      <div class="card ml-6" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Название карточки</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-        </div>
-    </div>
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Метка второго слайда</h5>
-        <p>Некоторый репрезентативный заполнитель для второго слайда.</p>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <div class="card ml-6" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Название карточки</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-        </div>
-    </div>
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Метка третьего слайда</h5>
-        <p>Некоторый репрезентативный заполнитель для третьего слайда.</p>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <div class="card ml-6" style="width: 18rem;">
-        <img src="..." class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Название карточки</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-        </div>
-    </div>
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Метка третьего слайда</h5>
-        <p>Некоторый репрезентативный заполнитель для третьего слайда.</p>
-      </div>
-    </div>
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark"  data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Предыдущий</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark"  data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Следующий</span>
-  </button>
-</div>
-
-<section>
-<div class="container">
-
-    <div class="slider">
-      <div class="slider__wrapper">
-        <div class="slider__items">
-          <div class="slider__item">
-            <!-- Контент 1 слайда -->
-            1
-          </div>
-          <div class="slider__item">
-            <!-- Контент 2 слайда -->
-            2
-          </div>
-          <div class="slider__item">
-            <!-- Контент 3 слайда -->
-            3
-          </div>
-          <div class="slider__item">
-            <!-- Контент 4 слайда -->
-            4
-          </div>
-          <div class="slider__item">
-            <!-- Контент 5 слайда -->
-            5
-          </div>
-        </div>
-      </div>
-      <a href="#" class="slider__control" data-slide="prev"></a>
-      <a href="#" class="slider__control" data-slide="next"></a>
-    </div>
-
-  </div>
-</section>
-
-</div>
 
 <div class="container">
 
     <div class="slider">
-      <div class="slider__wrapper">
-        <div class="slider__items">
-          <div class="slider__item">
-            <!-- Контент 1 слайда -->
-            1
-          </div>
-          <div class="slider__item">
-            <!-- Контент 2 слайда -->
-            2
-          </div>
-          <div class="slider__item">
-            <!-- Контент 3 слайда -->
-            3
-          </div>
-          <div class="slider__item">
-            <!-- Контент 4 слайда -->
-            4
-          </div>
-          <div class="slider__item">
-            <!-- Контент 5 слайда -->
-            5
+      <div class="slider__container">
+        <div class="slider__wrapper">
+          <div class="slider__items">
+          {% for referral_network in referral_networks %}
+            <div class="slider__item">
+              <!-- Начало контента 1 слайда -->
+              <div class="slider__item-container">
+                <div class="slider__item-content">
+                  <div class="slider__content_header">
+                     <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
+                      {# height="250" loading="lazy"> #}
+                    <span class="slider__content_section">Стоимость пакета {{ referral_network.pakage }} USDT</span>
+                  </div>
+                  <h2 class="slider__content_title">{{ referral_network.name }}</h2>
+                  <div class="slider__content_footer">
+                    <div class="slider__content_avatar">
+                      <img class="slider__content_photo" src="/examples/images/photo-2.jpg" alt="">
+                    </div>
+                    <span class="slider__content_author">Место в линии</span>
+                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+                      <path fill="currentColor"
+                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                      </path>
+                    </svg>
+                    <span class="slider__content_views">{{ referral_network.userStatus }}</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Конец контента 1 слайда -->
+            </div>
+          {% endfor %}  
+            {# <div class="slider__item">
+              <!-- Начало контента 2 слайда -->
+              <div class="slider__item-container">
+                <div class="slider__item-content">
+                  <div class="slider__content_header">
+                    <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
+                      height="250" loading="lazy">
+                    <span class="slider__content_section">Подборка</span>
+                  </div>
+                  <h2 class="slider__content_title">15 самых полезных свойств черники</h2>
+                  <div class="slider__content_footer">
+                    <div class="slider__content_avatar">
+                      <img class="slider__content_photo" src="/examples/images/photo-4.jpg" alt="">
+                    </div>
+                    <span class="slider__content_author">Тамара</span>
+                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+                      <path fill="currentColor"
+                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                      </path>
+                    </svg>
+                    <span class="slider__content_views">757</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Конец контента 2 слайда -->
+            </div>
+            <div class="slider__item">
+              <!-- Начало контента 3 слайда -->
+              <div class="slider__item-container">
+                <div class="slider__item-content">
+                  <div class="slider__content_header">
+                     <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
+                      height="250" loading="lazy">
+                    <span class="slider__content_section">Подборка</span>
+                  </div>
+                  <h2 class="slider__content_title">Лучшие фермерские рынки Майами</h2>
+                  <div class="slider__content_footer">
+                    <div class="slider__content_avatar">
+                      <img class="slider__content_photo" src="/examples/images/photo-3.jpg" alt="">
+                    </div>
+                    <span class="slider__content_author">Иван</span>
+                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path fill="currentColor"
+                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                      </path>
+                    </svg>
+                    <span class="slider__content_views">320</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Конец контента 3 слайда -->
+            </div>
+            <div class="slider__item">
+              <!-- Начало контента 4 слайда -->
+              <div class="slider__item-container">
+                <div class="slider__item-content">
+                  <div class="slider__content_header">
+                    <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
+                      height="250" loading="lazy">
+                    <span class="slider__content_section">Подборка</span>
+                  </div>
+                  <h2 class="slider__content_title">Почему утята такие милые?</h2>
+                  <div class="slider__content_footer">
+                    <div class="slider__content_avatar">
+                      <img class="slider__content_photo" src="/examples/images/photo-4.jpg" alt="">
+                    </div>
+                    <span class="slider__content_author">Тамара</span>
+                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+                      <path fill="currentColor"
+                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                      </path>
+                    </svg>
+                    <span class="slider__content_views">1855</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Конец контента 4 слайда -->
+            </div> #}
+            {# <div class="slider__item">
+              <!-- Начало контента 5 слайда -->
+              <div class="slider__item-container">
+                <div class="slider__item-content">
+                  <div class="slider__content_header">
+                    <img class="slider__content_img" src="/examples/images/slider/5-350x250.jpg" alt="..." width="350"
+                      height="250" loading="lazy">
+                    <span class="slider__content_section">Подборка</span>
+                  </div>
+                  <h2 class="slider__content_title">Вкусный лимонад в жаркий день</h2>
+                  <div class="slider__content_footer">
+                    <div class="slider__content_avatar">
+                      <img class="slider__content_photo" src="/examples/images/photo-2.jpg" alt="">
+                    </div>
+                    <span class="slider__content_author">Ирина</span>
+                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+                      <path fill="currentColor"
+                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                      </path>
+                    </svg>
+                    <span class="slider__content_views">2799</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Конец контента 5 слайда -->
+            </div>
+            <div class="slider__item">
+              <!-- Начало контента 6 слайда -->
+              <div class="slider__item-container">
+                <div class="slider__item-content">
+                  <div class="slider__content_header">
+                    <img class="slider__content_img" src="/examples/images/slider/6-350x250.jpg" alt="..." width="350"
+                      height="250" loading="lazy">
+                    <span class="slider__content_section">Совет эксперта</span>
+                  </div>
+                  <h2 class="slider__content_title">10 заповедей счастливой женщины</h2>
+                  <div class="slider__content_footer">
+                    <div class="slider__content_avatar">
+                      <img class="slider__content_photo" src="/examples/images/photo-4.jpg" alt="">
+                    </div>
+                    <span class="slider__content_author">Тамара</span>
+                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+                      <path fill="currentColor"
+                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                      </path>
+                    </svg>
+                    <span class="slider__content_views">1855</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Конец контента 6 слайда -->
+            </div>
+            <div class="slider__item">
+              <!-- Начало контента 7 слайда -->
+              <div class="slider__item-container">
+                <div class="slider__item-content">
+                  <div class="slider__content_header">
+                    <img class="slider__content_img" src="/examples/images/slider/7-350x250.jpg" alt="..." width="350"
+                      height="250" loading="lazy">
+                    <span class="slider__content_section">Совет эксперта</span>
+                  </div>
+                  <h2 class="slider__content_title">Влияние кофе на организм человека</h2>
+                  <div class="slider__content_footer">
+                    <div class="slider__content_avatar">
+                      <img class="slider__content_photo" src="/examples/images/photo-1.jpg" alt="">
+                    </div>
+                    <span class="slider__content_author">Арнольд</span>
+                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+                      <path fill="currentColor"
+                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                      </path>
+                    </svg>
+                    <span class="slider__content_views">2107</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Конец контента 7 слайда -->
+            </div> #}
           </div>
         </div>
+        <a href="#" class="slider__control" data-slide="prev"></a>
+        <a href="#" class="slider__control" data-slide="next"></a>
+        <ol class="slider__indicators">
+        {% for i in range(1, my_team_count) %}
+          <li data-slide-to="{{ i }}"></li>
+          {# <li data-slide-to="1"></li>
+          <li data-slide-to="2"></li>
+          <li data-slide-to="3"></li>
+          <li data-slide-to="4"></li>
+          <li data-slide-to="5"></li>
+          <li data-slide-to="6"></li> #}
+        {% endfor %}
+        </ol>
       </div>
-      <a href="#" class="slider__control" data-slide="prev"></a>
-      <a href="#" class="slider__control" data-slide="next"></a>
     </div>
+  </div>
+
+</div>
+
 
   </div>
 
@@ -238,7 +323,10 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
       const slider = new ChiefSlider('.slider', {
-        loop: false
+        loop: true,
+        autoplay: true,
+        interval: 5000,
+        refresh: true,
       });
     });
   </script>

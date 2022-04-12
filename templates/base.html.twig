@@ -16,23 +16,23 @@
         {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css"/>
   <link rel=
 "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css"/> #}
-{# <link rel="stylesheet" href="{{ asset('asset/css/chief-slider.min.css') }}"> #}
+<link rel="stylesheet" href="{{ asset('asset/css/chief-slider.min.css') }}">
 <link rel = "stylesheet"  href="{{ asset('asset/css/jquery.fancybox.css') }}">
 <link rel="stylesheet" href="{{ asset('asset/css/style.css') }}">
         {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
         {% block stylesheets %}
             {# {{ encore_entry_link_tags('app') }} #}
         {% endblock %}
-        {% block javascripts %}
+        {# {% block javascripts %}
             {{ include('js.html.twig') }}
-        {% endblock %}
+        {% endblock %} #}
         
 
     </head>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: black;">
         <div class="container-fluid">    
             <a class="nav-link" href="{{ path('app_home') }}">
-                <img src="{{ asset('asset/img/comet-coin5.jpeg') }}" alt="" class="logo" style="max-width: 20px;">
+                <img src="{{ asset('asset/img/comet-coin4.jpeg') }}" alt="" class="logo" style="max-width: 30px;">
             </a>    
             <a class="navbar-brand" href="{{ path('app_home') }}">Comet-AP</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,9 +40,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
+                {# <li class="nav-item">
                 <a class="nav-link" href="tel:">+xx (xxx) xxx-xx-xx</a>
-                </li>
+                </li> #}
                 <li class="nav-item">
                 <a class="nav-link" href="mailto:ficakki48@gmail.com">comet-ap@gmail.com</a>
                 </li>
@@ -67,7 +67,7 @@
                 <li class="nav-item">
                 {# <a class="btn btn-warning" href="#" tabindex="-1" aria-disabled="true">Быстрая консультация</a> #}
                 <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn text-light rounded-0" style="background: #5eabeb;">Быстрая консультация</a> 
-                <a data-fancybox data-src="#hidden-content" href="javascript:;" class="header_btn">Бесплатная консультация</a>       
+                   
                 </li>
             </ul>
             {# <form class="d-flex">
@@ -128,11 +128,19 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         {# <li><a class="dropdown-item" href="{{ path('app_current_balance') }}">Текущий баланс</a></li> #}
                         <li><a class="dropdown-item" href="{{ path('app_referral_network_myplace') }}">Мой баланс</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_wallet_user') }}">Мой кошелек</a></li>
                         {# <li><a class="dropdown-item" href="#">История транзакций</a></li> #}
-                        {% if app.user.pakageStatus == 0 %}
+                        {% if is_granted('ROLE_ADMIN') %}
                         <li><a class="dropdown-item" href="{{ path('app_pakege_new') }}">Купить пакет</a></li>
-                        {% elseif app.user.pakageStatus == 1  %}
-                         <li><a class="dropdown-item" href="{{ path('app_pakege_new') }}">Повысить пакет</a></li>
+                            {% if app.user.pakageStatus == 1 %}
+                            <li><a class="dropdown-item" href="{{ path('app_pakege_edit', {'id': app.user.pakageId}) }}">Повысить пакет</a></li>
+                            {% endif %}
+                        {% else %}   
+                            {% if app.user.pakageStatus == 0 %}
+                            <li><a class="dropdown-item" href="{{ path('app_pakege_new') }}">Купить пакет</a></li>
+                            {% elseif app.user.pakageStatus == 1  %}
+                            <li><a class="dropdown-item" href="{{ path('app_pakege_edit', {'id': app.user.pakageId}) }}">Повысить пакет</a></li>
+                            {% endif %}
                         {% endif %} 
                         {# <li><a class="dropdown-item" href="{{ path('app_referral_network_index') }}">Участники реферальных сетей</a></li>
                         <li><a class="dropdown-item" href="{{ path('app_list_referral_networks_index') }}">Реферальные сети</a></li> #}
@@ -152,7 +160,7 @@
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         <li><a class="dropdown-item" href="#">Поддержка (не активно)</a></li>
                         {% if is_granted('ROLE_ADMIN') %}   
-                        <li><a class="dropdown-item" href="{{ path('app_admin') }}">Кабинет админа</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_admin') }}">Кабинет администратора</a></li>
                         {% endif %} 
                         {% endif %} 
                     </ul>
@@ -166,10 +174,10 @@
         </div>
     </nav>
     <body>
-        {% block body %}{% endblock %}
-    </body>
-    
-    {% block fast_consultation %}
+        {% block body %}
+         
+        {% endblock %}
+        {% block fast_consultation %}
             {# {% if form_errors(fast_consultation_form) %}
                 <div class="my-custom-class-for-errors">
                     {{ form_errors(fast_consultation_form) }}
@@ -177,7 +185,14 @@
             {% endif %} #}
             {{ include('fast_consultation.html.twig') }}
     {% endblock %}
-    {# {% block javascripts %}
+    </body>
+    
+    
+    {% block javascripts %}
             {{ include('js.html.twig') }}
-    {% endblock %} #}
+    {% endblock %}
+    {% block javascripts2 %}      
+    {% endblock %}
+    {% block javascripts_three %}      
+    {% endblock %}
 </html>

@@ -9,6 +9,7 @@ use App\Form\PakegeType;
 use App\Entity\TokenRate;
 use App\Entity\TablePakage;
 use App\Entity\PersonalData;
+use App\Form\BoostPakageType;
 use App\Entity\ReferralNetwork;
 use App\Entity\FastConsultation;
 use App\Form\FastConsultationType;
@@ -28,10 +29,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/pakege')]
 class PakegeController extends AbstractController
 {
-    #[Route('/', name: 'app_pakege_index', methods: ['GET'])]
+    #[Route('/admin', name: 'app_pakege_index_admin', methods: ['GET'])]
     public function index(PakegeRepository $pakegeRepository, Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $pakages = $pakegeRepository->findAll();
+        $pakages_array_price = [0];
+        
+        foreach($pakages as $pakage){
+            $pakages_array_price[] = $pakage -> getPrice();
+        }
+        $pakage_summ_usdt = array_sum($pakages_array_price);
+
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -44,9 +54,11 @@ class PakegeController extends AbstractController
 
         return $this->render('pakege/index.html.twig', [
             'pakeges' => $pakegeRepository->findAll(),
+            'count' => count($pakegeRepository->findAll()),
             'controller_name' => 'Список всех приобретенных пакетов в сети',
             'title' => 'Pakages',
             'fast_consultation_form' => $fast_consultation_form -> createView(),
+            'pakage_summ_usdt' => $pakage_summ_usdt,
         ]);
     }
 
@@ -58,15 +70,21 @@ class PakegeController extends AbstractController
 
         $user = $this -> getUser();
         $user_id = $user -> getId();
-        //проверка баланса кошелька для покупки нового пакета
-        $wallet = $entityManager->getRepository(Wallet::class)->findOneBySomeField($user_id);
+        $wallet = $user -> getWallet();
+        
+        $pakage_table = $entityManager->getRepository(Pakege::class)->findOneBy(['user_id' => $user_id]);
+        if($pakage_table == true){    
+            $this->denyAccessUnlessGranted('ROLE_ADMIN'); 
+        }
+        
+        //проверка наличия кошелька для покупки нового пакета
+        $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user_id]);
 
-        //dd($user_id);
         if( $wallet == NULL){
             $this->addFlash(
                 'warning',
-                'Вы не пополнили кошелек, у вас нет средств на балансе, перейти к пополнению' .'<a href="http://164.92.159.123/wallet/new">пополнить?</a>'. 'oo');
-            return $this->redirectToRoute('app_wallet_user', [], Response::HTTP_SEE_OTHER);
+                'Вы заполнили не все данные, у вас пока нет кошелька, пройдите полную регитрацию');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
         
         $pakege = new Pakege();
@@ -88,7 +106,7 @@ class PakegeController extends AbstractController
             $form_referral_link = $form->get('referral_link')->getData();
             $form_pakage_name = $form->get('name')->getData();
             $form_referral_select = $request->get('select');
-            //dd($form_pakage_name);
+            
             $pakage_user = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $form_pakage_name]); 
             $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
             $wallet_cometpoin = $wallet -> getCometpoin();
@@ -111,7 +129,7 @@ class PakegeController extends AbstractController
                     return $this->redirectToRoute('app_pakege_new', [], Response::HTTP_SEE_OTHER);
                 }
             }
-            //dd($form_referral_select);
+            
             if($form_referral_link != NULL){
                 if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $form_referral_link]) == false ){
                 
@@ -129,7 +147,8 @@ class PakegeController extends AbstractController
             $pakegeRepository->add($pakege);
             $unique = $form->get('unique_code')->getData();
 
-            $pakage_comet_id = $this -> newChoice ($request,$pakegeRepository,$doctrine,$unique,$wallet,$form_referral_select,$form_pakage_name,$pakage_user_price,$token_rate);
+            $pakage_comet_id = $this -> newChoice ($request,$pakegeRepository,$doctrine,$unique,$wallet,$form_referral_select,$form_pakage_name,$pakage_user_price,$token_rate,$user_table);
+            $user_table -> setPakageId($pakage_comet_id);
             $entityManager->flush();
             $mailerController->sendEmail($mailer);
             $this->addFlash(
@@ -162,8 +181,17 @@ class PakegeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_pakege_show', methods: ['GET'])]
-    public function show(Pakege $pakege,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function show(Pakege $pakege,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $user = $this->getUser();
+        $user_id = $user -> getId();
+        $pakage_user = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
+        if($user_id != $pakage_user -> getUserId()){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        }
+
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -183,16 +211,196 @@ class PakegeController extends AbstractController
     #[Route('/{id}/edit', name: 'app_pakege_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
+        $user = $this->getUser();
+        $wallet = $user -> getWallet();
+        $user_id = $user -> getId();
+        $pakage_comet = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
+        if($user_id != $pakage_comet -> getUserId()){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        }
+
+        $form = $this->createForm(BoostPakageType::class, $pakege);
+        $form->handleRequest($request);
+        $entityManager = $doctrine->getManager();
+        
+        if($pakage_comet-> getname() == 'Starter'){
+            $choise  = [
+                'Basic' => 'Basic',
+                'Networker' => 'Networker',
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($pakage_comet-> getname() == 'Basic'){
+            $choise  = [
+                'Networker' => 'Networker',
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($pakage_comet-> getname() == 'Networker'){
+            $choise  = [
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($pakage_comet-> getname() == 'Business'){
+            $choise  = [
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($pakage_comet-> getname() == 'Trader'){
+            $choise  = [
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($pakage_comet-> getname() == 'VIP'){
+            $this->addFlash(
+                'warning',
+                'У вас самый высокий уровень пакета, вы не можете повысить пакет');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+        $unique = $pakage_comet -> getUniqueCode();
+        $user_referral_link = $pakage_comet -> getReferralLink();
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $form_pakage = $request->get('pakage');
+            $form_referral_select = $request->get('select');
+            $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
+            $pakage_user = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $form_pakage]); 
+            $wallet_cometpoin = $wallet -> getCometpoin();
+            $wallet_cometcoin_rate =  $wallet_cometpoin / $token_rate;
+            $pakage_user_price = $pakage_user -> getPricePakage();
+            $token = $token_rate * $pakage_user_price;
+            if($form_referral_select == 1){
+
+                if(($wallet -> getUsdt()) < $pakage_user_price ){
+                    $this->addFlash(
+                        'warning',
+                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
+                    return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
+                }
+                else{
+                    $new_balanse_wallet = $wallet -> getUsdt() - $pakage_user_price;
+                    $wallet -> setUsdt($new_balanse_wallet);
+                }
+            }
+            elseif($form_referral_select == 2){
+                if($wallet_cometcoin_rate < $pakage_user_price ){
+                    $this->addFlash(
+                        'warning',
+                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
+                    return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
+                }
+                else{
+                    $new_balanse_wallet = $wallet_cometcoin_rate - $pakage_user_price;
+                    $wallet -> setCometpoin($new_balanse_wallet);
+                }
+            }
+            $pakage_comet -> setPrice($pakage_user_price);
+            $pakage_comet -> setName($form_pakage);
+            $pakage_comet -> setToken($token);
+            $entityManager->flush();
+            
+            $this->addFlash(
+                'success',
+                'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('pakege/edit_boost.html.twig', [
+            'pakege' => $pakege,
+            'form' => $form,
+            'unique_code' => $unique,
+            'user_referral_link' => $user_referral_link,
+            'fast_consultation_form' => $fast_consultation_form,
+            'choise' => $choise,
+        ]);
+    }
+
+
+    #[Route('/{id}/edit/admin', name: 'app_pakege_edit_admin', methods: ['GET', 'POST'])]
+    public function editAdmin(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $user = $this->getUser();
+        $wallet = $user -> getWallet();
         $form = $this->createForm(PakegeType::class, $pakege);
         $form->handleRequest($request);
         $entityManager = $doctrine->getManager();
         $pakage_comet = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
+        
+        $user_referral_link = $pakage_comet -> getReferralLink();
+            $choise  = [
+                'Starter' => 'Starter',
+                'Basic' => 'Basic',
+                'Networker' => 'Networker',
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        
         $unique = $pakage_comet -> getUniqueCode();
         $user_referral_link = $pakage_comet -> getReferralLink();
-
+        
         if ($form->isSubmitted() && $form->isValid()) {
-            $pakegeRepository->add($pakege);
-            return $this->redirectToRoute('app_pakege_index', [], Response::HTTP_SEE_OTHER);
+            $form_pakage = $request->get('pakage');
+            $form_referral_select = $request->get('select');
+            $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
+            $pakage_user = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $form_pakage]); 
+            $wallet_cometpoin = $wallet -> getCometpoin();
+            $wallet_cometcoin_rate =  $wallet_cometpoin / $token_rate;
+            $pakage_user_price = $pakage_user -> getPricePakage();
+            $token = $token_rate * $pakage_user_price;
+            if($form_referral_select == 1){
+
+                if(($wallet -> getUsdt()) < $pakage_user_price ){
+                    $this->addFlash(
+                        'warning',
+                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
+                    return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
+                }
+                else{
+                    $new_balanse_wallet = $wallet -> getUsdt() - $pakage_user_price;
+                    $wallet -> setUsdt($new_balanse_wallet);
+                }
+            }
+            elseif($form_referral_select == 2){
+                if($wallet_cometcoin_rate < $pakage_user_price ){
+                    $this->addFlash(
+                        'warning',
+                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
+                    return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
+                }
+                else{
+                    $new_balanse_wallet = $wallet_cometcoin_rate - $pakage_user_price;
+                    $wallet -> setCometpoin($new_balanse_wallet);
+                }
+            }
+            $pakage_comet -> setPrice($pakage_user_price);
+            $pakage_comet -> setName($form_pakage);
+            $pakage_comet -> setToken($token);
+            $entityManager->flush();
+            
+            $this->addFlash(
+                'success',
+                'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
 
         $fast_consultation = new FastConsultation();       
@@ -211,12 +419,17 @@ class PakegeController extends AbstractController
             'unique_code' => $unique,
             'user_referral_link' => $user_referral_link,
             'fast_consultation_form' => $fast_consultation_form,
+            'choise' => $choise,
+            'user_referral_link' => $user_referral_link,
         ]);
     }
+
 
     #[Route('/{id}', name: 'app_pakege_delete', methods: ['POST'])]
     public function delete(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         if ($this->isCsrfTokenValid('delete'.$pakege->getId(), $request->request->get('_token'))) {
             $pakegeRepository->remove($pakege);
             $this->addFlash(
@@ -228,12 +441,12 @@ class PakegeController extends AbstractController
     }
 
     //#[Route('/new/{unique}/choice', name: 'app_pakege_new_choice', methods: ['GET', 'POST'])]
-    private function newChoice ($request, $pakegeRepository, $doctrine, $unique,$wallet,$form_referral_select,$form_pakage_name,$pakage_user_price,$token_rate)
+    private function newChoice ($request, $pakegeRepository, $doctrine, $unique,$wallet,$form_referral_select,$form_pakage_name,$pakage_user_price,$token_rate,$user_table)
     {
         $user = $this -> getUser();
         $user_id = $user -> getId();
         $entityManager = $doctrine->getManager();
-        $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user_id]);
+        
         $personal_data_table = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
         $client_code = $personal_data_table -> getClientCode();
         $pakage_comet = $entityManager->getRepository(Pakege::class)->findOneBy(['unique_code' => $unique]);
@@ -243,7 +456,6 @@ class PakegeController extends AbstractController
         if($form_referral_select == 1){
             $current_usdt = $wallet -> getUsdt();
             $new_balance_usdt = $current_usdt - $pakage_user_price;
-            //dd($new_balance_usdt);
             $wallet -> setUsdt($new_balance_usdt);
         }
         elseif($form_referral_select == 2){
@@ -259,6 +471,7 @@ class PakegeController extends AbstractController
         $price_token = $price_usdt * $token_table;
          
         $user_table -> setPakageStatus(1);
+        
         $pakage_comet -> setUserId($user_id);
         $pakage_comet -> setPrice($price_usdt);
         $pakage_comet -> setToken($price_token);
@@ -266,7 +479,6 @@ class PakegeController extends AbstractController
          
         return $pakage_comet_id;
     }
-
 
 
     public function random_string ($str_length)

@@ -29,3 +29,8 @@ function showClose(id) {
         document.getElementById(id).style.display = 'none';
         return false;
 }
+jQuery(document).ready(function($){
+    var url = document.location.href;
+    new Clipboard('.copy_link', {text: function(){ return url;}});
+    $('.copy_link').click(function(){alert('Cсылка успешно скопирована в буфер обмена.');});
+    });

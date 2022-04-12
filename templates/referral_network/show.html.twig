@@ -33,15 +33,19 @@
                     </div>
                 {% endfor %}            
     {% endfor %}
-    <div class="col-xs-12 text-secondary text-center shadow p-3 mb-1 bg-light rounded">
-      <h5>Структура ваших начислений дохода в сети в USDT</h5>
+    {# <div class="col-xs-12 text-secondary text-center shadow p-3 mb-1 bg-light rounded-0">
+      <h5 class="text-secondary">Структура ваших начислений дохода в сети в USDT</h5>
+    </div> #}
+    <div class="col-md-12 text-center mt-3 mb-3">
+        <img src="{{ asset('asset/img/icone-comet-6.png') }}" class="img-fluid rounded-start" alt="..." style="max-width: 100px;">
     </div>
     <div class="row justify-content-center">
         <div class="col-sm-12 mb-1">
-            <div class="card text-center shadow p-3 mb-1 bg-light rounded">
+            <div class="card text-center shadow p-3 mb-1 bg-light rounded-0">
+            <h5 class="text-secondary">Структура ваших начислений дохода в сети в USDT</h5>
             {% if  referral_network.reward == NULL %}
-                <div class="card-body">
-                    У вас пока нет начислений в сети
+                <div class="card-body text-info">
+                    <h3>У вас пока нет начислений в сети</h3>
                 </div>
             {% else %}
                 <div class="card-body">
@@ -52,39 +56,37 @@
         </div>
     </div>
     <div class="col-sm-12 mb-1">
-            <a href=""  class="card text-secondary shadow p-3 mb-1  rounded btn" style="background: #d5edf7;">
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Отстаток начсиленных доходов в сети для перевода на кошелек</h6></span>
-                    <span><h6 class="card-title text-dark">{{ referral_network.rewardWallet }} USDT</h6></span>    
-                </div>
-            </a>
-    </div>
-    <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded">
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Всего переведено доходов на кошелек с момента активации пакета</h6></span>
-                    <span><h6 class="card-title text-dark">{{ referral_network.withdrawalToWallet }} USDT</h6></span>    
+            <div class="card text-secondary shadow p-3 mb-1 bg-warning rounded-0">
+                <div class="card-body d-flex  justify-content-between">    
+                    <span><h6 class="card-title">Отстаток начсиленных доходов в сети доступных для перевода на кошелек</h6></span>
+                    {% if  referral_network.rewardWallet == NULL %}     
+                    <span><h6 class="card-title text-dark">0.00 USDT</h6></span>
+                    {% else %}
+                    <span><h6 class="card-title text-dark">{{ referral_network.rewardWallet }} USDT</h6></span>
+                    {% endif %} 
+                    <a class="btn  btn-info rounded-0 btn-sm mb-1" href="{{ path('app_wallet_exchange_wallet_comet', {'id': wallet_id}) }}">Вывести на кошелек</a>    
                 </div>
             </div>
     </div>
+
     <div class="row justify-content-center">
         <div class="col-sm-4 mb-1">
-            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded">
+            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
                 <div class="card-body">    
-                    <img src="{{ asset('asset/img/network-3.png') }}" class="card-img-top" alt="" style="max-width: 101px;">
+                    <img src="{{ asset('asset/img/network-3.png') }}" class="card-img-top" alt="" style="max-width: 102px;">
                     <h5 class="card-title">Сеть с левой стороны</h5>
-                    <p class="card-text">Баланс сети слева {{ data.summ_left }} USDT</p>
+                    {# <p class="card-text">Баланс сети слева {{ data.summ_left }} USDT</p> #}
                     <p class="text-warning shadow p-3 mb-1  rounded-0 fw-bolder" style="background: #5eabeb;">Количество участников слева : {{ data.count_left }}</p>
                     {# <a href="#" class="btn btn-primary">Перейти куда-нибудь</a> #}
                 </div>
             </div>
         </div>
         <div class="col-sm-4 mb-1">
-            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded">
+            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
                 <div class="card-body">
                 <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="" style="max-width: 100px;">
-                    <h5 class="card-title">Моё место в сети</h5>
-                    <p class="card-text">Мой баланс всех начислений</p>
+                    <h5 class="card-title">Мой баланс</h5>
+                    {# <p class="card-text">Мой баланс всех начислений</p> #}
                     {% if data.my_summ == NULL %}  
                     <p class="text-warning shadow p-3 mb-1  rounded-0 fw-bolder" style="background: #5eabeb;">0.00 USDT</p>
                     {% else %}
@@ -95,101 +97,131 @@
             </div>
         </div>
         <div class="col-sm-4 mb-1">
-            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded">
+            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
                 <div class="card-body">
-                <img src="{{ asset('asset/img/network-3.png') }}" class="card-img-top" alt="" style="max-width: 101px;">
+                <img src="{{ asset('asset/img/network-3.png') }}" class="card-img-top" alt="" style="max-width: 102px;">
                     <h5 class="card-title">Сеть с правой стороны</h5>
-                    <p class="card-text">Баланс сети справа {{ data.summ_right }} USDT</p>
+                    {# <p class="card-text">Баланс сети справа {{ data.summ_right }} USDT</p> #}
                     <p class="text-warning shadow p-3 mb-1 rounded-0 fw-bolder" style="background: #5eabeb;">Количество участников справа : {{ data['count_right'] }}</p>
                     {# <a href="#" class="btn btn-primary">Перейти куда-нибудь</a> #}
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-12 mb-1">
-            <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="card text-secondary shadow p-3 mb-1 bg-light rounded btn">
+    <div class=" mb-1 row justify-content-between">
+    <div class="col-sm-4 mb-1">
+            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
                 <div class="card-body row justify-content-between">    
-                    <span><h6 class="card-title">Моя личная реферальная ссылка (нажмите чтобы отправить)</h6></span>
-                    <span><h6 class="card-title text-dark">{{ referral_network.memberCode }}</h6></span>    
+                    <span><h6 class="card-title">Моя личная реферальная ссылка</h6></span>
+                    {# <span><h6 class="card-title text-dark" id="myInput">{{ referral_network.memberCode }}</h6></span>  #}
+                    <!-- The text field -->
+                    {# <div class="hidden"> #}
+                    <input class="rounded-0 border-0 bg-light text-info" type="text" value="{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput">
+                    {# </div> #}
+                    <!-- The button used to copy the text -->
+                    <button class="btn btn-info rounded-0 mb-1 mt-1 btn-sm" onclick="myFunction()">Скопировать ссылку</button>
+                    <a class="btn btn-info rounded-0  btn-sm" data-fancybox data-src="#hidden-content-referral" href="javascript:;" >Отправить по емайл</a>            
                 </div>
-            </a>
+            </div>
     </div>
-    {% if(referral_network.cash >= (referral_network.pakage * k_cash_back)) %}
-    <div class="col-sm-12 mb-1">
-            <a href="" class="card text-secondary shadow p-3 mb-1 bg-light rounded btn">
+    <div class="col-sm-4 mb-1">
+            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
                 <div class="card-body row justify-content-between">    
-                    <span><h6 class="card-title">Мой пакет (нажмите чтобы повысить)</h6></span>
-                    <span><h6 class="card-title text-dark">{{ referral_network.pakage }} USDT</h6></span>    
+                    <h6 class="card-title">Моя команда - количество участников</h6>
+                    <h6 class="card-title text-info mt-1">{{ my_team_count }}</h6>   
+                    <a class="btn  btn-info rounded-0 btn-sm mb-4 mt-1" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Открыть</a> 
+                    {# <div class="hidden"> 
+                    <a class="btn  btn-info rounded-0 btn-sm mb-1" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Открыть</a>   
+                    </div>        #}
                 </div>
-            </a>
+            </div>
+    </div>
+    {% if referral_network.cash < (referral_network.pakage * k_cash_back) %}
+    <div class="col-sm-4 mb-1">
+            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
+                <div class="card-body row  justify-content-between">    
+                    <span><h6 class="card-title">Мой пакет</h6></span>
+                    <span><h6 class="card-title text-info">{{ referral_network.pakage }} USDT</h6></span>
+                    <a class="btn  btn-info rounded-0 btn-sm mb-1 mt-1" href="{{ path('app_pakege_show', {'id': referral_network.pakegeId}) }}">Подробности</a>
+                    <a class="btn  btn-info rounded-0 btn-sm" href="{{ path('app_pakege_edit', {'id': referral_network.pakegeId}) }}">Повысить</a>          
+                </div>
+            </div>
     </div>
     {% else %}
     <div class="col-sm-12 mb-1">
-            <a href="" class="card text-white shadow p-3 mb-1 bg-danger rounded btn">
+            <div class="card text-white shadow p-3 mb-1 bg-danger rounded-0">
                 <div class="card-body row justify-content-between">    
                     <span><h6 class="card-title">Мой пакет Внимание! вы достигли предела выплат cashback, необходимо повысить пакет (нажмите чтобы повысить)</h6></span>
-                    <span><h6 class="card-title text-dark">{{ referral_network.pakage }} USDT</h6></span>    
+                    <span><h6 class="card-title text-info">{{ referral_network.pakage }} USDT</h6></span>
+                    <a class="btn  btn-info rounded-0 btn-sm mb-1" href="{{ path('app_pakege_show', {'id': referral_network.pakegeId}) }}">Подробности</a>
+                    <a class="btn  btn-info rounded-0 btn-sm " href="{{ path('app_pakege_edit', {'id': referral_network.pakegeId}) }}">Повысить</a>    
                 </div>
-            </a>
+            </div>
     </div>
     {% endif %}
+   </div>
     <div class="col-sm-12 mb-1">
-            <a href="" class="card text-secondary shadow p-3 mb-1 bg-light rounded btn">
-                <div class="card-body row justify-content-between">    
-                    <span><h6 class="card-title">Моя команда - количество участников (нажмите чтобы посмотреть подробности)</h6></span>
-                    <span><h6 class="card-title text-dark">{{ my_team_count }}</h6></span>    
-                </div>
-            </a>
-    </div>
-    <div class="col-sm-12 mb-1">
-            <a href="" class="card text-secondary shadow p-3 mb-1 bg-light rounded btn">
+            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
                 <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Моя команда - баланс (нажмите чтобы посмотреть)</h6></span>
-                    <span><h6 class="card-title">{{ my_team_summ }} USDT</h6></span>    
+                    <span><h6 class="card-title">Моя команда - баланс</h6></span>
+                    <span><h6 class="card-title text-info">{{ my_team_summ }} USDT</h6></span>    
                 </div>
-            </a>
-    </div>
-    <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded">
                 <div class="card-body d-flex justify-content-between">    
                     <span><h6 class="card-title">Моя сторона в сети</h6></span>
-                    <span><h6 class="card-title">{{ referral_network.userStatus }}</h6></span>    
+                    <span><h6 class="card-title text-info">{{ referral_network.userStatus }}</h6></span>    
                 </div>
-            </в>
-    </div>
-    <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded">
                 <div class="card-body d-flex justify-content-between">    
                     <span><h6 class="card-title">Мои начисления по программе Cashback</h6></span>
-                    <span><h6 class="card-title">{{ referral_network.cash }} USDT</h6></span>    
+                    {% if  referral_network.cash == NULL %}
+                    <span><h6 class="card-title text-info">0.00 USDT</h6></span>
+                    {% else %}
+                    <span><h6 class="card-title text-info">{{ referral_network.cash }} USDT</h6></span>
+                    {% endif %}         
                 </div>
-            </в>
-    </div>
-    <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded">
                 <div class="card-body d-flex justify-content-between">    
                     <span><h6 class="card-title">Мои начисления по программе Direct</h6></span>
-                    <span><h6 class="card-title">{{ referral_network.direct }} USDT</h6></span>    
+                    {% if  referral_network.direct == NULL %}
+                    <span><h6 class="card-title text-info">0.00 USDT</h6></span>
+                    {% else %}
+                    <span><h6 class="card-title text-info">{{ referral_network.direct }} USDT</h6></span>
+                    {% endif %}        
                 </div>
-            </в>
+                <div class="card-body d-flex justify-content-between">    
+                    <span><h6 class="card-title">Всего переведено доходов на кошелек с момента активации пакета</h6></span>
+                    {% if  referral_network.withdrawalToWallet == NULL %}
+                    <span><h6 class="card-title text-info">0.00 USDT</h6></span>    
+                    {% else %}
+                    <span><h6 class="card-title text-info">{{ referral_network.withdrawalToWallet }} USDT</h6></span>
+                    {% endif %}    
+                </div>
+            </div>
     </div>
-        
+    {# <div class="col-sm-12 mb-1">
+            
+    </div>
+    <div class="col-sm-12 mb-1">
+            
+    </div>
+    <div class="col-sm-12 mb-1">
+            
+    </div> #}
+     
     {% if is_granted('ROLE_ADMIN') %}
     <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-white rounded">
+            <div class="card text-secondary shadow p-3 mb-1 bg-white rounded-0">
                 <div class="card-body">
                 <table class="table">
                     <tbody>    
                         <h5 class="card-title mb-3">Для Администратора - информация о сети на момент активации пакета данного пользователя</h5>
-                        <tr class="shadow p-3 mb-1 bg-light rounded">
+                        <tr class="shadow p-3 mb-1 bg-light rounded-0">
                             <th>Выплата в компанию (проект) в момент активации пакета данного участника</th>
                             <td>{{ referral_network.currentNetworkProfit }} USDT</td>
                         </tr>
-                        <tr class="shadow p-3 mb-1 bg-light rounded">
+                        <tr class="shadow p-3 mb-1 bg-light rounded-0">
                             <th>Выплата в сеть по программе Direct в момент активации пакета данного пользователя</th>
                             <td>{{ referral_network.paymentsNetwork }} USDT</td>
                         </tr>
-                        <tr class="shadow p-3 mb-1 bg-light rounded">
+                        <tr class="shadow p-3 mb-1 bg-light rounded-0">
                             <th>Выплата в сеть по программе Cash back в момент активации пакета данного пользователя</th>
                             <td>{{ referral_network.cash }} USDT</td>
                         </tr>    
@@ -200,7 +232,7 @@
     </div>
     
     <div class="col-sm-12 mb-1">
-            <div class="card text-center shadow p-3 mb-1 bg-light rounded">
+            <div class="card text-center shadow p-3 mb-1 bg-light rounded-0">
                 <div class="card-body">
                     {% if is_granted('ROLE_ADMIN') %}  
                     <a  class="btn btn-secondary mb-1" href="{{ path('app_referral_network_index') }}">К списку всех участников</a>
@@ -224,10 +256,10 @@
         <div class="form_box-left">
             
             {{ form_row(referral_link_to_email_form.email_to_client) }}
-
+            <div class="hidden">
             {{ form_row(referral_link_to_email_form.referral_link) }}
             {{ form_row(referral_link_to_email_form.user_id) }}
-            
+            </div>
             <input type="submit" value="Отправить">
         </div>
     </div>
@@ -236,8 +268,22 @@
     
 
 </div>
+
 <script>
-var chart = bb.generate({
+function myFunction() {
+  /* Get the text field */
+  var copyText = document.getElementById("myInput");
+
+  /* Select the text field */
+  copyText.select();
+
+  /* Copy the text inside the text field */
+  document.execCommand("copy");
+
+  /* Alert the copied text */
+  alert("Copied the text: " + copyText.value);
+}
+{# var chart = bb.generate({
         data: {
           columns: [
             ["Blue Direct", {{ referral_network.direct }}],
@@ -259,9 +305,16 @@ var chart = bb.generate({
           title: "Всего {{ referral_network.reward }}",
         },
         bindto: "#donut-chart-my-position",
-      });
-</script>
+      }); #}
+</script> 
+{# <script>
+jQuery(document).ready(function($){
+var url = document.location.href;
+new Clipboard('.copy_link', {text: function(){ return url;}});
+$('.copy_link').click(function(){alert('Cсылка успешно скопирована в буфер обмена.');});
+});
+</script> #}
 {% endblock %}
-{# {% block javascripts %}
+{% block javascripts2 %}
             {{ include('js_show_my_position.html.twig') }}
-{% endblock %} #}
+{% endblock %}

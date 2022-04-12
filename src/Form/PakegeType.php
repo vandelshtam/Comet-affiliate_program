@@ -25,8 +25,8 @@ class PakegeType extends AbstractType
                     'VIP' => 'VIP',
                 ]
             ])
-             ->add('activation')
-             ->add('price')
+            ->add('activation')
+            ->add('price')
             ->add('referral_link', TextType::class, [
                 'label' => 'Вставьте реферальную ссылку или код клиента',
                 'required' => false,  

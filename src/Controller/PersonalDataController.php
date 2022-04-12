@@ -24,10 +24,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/personal/data')]
 class PersonalDataController extends AbstractController
 {
-    #[Route('/', name: 'app_personal_data_index', methods: ['GET'])]
+    #[Route('/admin', name: 'app_personal_data_index', methods: ['GET'])]
     public function index(PersonalDataRepository $personalDataRepository): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         return $this->render('personal_data/index.html.twig', [
@@ -41,8 +41,9 @@ class PersonalDataController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
+
         $personal_data_id = $this->getUser()->getPersonalDataId();
-        if($personal_data_id != NULL)
+        if($personal_data_id != NULL || $user_id != $user -> getId())
         {
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
@@ -56,6 +57,11 @@ class PersonalDataController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $personalDataRepository->add($personalDatum);
             $wallet -> setUser($user);
+            $wallet -> setUsdt(0);
+            $wallet -> setBitcoin(0);
+            $wallet -> setCometpoin(0);
+            $wallet -> setEtherium(0);
+
             $walletRepository->add($wallet);
             $personalData = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
             $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user -> getId()]);
@@ -78,7 +84,6 @@ class PersonalDataController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            //dd($fast_consultation->getName());
             $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
             $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
@@ -100,32 +105,19 @@ class PersonalDataController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
         $entityManager = $doctrine->getManager();
-
         $repository = $doctrine->getRepository(PersonalData::class);
-        //dd($repository->findOneBy(['user_id' => $personal_user_id]));
+        
         if($personal_user_id != NULL)
         {
-
             if($repository->findOneBy(['id' => $personal_user_id]) == NULL)
-            {
-                
+            {   
                 $this->denyAccessUnlessGranted('ROLE_ADMIN');
-            
-            //if($doctrine->getRepository(PersonalData::class)->findOneBy(['id' => $personal_user_id]) == NULL){
-                // $this->addFlash(
-                //     'danger',
-                //     'У вас нет прав доступа');
-            
-                // return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
             }
-
         }
         else{
-
             $this->addFlash(
                 'danger',
                 'У вас нет прав доступа');
-        
             return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
             
@@ -154,6 +146,24 @@ class PersonalDataController extends AbstractController
     public function edit(Request $request, PersonalData $personalDatum, PersonalDataRepository $personalDataRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $entityManager = $doctrine->getManager();
+        $repository = $doctrine->getRepository(PersonalData::class);
+
+        if($this->getUser()->getPersonalDataId() != NULL)
+        {
+            if($repository->findOneBy(['id' => $this->getUser()->getPersonalDataId()]) == NULL)
+            {   
+                $this->denyAccessUnlessGranted('ROLE_ADMIN');
+            }
+        }
+        else{
+            $this->addFlash(
+                'danger',
+                'У вас нет прав доступа');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+
+
         if($this->getUser()->getPersonalDataId() != $id)
         {
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -189,6 +199,7 @@ class PersonalDataController extends AbstractController
     #[Route('/{id}/delete', name: 'app_personal_data_delete', methods: ['POST'])]
     public function delete(Request $request, PersonalData $personalDatum, PersonalDataRepository $personalDataRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         if ($this->isCsrfTokenValid('delete'.$personalDatum->getId(), $request->request->get('_token'))) {
             $personalDataRepository->remove($personalDatum);
         }

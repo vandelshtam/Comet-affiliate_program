@@ -1,0 +1,50 @@
+
+{% if form_errors(form) %}
+<div class="alert alert-danger" role="alert">
+    {{ form_errors(form) }}
+</div>
+{% endif %}
+{# {% if error %}
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+{% endif %} #}
+  
+{{ form_start(form) }}
+<div class="form_box-inner">   
+    <div class="form_box-left">
+    {{ form_row(form.name) }}
+    {% if user_referral_link != NULL%}
+      {% if is_granted('ROLE_ADMIN') %}
+       
+        {{ form_row(form.referral_link, {'value': user_referral_link }) }}
+        
+      {% else %}
+        <div class="hidden">  
+        {{ form_row(form.referral_link, {'value': user_referral_link }) }}
+        </div>
+      {% endif %}
+    {% else %}
+    {{ form_row(form.referral_link) }}<div id="emailHelp" class="form-text mb-3">Введите реферальную ссылку.</div> 
+    {% endif %}
+    <select class="form-select" aria-label="Default select example" name="select">
+      <option selected>Валюта покупки</option>
+      <option value="1">USDT</option>
+      <option value="2">Cometpoin</option>
+    </select>
+    <div id="emailHelp" class="form-text mb-3">Выберите валюту покупки.</div> 
+    {% if is_granted('ROLE_ADMIN') %}
+    {{ form_row(form.price) }}
+    {{ form_row(form.activation) }}
+    {% else %}
+    <div class="hidden">  
+    {{ form_row(form.price) }}
+    {{ form_row(form.activation) }}
+    </div>
+    {% endif %} 
+    <div class="hidden">
+      {{ form_row(form.unique_code, {'value': unique_code }) }}
+    </div>
+    <button class="btn btn-info rounded-0 mb-1">{{ button_label|default('Купить') }}</button>
+    </div>
+</div>
+{{ form_end(form) }}
+

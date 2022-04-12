@@ -111,11 +111,12 @@
             <div class="card text-center shadow p-3 mb-1 bg-white rounded">
             
                 <div class="card-body">
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_index') }}">Назад</a>
-        
-    
+                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">В личный кабинет</a>
+                {% endif %}
         {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}">edit</a> #}
                 {% if is_granted('ROLE_ADMIN') %}
+                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_admin') }}">В кабинет администратора</a>
                     {{ include('wallet/_delete_form.html.twig') }}
                 {% endif %}
                 </div>
@@ -123,7 +124,7 @@
         </div>
     </div>
 </div>
-<script>
+{# <script>
       var chart = bb.generate({
         data: {
           columns: [
@@ -147,8 +148,8 @@
         },
         bindto: "#donut-chart",
       });
-</script>
+</script> #}
 {% endblock %}
-{# {% block javascripts_three %}
+{% block javascripts_three %}
             {{ include('js_show_wallet.html.twig') }}
-{% endblock %} #}
+{% endblock %}

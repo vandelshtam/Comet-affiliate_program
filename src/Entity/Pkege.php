@@ -19,6 +19,10 @@ class Pkege
     #[ORM\Column(type: 'integer', nullable: true)]
     private $token;
 
+    #[ORM\OneToOne(inversedBy: 'pkege', targetEntity: User::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private $user;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +48,18 @@ class Pkege
     public function setToken(?int $token): self
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

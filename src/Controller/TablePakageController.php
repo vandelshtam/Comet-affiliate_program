@@ -23,6 +23,8 @@ class TablePakageController extends AbstractController
     #[Route('/', name: 'app_table_pakage_index', methods: ['GET'])]
     public function index(TablePakageRepository $tablePakageRepository,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -41,9 +43,11 @@ class TablePakageController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_table_pakage_new', methods: ['GET', 'POST'])]
+    #[Route('/new/admin', name: 'app_table_pakage_new_admin', methods: ['GET', 'POST'])]
     public function new(TablePakageRepository $tablePakageRepository,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $tablePakage = new TablePakage();
         $form = $this->createForm(TablePakageType::class, $tablePakage);
         $form->handleRequest($request);
@@ -89,9 +93,11 @@ class TablePakageController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_table_pakage_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit/admin', name: 'app_table_pakage_edit_admin', methods: ['GET', 'POST'])]
     public function edit(Request $request, TablePakage $tablePakage, TablePakageRepository $tablePakageRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $form = $this->createForm(TablePakageType::class, $tablePakage);
         $form->handleRequest($request);
 
@@ -117,9 +123,11 @@ class TablePakageController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_table_pakage_delete', methods: ['POST'])]
+    #[Route('/{id}/admin', name: 'app_table_pakage_delete_admin', methods: ['POST'])]
     public function delete(Request $request, TablePakage $tablePakage, TablePakageRepository $tablePakageRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         if ($this->isCsrfTokenValid('delete'.$tablePakage->getId(), $request->request->get('_token'))) {
             $tablePakageRepository->remove($tablePakage);
         }

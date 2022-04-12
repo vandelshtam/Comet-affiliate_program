@@ -1,5 +1,6 @@
 {{ form_start(form) }}
     {{ form_row(form.name) }}<div id="emailHelp" class="form-text">Введите любое название на любом языке, а так же используя любые символы которые вам нравяться!</div> 
+    {{ form_row(form.owner_name) }}<div id="emailHelp" class="form-text">автоматически вводится ваше имя в сети введенное  при регистрации, вы можете ввести любое другое имя</div> 
     <div class="hidden">
       {{ form_row(form.pakege, {'value': pakege_id }) }}
     </div>
