@@ -427,3 +427,96 @@ div#consultation{
     .slider__indicators li.active {
       background-color: #757575;
     }
+
+
+
+/*     
+    .footer_content{
+        background-color: #595959;
+        padding: 20px 0px 30px;
+    }
+    .footer_inner{
+        display: flex;
+        justify-content: space-between;
+    }
+    .footer_inner .header_btn{
+        float: none;
+        display: inline-block;
+    }
+    
+    .footer_map iframe{
+        width: 100%;
+    }
+    .footer_map{
+        padding-top: 10px;
+        max-width: 630px;
+        width: 100%;
+    }
+    .footer_title{
+        color: #fff;
+        font-family: 'Roboto',sans-serif;
+        font-weight: 500;
+        line-height: 36px;
+        letter-spacing: 0.5px;
+    }
+    .footer_info{
+        max-width: 360px;
+    }
+    .footer_text{
+        color: #d3d2d2;
+        margin-bottom: 20px;
+    }
+    .footer_list li{
+        margin-top: 10px;
+    }
+    .footer_list{
+        padding-top: 10px;
+    }
+    .footer_list a{
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.25px;
+        color: #dadada;
+        font-weight: 400;
+        font-family: 'Roboto',sans-serif;
+        padding-left: 33px;
+        position: relative;
+    
+    }
+    .footer_list a:hover{
+        font-size: 16.5px;
+        color: #fff;
+    }
+    .footer_list a::before{
+        content:"";
+        position: absolute;
+        left: 0;
+        color: #ffc222;
+        content: "\f003";
+        font-family: 'icomoon';
+    }
+    .footer_list .footer_phone::before{
+        content:"\f095";
+        left: 3px;
+    }
+    .footer_list .footer_adress::before{
+        content:"\f041";
+        left: 3px;
+    }
+    .footer_list .footer_telegramm::before{
+        content: "\f2c6";
+        left: 3px;
+    }
+    .footer_list .footer_whatss::before{
+        content: "\f232";
+        left: 3px;
+    }
+    .footer_copy{
+        background-color: #303030;
+        text-align: center;
+        font-size: 12px;
+        line-height: 24px;
+        padding: 8px 0px;
+        font-weight: 400;
+        font-family: 'Roboto',sans-serif;
+    } */

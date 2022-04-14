@@ -50,6 +50,9 @@ class ListReferralNetworks
     #[ORM\Column(type: 'integer', nullable: true)]
     private $current_balance;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $system_revenues;
+
 
     public function getId(): ?int
     {
@@ -200,6 +203,18 @@ class ListReferralNetworks
     public function setCurrentBalance(?int $current_balance): self
     {
         $this->current_balance = $current_balance;
+
+        return $this;
+    }
+
+    public function getSystemRevenues(): ?int
+    {
+        return $this->system_revenues;
+    }
+
+    public function setSystemRevenues(?int $system_revenues): self
+    {
+        $this->system_revenues = $system_revenues;
 
         return $this;
     }

@@ -28,6 +28,21 @@ class SettingOptions
     #[ORM\Column(type: 'integer', nullable: true)]
     private $accrual_limit;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $system_revenues;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $start_day;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $fast_start;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $update_day;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $limit_wallet_from_line;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +104,66 @@ class SettingOptions
     public function setAccrualLimit(?int $accrual_limit): self
     {
         $this->accrual_limit = $accrual_limit;
+
+        return $this;
+    }
+
+    public function getSystemRevenues(): ?int
+    {
+        return $this->system_revenues;
+    }
+
+    public function setSystemRevenues(?int $system_revenues): self
+    {
+        $this->system_revenues = $system_revenues;
+
+        return $this;
+    }
+
+    public function getStartDay(): ?int
+    {
+        return $this->start_day;
+    }
+
+    public function setStartDay(?int $start_day): self
+    {
+        $this->start_day = $start_day;
+
+        return $this;
+    }
+
+    public function getFastStart(): ?int
+    {
+        return $this->fast_start;
+    }
+
+    public function setFastStart(?int $fast_start): self
+    {
+        $this->fast_start = $fast_start;
+
+        return $this;
+    }
+
+    public function getUpdateDay(): ?int
+    {
+        return $this->update_day;
+    }
+
+    public function setUpdateDay(?int $update_day): self
+    {
+        $this->update_day = $update_day;
+
+        return $this;
+    }
+
+    public function getLimitWalletFromLine(): ?int
+    {
+        return $this->limit_wallet_from_line;
+    }
+
+    public function setLimitWalletFromLine(?int $limit_wallet_from_line): self
+    {
+        $this->limit_wallet_from_line = $limit_wallet_from_line;
 
         return $this;
     }

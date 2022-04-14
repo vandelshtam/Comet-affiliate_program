@@ -177,6 +177,9 @@
         {% block body %}
          
         {% endblock %}
+        {% block footer %}
+        {{ include('footer.html.twig') }}
+        {% endblock %}
         {% block fast_consultation %}
             {# {% if form_errors(fast_consultation_form) %}
                 <div class="my-custom-class-for-errors">

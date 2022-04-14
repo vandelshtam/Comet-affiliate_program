@@ -80,6 +80,9 @@ class ReferralNetwork
     #[ORM\Column(type: 'integer', nullable: true)]
     private $withdrawal_to_wallet;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $system_revenues;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -351,6 +354,18 @@ class ReferralNetwork
     public function setWithdrawalToWallet(?int $withdrawal_to_wallet): self
     {
         $this->withdrawal_to_wallet = $withdrawal_to_wallet;
+
+        return $this;
+    }
+
+    public function getSystemRevenues(): ?int
+    {
+        return $this->system_revenues;
+    }
+
+    public function setSystemRevenues(?int $system_revenues): self
+    {
+        $this->system_revenues = $system_revenues;
 
         return $this;
     }

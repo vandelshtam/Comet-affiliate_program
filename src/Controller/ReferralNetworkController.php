@@ -216,7 +216,7 @@ class ReferralNetworkController extends AbstractController
         $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);//объект владельца сети
         $user_id = $referral_network -> getUserId();
         $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['user_id' => $user_id]);// получаем оъект пакета  участника реферальной сети
-        $owner_array[] = $user_owner;//основатель сети
+        $owner_array[] = $user_owner;//основатель сети (Владелец)
         $reward = $referral_network -> getReward();
         $pakage_price = $referral_network -> getPakage();
         $k_cash_back = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getCashBack()/100;//получаем коэффициент начисления cash_back
@@ -340,7 +340,12 @@ class ReferralNetworkController extends AbstractController
         return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    private function newConfirm($request,  $referralNetworkRepository,  $doctrine,  $member_code,  $id,  $referral_link)
+
+
+
+
+
+    private function newConfirm($request,  $referralNetworkRepository,  $doctrine,  $member_code,  $id,  $referral_link,)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         
@@ -355,12 +360,18 @@ class ReferralNetworkController extends AbstractController
         // if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code])->getUserId() != $this->getUser()->getId()){
         //     $this->denyAccessUnlessGranted('ROLE_ADMIN');
         // }
+
+
+        //==================== получение объектов и переменных для построения линии и обработки результата =====================
+        // $id - АйДи нового пакета нового учатника который активируется в линии 
+        //$referral_link реферральная ссылка нового участника полученная от пригласившего участника который называется  Рефовод
+        //$member_code поле в таблице ReferralNetwork в которое записывается реферральная ссылка $referral_link. используя переменную $referral_link получаем из таблицы объект Рефовода, при запросе с использованием переменной $member_code - получаем объект нового участника пакет которого активируется 
         $referral_network_status = $entityManager->getRepository(ReferralNetwork::class)->findByExampleField();//получем две самых новых по времени записи в реферальной сети (в таблице), предпоследняя запись содержит статус пользователя (left/right) для присвоения статуса новому пользователю
         $status_user = $referral_network_status[1]->getUserStatus();//получаем запись самого нового участника сети ,определяем его положение в линии "слева" или "справа"
         $status = $this -> status($status_user);// присваеваем новому участнику сети положение в линии  слева или справа
-        $referral_network_referral = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]);//получаем объект пользователя участника  реферальной сети который предоставил реферальную ссылку
-        $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code]);//получаем данные нового участника в реферальной сети (рефовод) чтобы дополнить информацию всеми необходимыми данными
-        $network_code = $referral_network_referral -> getNetworkCode();//получаем код родительской сети
+        $referral_network_referral = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]);//получаем объект пользователя участника  реферальной сети который предоставил реферальную ссылку Рефовод
+        $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code]);//получаем данные нового участника в реферальной сети  чтобы дополнить информацию всеми необходимыми данными
+        $network_code = $referral_network_referral -> getNetworkCode();//получаем индивидуальный идентификационный код родительской сети
         $list_network = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['network_code' => $network_code]);//обект родительской сети
         $list_network_all = $entityManager->getRepository(ReferralNetwork::class)->findByMemberField([$network_code]);//все обекты родительской сети
         $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);// получаем оъект пакета нового участника реферальной сети
@@ -375,7 +386,11 @@ class ReferralNetworkController extends AbstractController
 	    //получаем объект записи родительской реферальной сети и получем из нее код этой сети
         $listReferralNetwork = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['id' => $listReferralNetwork_id]);
         $network_code = $listReferralNetwork -> getNetworkCode();
+        // ==================================================================================================================
 
+
+
+        //=============== первичная обработка информации и сохранение в таблицы ==============================================
         //изменения статуса пакета приглашенного участника сети на "активирован"
         $pakege_user -> setActivation('активирован');
         $pakege_user -> setReferralNetworksId($network_code);
@@ -392,7 +407,7 @@ class ReferralNetworkController extends AbstractController
         $referral_network_referral_Rewardwallet = $referral_network_referral -> getRewardWallet();//текущие доступные общие начисления для вывода на кошелек у рефовода
         $referral_network_referral_direct = $referral_network_referral -> getDirect();//директ бонусы текущие у рефовода 
         $reward = $bonus + $referral_network_referral_bonus;
-        $reward_wallet = $bonus + $referral_network_referral_Rewardwallet;
+        $reward_wallet = $bonus + $referral_network_referral_Rewardwallet;//остаток начислений доступных для вывода на кошелек
         $direct = $bonus + $referral_network_referral_direct;
         $profit_network_advance = $balance - $bonus;
         
@@ -421,6 +436,7 @@ class ReferralNetworkController extends AbstractController
         $referral_network -> setPaymentsCash(0);//начисление в сеть по программе КешБек в момент активации нового пакета 
         $referral_network -> setRewardWallet(0);//остаток начислений доступных для вывода на кошелек пользователя
         $referral_network -> setWithdrawalToWallet(0);//общая сумма выведенных на кошелек начисленых доходов пользователя
+        $referral_network -> setsystemRevenues(0);//сумма начисления дохода системы (30%) в момент активации пакета
         //$referral_network -> setReward($reward);
         //$referral_network_referral -> setRewardWallet($reward);
         $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
@@ -428,35 +444,42 @@ class ReferralNetworkController extends AbstractController
         $old_profit_network = $list_network -> getProfitNetwork();
         $new_profit_network = $old_profit_network + $profit_network_advance;
         //$list_network ->setProfitNetwork($new_profit_network);
+        // ======================================================================================================================
 
 
-        //========выполнение формулы одной линии========= 
-        $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
-        $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'left']);
-        $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'right']);
-        $referral_network_user_id = $referral_network_referral -> getId();
 
-    //dd($list_network_all_count);
+        //===================выполнение формулы постоения  линии ================================================================ 
+        $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();//количество участников в линии (в сети)
+        $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'left']);//получение всех объектов линии слевой стороны, пока в линии нет Владельца (Я)
+        $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'right']);//получение всех объектов в линии справой стороны, в линии нет Владеьца (Я)!
+        $referral_network_user_id = $referral_network_referral -> getId();// АйДи рефовода
+
         //первое построение линии из трех участников реферальной сети. Когда происходит активация пакета 3-го участника в сети числится еще 2 участника, поэтому в условии установлена цифра 2 участника активных 
         if($list_network_all_count == 2){
             $referral_network_user = $referral_network_referral;
-            $this -> singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus);
+            $this -> singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$k_system_revenues);
             $entityManager->persist($referral_network);
             $entityManager->persist($referral_network_referral);
             $entityManager->flush();
         }
+
         //построение линии при количестве участников более 3-х. При активации 4 го участника и выше. Условие установлено более 3 ативных участников чьи пакету уже активированы
         elseif($list_network_all_count > 2){
             $referral_network_user = $referral_network_referral;
             $referral_network_user_new = $referral_network;
             $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
-            $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);
-            $this -> single($request, $referralNetworkRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user, $referral_network_user_new, $referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus);
+            $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);//объект владельца линии (Я)
+            //обработка линии, проведение начислений при вступлении нового участника (активации новго пакета)
+            $this -> single($request, $referralNetworkRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user, $referral_network_user_new, $referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus, $balance,  $referral_network_referral);
             $entityManager->persist($referral_network);
             $entityManager->flush();
         }
+        //======================================================================================================================
 
-        //получаем все начисления и погашеня сети 
+
+
+
+        //==================получаем и записываем  все начисления и погашеня сети ==============================================
         $list_network_all_new = $entityManager->getRepository(ReferralNetwork::class)->findByMemberField([$network_code]);//обновляем все обекты родительской сети
         foreach($list_network_all_new as $curren_network_profit){
             $curren_network[] = $curren_network_profit -> getCurrentNetworkProfit();
@@ -470,17 +493,22 @@ class ReferralNetworkController extends AbstractController
         foreach($list_network_all_new as $price_network){
             $current_price[] = $price_network -> getBalance();
         }  
-        $curren_network_summ = array_sum($curren_network);
-        $payments_direct_summ = array_sum($payments_direct);
-        $payments_cash_summ = array_sum($payments_cash);
-        $current_price_summ = array_sum($current_price);
+        $curren_network_summ = array_sum($curren_network);//общая сумма погашения пакетов на момент активации последнего пакета
+        $payments_direct_summ = array_sum($payments_direct);//общая сумма начислений попрограмме Директ на момент активации последнего пакета в сети
+        $payments_cash_summ = array_sum($payments_cash);//общая сумма начислений по программе КешБек на момент активации последнего пакета в сети
+        $current_price_summ = array_sum($current_price);//текущая общая сумма оставшихся не погашенных пакетов в сети на момент активации последнего пакета
 
         //запись данных начислений во всей сети в родительский объект сети
-        $listReferralNetwork -> setProfitNetwork($curren_network_summ);
-        $listReferralNetwork -> setPaymentsDirect($payments_direct_summ);
-        $listReferralNetwork -> setPaymentsCash($payments_cash_summ);
-        $listReferralNetwork -> setCurrentBalance($current_price_summ);
+        $listReferralNetwork -> setProfitNetwork($curren_network_summ);//общая сумма погашения пакетов на момент активации последнего пакета
+        $listReferralNetwork -> setPaymentsDirect($payments_direct_summ);//общая сумма начислений попрограмме Директ на момент активации последнего пакета в сети
+        $listReferralNetwork -> setPaymentsCash($payments_cash_summ);//общая сумма начислений по программе КешБек на момент активации последнего пакета в сети
+        $listReferralNetwork -> setCurrentBalance($current_price_summ);//текущая общая сумма оставшихся не погашенных пакетов в сети на момент активации последнего пакета
+        //=========== =========================================================== ==============================================
 
+
+
+        // =====================================================================================================================
+        //сохранение записей в базе данных
         $entityManager->persist($referral_network);
         $entityManager->persist($referral_network_referral);
         $entityManager->flush();
@@ -503,7 +531,7 @@ class ReferralNetworkController extends AbstractController
     }
 
 
-    public function single($request, ReferralNetworkRepository $referralNetworkRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user,$referral_network_user_new,$referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus)
+    public function single($request, ReferralNetworkRepository $referralNetworkRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user,$referral_network_user_new,$referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus, $balance,  $referral_network_referral)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         
@@ -517,25 +545,28 @@ class ReferralNetworkController extends AbstractController
         if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code])->getUserId() != $this->getUser()->getId()){
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
-        //=========формула расчета наград в сети при количестве участников 4 и более======
+        //==================формула расчета наград в сети при количестве участников 4 и более====================================
         //получаем информацию о сети и записи участника предоставившего реферальную ссылку(рефовода)
         
-        $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
+        $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии, запрос сделан так что объект строится в обратном порядке
+        //так чтобы при соединении двух массивов Левой и Правой стороны получился один объект в котором все записи образут линию в центре которой от владельца (организатора сети) расходятся
+        //в лево и в право участники в соответсвии с датой вступления, чем раньше дата , тем ближе к владельцу
         //$referral_network_left_balance = $entityManager->getRepository(ReferralNetwork::class)->findByBalanceField('left',0);//получаем объект участников с левой стороны линии с балансом более "0"
         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
         //$referral_network_right_balance = $entityManager->getRepository(ReferralNetwork::class)->findByBalanceField('right',0);//получаем объект участников с правой стороны линии с балансом более "0"
         $referral_network_all = $entityManager->getRepository(ReferralNetwork::class)->findByMemberField(['network_code' => $network_code]);//получаем все  объекты сети
         //$referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByStatusField(['right',$network_code]);//получаем объект участников участников с правой стороны
         //$referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByStatusField(['left',$network_code]);//получаем объект всех участников с левой стороны линии 
-        $pakege_all = $entityManager->getRepository(Pakege::class)->findByExampleField(['referral_networks_id' => $network_code]);//получаем все  объекты купленных в сети пакетов
+        $pakege_all = $entityManager->getRepository(Pakege::class)->findByExampleField(['referral_networks_id' => $network_code]);//получаем все  объекты купленные пользователями в сети пакетов
         $price_pakage_all = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getAllPricePakage();//получаем параметр предельного баланса всех купленных пакетов для начисления выплат, если сеть достигла предела выплаты single-line не начисляются
         $k_payments_singl_line = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getPaymentsSingleline();//получаем коеффициент начисления наград в  single-line 
         $k_payments_direct = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getPaymentsDirect();//получаем коэффициент начисления direct
-        $k_cash_back = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getCashBack()/100;//получаем коэффициент начисления cash_back
-        $k_accrual_limit = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getAccrualLimit()/100;//получаем коэффициент общей суммы  предела начислений в линии в виде cash-back
+        $k_cash_back = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getCashBack()/100;//получаем коэффициент начисления cash_back, в таблице запись в процентах
+        $k_accrual_limit = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getAccrualLimit()/100;//получаем коэффициент общей суммы  предела начислений в линии в виде cash-back, в таблице запись в процентах
         $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//получаем курс внутреннего токена сети
+        $k_system_revenues = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getSystemRevenues();//коэффициент в процентах - доход системы , отчисляется всегда от баланса с меньшей стороны или если одни пакет то от стоимости пакета с меньшей стороны
         $user_referral_status = $referral_network_user -> getUserStatus();
-        $owner_array[] = $user_owner;//основатель сети
+        $owner_array[] = $user_owner;//основатель (владелец) сети
 
         //сумма стоимости всех приобретенных в сети пакетов
         foreach($pakege_all as $pakages){
@@ -544,8 +575,9 @@ class ReferralNetworkController extends AbstractController
         $all_pakages_summ = array_sum($pakages_summ) * $token_rate;//фактическая сумма стоимости приобретенных пакетов в сети переведенная в лакальный токен по курсу
 
 
-        //построение линии сингл-лайт
+        //====построение линии сингл-лайн и получение АйДи Рефовода и получение баланса с левой и с правой стороны ===============
         $single_line = array_merge($referral_network_left, $owner_array, $referral_network_right);//объеденяем в один массив в  соотвтетсвии с правилом построения линии сингл-лайн
+        //находим порядкоый номер рефовода
         for($i = 0; $i <= count($single_line); $i++){
             if($single_line[$i] -> getMemberCode() == $referral_link){
                 $key_user = $i;
@@ -553,250 +585,229 @@ class ReferralNetworkController extends AbstractController
                 break;
             }
         }
-        $single_line_left = [];
+
+        //относительно порядкового номера рефовода в массиве определяем линию с права и с лева
+        $single_line_left = [];//массив линии с лева от Рефовода
         for($i = 0; $i < $key_user; $i++){
             $single_line_left[] = $single_line[$i];
         }
-        $single_line_right = [];
+        $single_line_right = [];//массив линии с права от Рефовода
         for($i = $key_user + 1; $i < count($single_line); $i++){
             $single_line_right[] = $single_line[$i];
         }
-        $array_single_line_right = $single_line_right;
-        $array_single_line_left = $single_line_left;
-        //dd($array_single_line_left);
+        $array_single_line_right = $single_line_right;//массив линии с права от Рефовода без рефовода
+        $array_single_line_left = $single_line_left;//массив линии с лева от Рефовода без рефовода
         
-        //получаем баланс левой и правой части линии перед погашением
+        //получаем баланс левой и правой части линии до  погашения баланса пакетов
         $single_line_left_balance = [];
         for($i = 0; $i < count($single_line_left); $i++){
             $single_line_left_balance[] = $single_line_left[$i] -> getBalance();
         }
-        $summ_single_line_left_balance = array_sum($single_line_left_balance);
+        $summ_single_line_left_balance = array_sum($single_line_left_balance);//баланс пакетов в левой части линии относительно Рефовода
         
         $single_line_right_balance = [];
         for($i = 0; $i < count($single_line_right); $i++){
             $single_line_right_balance[] = $single_line_right[$i] -> getBalance();
         }
-        $summ_single_line_right_balance = array_sum($single_line_right_balance);
-    
-        // //==============проводим погашение баланса покетов пользователей в линии=============
-        //     //сформируем массивы баланса пакетов больше нуля с левой и с правой стороны
-        // if($summ_single_line_left_balance != $summ_single_line_right_balance && ($summ_single_line_left_balance != 0 or $summ_single_line_right_balance != 0)){
-        //     $single_line_left_balance_pakege = [];
-        //     for($i = 0; $i < count($array_single_line_left); $i++){
-        //         if($array_single_line_left[$i] -> getBalance() > 0){
-        //             $single_line_left_balance_pakege[] = $array_single_line_left[$i];
-        //             $array_left_balance_pakege[] = $array_single_line_left[$i] -> getBalance();
-        //         }    
-        //     }
-        //     //dd($array_single_line_left);
-        //     $summ_left_balance_pakege = array_sum($array_left_balance_pakege);
-        //     $count_left_balance_pakege = count($array_left_balance_pakege);
-            
-        //     $single_line_right_balance_pakege = [];
-        //     for($i = 0; $i < count($array_single_line_right); $i++){
-        //         if($array_single_line_right[$i] -> getBalance() > 0){
-        //             $single_line_right_balance_pakege[] = $array_single_line_right[$i];
-        //             $array_right_balance_pakege[] = $array_single_line_right[$i] -> getBalance();
-        //         }
-        //     }
-        //     $summ_right_balance_pakege = array_sum($array_right_balance_pakege);
-        //     $count_right_balance_pakege = count($array_right_balance_pakege);
-            
-        //     //запись нвого баланса стоимости пакетов
-        //     if($summ_left_balance_pakege > $summ_right_balance_pakege){
-        //         $summ_remainder = $summ_left_balance_pakege - $summ_right_balance_pakege;
+        $summ_single_line_right_balance = array_sum($single_line_right_balance);//баланс пакетов в правой части линии относительно Рефовода
+        //==========================================================================================================================
 
-        //         for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-        //             $balance_old1 = $single_line_left_balance_pakege[$i] -> getBalance();
-        //             $participation_rate = $balance_old1 / $summ_left_balance_pakege;
-        //             $single_line_left_balance_pakege[$i] -> setKoef($participation_rate);
-        //             $entityManager->flush();
-        //         }
-        //         for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-        //             $participation_rate_user = $single_line_left_balance_pakege[$i] -> getKoef();
-        //             $new_balance_user = $participation_rate_user * $summ_remainder;
-        //             $single_line_left_balance_pakege[$i] -> setBalance($new_balance_user);
-        //             $entityManager->flush();
-        //         }
-
-        //         for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-        //             $single_line_right_balance_pakege[$i] -> setBalance(0);
-        //             $entityManager->flush();
-        //         }
-                
-        //     }
-        //     else{
-        //         $summ_remainder2 = $summ_right_balance_pakege - $summ_left_balance_pakege;
-        //         for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-                    
-        //             $balance_old2 = $single_line_right_balance_pakege[$i] -> getBalance();
-        //             $participation_rate2 = $balance_old2 / $summ_right_balance_pakege;
-        //             $single_line_right_balance_pakege[$i] -> setKoef($participation_rate2);
-        //             $entityManager->flush();
-        //         }
-        //         for($i = 0; $i < count($single_line_right_balance_pakege); $i++){
-                    
-        //             $participation_rate_user2 = $single_line_right_balance_pakege[$i] -> getKoef();
-        //             $new_balance_user2 = $participation_rate_user2 * $summ_remainder2;
-        //             $single_line_right_balance_pakege[$i] -> setBalance($new_balance_user2);
-        //             $entityManager->flush();
-        //         }
-
-        //         for($i = 0; $i < count($single_line_left_balance_pakege); $i++){
-        //             $single_line_left_balance_pakege[$i] -> setBalance(0);
-        //             $entityManager->flush();
-        //         }
-        //     } 
-        // }
-            
-            
-        // //вычисление и запись вознаграждений rewards
-        // //получаем баланс левой и правой части линии после погашения
-        // $single_line_left_balance = [];
-        // for($i = 0; $i < count($single_line_left); $i++){
-        //     $single_line_left_balance[] = $single_line_left[$i] -> getBalance();
-        // }
-        // $summ_single_line_left_balance = array_sum($single_line_left_balance);
         
-        // $single_line_right_balance = [];
-        // for($i = 0; $i < count($single_line_right); $i++){
-        //     $single_line_right_balance[] = $single_line_right[$i] -> getBalance();
-        // }
-        // $summ_single_line_right_balance = array_sum($single_line_right_balance);
-        
-     
-        //определяем с какой стороны линии сумма баланса больше
+        //============определяем с какой стороны линии сумма баланса больше и проводим начисления Кешбек ============================
         if($summ_single_line_left_balance == 0 || $summ_single_line_right_balance == 0){
-            //dd('malance 0');
-            $not_needed_variable = 0;
-            //сообщение о достижении предела общего баланса сети
+            //проверка предельного баланса и сообщение в случае   достижения предела общего баланса сети
             if($price_pakage_all <= $all_pakages_summ){
                 $this->addFlash(
                     'danger',
-                    'Сеть достигла предела накопления пакетов 1');
+                    'Сеть достигла предела накопления пакетов Лимит стоимости пакетов сети');
             }
         }
         elseif($summ_single_line_left_balance == $summ_single_line_right_balance ){
             //dd(',fkfyc 000');
-                //вычислим и запишем награду участнику относительно которого выстроена линия (рефоводу) и проведем погашение балансов пакетов
-                $this -> where_is_balance($referral_network_user,$summ_single_line_right_balance);
+            //проверка и вывод информационного сообщение о достижении предела общей стоимости сети (купленных пакетов)
+            if($price_pakage_all <= $all_pakages_summ){
+                    $this->addFlash(
+                        'danger',
+                        'Сеть достигла предела накопления пакетов Лимит стоимости пакетов сети');
+                }
+            else{
+                //вычислим и проведем погашение балансов пакетов начисления погашения сумм в систему и начисление Дохода в систему( сечас 30%)
+                //при таком сочетании стоимости пакетв в сети на момент активации нового пакета( когда баланс паветов справа и слева равны и не равны нулю)
+                //начисляется только бонус Директ рефоводу, другим участникам линии ничего не начисляется, а пакеты в далнейшем сгорают
+                $this -> where_is_balance($referral_network_user,$summ_single_line_right_balance);//так как баланс с обоих сторон одинаковый для расчета можно взять любой баланс, в данной случае взят баланс линии с праваой стороны
                 $entityManager->flush();
-                $repayment_amount = 0;
-                //всем кроме рефовода обнуляем баланс
+                $repayment_amount = 0;//сумма погашения пакетов за минусом начмсления Директ бонуса и Начисления в Дохода в систему (30%)
+                $system_revenues = ($balance * $k_system_revenues) / 100 ;//доход системы от стоимости нового пакета(30%)
+                //всем участникам линии, кроме рефовода обнуляем баланс
+                //обнуление баланса справа от рефовода
                 while($i <= count($single_line_right)){
                     $user = array_shift($single_line_right);
                     $user -> setBalance(0);
                     $entityManager->flush(); 
                 } 
+                //обнуление баланса слева от рефовода
                 while($i <= count($single_line_left)){
                     $user = array_shift($single_line_left);
                     $user -> setBalance(0);
                     $entityManager->flush(); 
-                    } 
-                $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - $bonus;
-                //информационное сообщение о достижении предела общей стоимости сети (купленных пакетов)
-                if($price_pakage_all <= $all_pakages_summ){
-                    $this->addFlash(
-                        'danger',
-                        'Сеть достигла предела накопления пакетов 2');
-                }  
+                    }
+
+                $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - ($bonus + $system_revenues);//сумма погашения которая уходит из сети в доход системы
+                $referral_network -> setCurrentNetworkProfit($repayment_amount);// запись в таблицу начисления погашеной суммы в систему
+                $referral_network -> setSystemRevenues($system_revenues);// запись в таблицу начисления  суммы дохода системы  (30%)
+            }  
+                       
         }
         elseif($summ_single_line_left_balance != $summ_single_line_right_balance ){
             
                     //dd('balance no 0');
+                    $single_line_left = array_reverse($single_line_left);//переворачиваем массив в нормальный вид, чтобы перебор массива происходил от пользователей с более ранней датой входа в лини (которые в линии ближе к рефоводу)
                     //array_unshift($single_line_right, $referral_network_user);//добавляем рефовода который предоставил ссылку в массив с права 
                     $count_left = count($single_line_left);
                     $count_right = count($single_line_right);
-
-                    //высчитаем сумму отведенную в проекте для начисления в линии Синг-Лайн
+                    $system_revenues = 0;//сумма дохода системы 30%
+                    //высчитаем сумму от размера которой будут  производится начисления КешБек в линии Синг-Лайн и сравним с Лимитом для выплаты
+                    //находим баланс с меньшей стороны и от этого баланса высчитываем предел выплаты в линию по программе КешБек (70%)
                     if($summ_single_line_left_balance > $summ_single_line_right_balance){
-                        $summ_ammoutn_all = $summ_single_line_right_balance * 2;
+                        $summ_ammoutn_all = $summ_single_line_right_balance;
+                        $system_revenues = ($summ_ammoutn_all * $k_system_revenues) / 100 ;//доход системы от баланса с меньшей стороны(30%)
                     }
                     else{
-                        $summ_ammoutn_all = $summ_single_line_left_balance * 2;
+                        $summ_ammoutn_all = $summ_single_line_left_balance;
+                        $system_revenues = ($summ_ammoutn_all * $k_system_revenues) / 100 ;//доход системы от баланса с меньшей стороны(30%)
                     }
-                    $accrual_limit = $summ_ammoutn_all * $k_accrual_limit;
+                    $accrual_limit = $summ_ammoutn_all * $k_accrual_limit;//максимальная сумму начисления по программе КешБек в линию(лимит совокупных начислений)
 
-                    //получение общей суммы начислений в линии в виде cash-back
 
-                 
-                    //==========вычисляем и записываем награды участникам лини двигаясь в левую сторону ===========
-                    array_unshift($single_line_right, $referral_network_user);//добавляем рефовода который предоставил ссылку в массив с права , так как сначала масивы участников строились слева и спава от рефовода, самого рефовода
-                    //нет в массивах, теперь чтобы начислять награды двигаясь полинии и сравнивая балансы, рефовода нужно добаить в любой массив, в данном случае добавлен в массив справа
-                    $count_left = count($single_line_left);
-                    $count_right = count($single_line_right);
-            //условие начисления выплат по линии Сингл-Лайн в зависимсоти от количества проданных пакетов
-            if($price_pakage_all > $all_pakages_summ){ 
-                //условие начисления выплат по линии Сингл-Лайн если общее количество выплат меньше норматива суммы (сейчас 70% от суммы погашения-зачисления к проект сети) 
-                //то начисление производится в размере определенногокоэффициента (сейчас 10%), если общая сумма начислений к выплате превашает установленную сумму (70%) то 
-                //сумма предназначенная для выплат делиться на всех участников , которые должны получить начисление
 
-                //проверяем общее начисление и количество пользователей к начислению КешБэк в линии с помощью методов
-                $cash_back_all_1 = $this -> cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
-                $cash_back_all_2 = $this -> cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
-                $cash_back_all_1_summ = array_sum($cash_back_all_1); 
-                $cash_back_all_2_summ = array_sum($cash_back_all_2);
-                $cash_back_all_1_count = count($cash_back_all_1); 
-                $cash_back_all_2_count = count($cash_back_all_2);
-                $cash_back_all_summ = $cash_back_all_1_summ + $cash_back_all_2_summ;
-                $cash_back_all_count = $cash_back_all_1_count + $cash_back_all_2_count;
+                    //=====получение общей суммы начислений в линии в виде cash-back которые по 1-му правилу должны начисляться участникам
+                    //==========вычисляем и записываем награды участникам лини, сначала двигаясь относительно Рефовода  в сторону меньшего баланса линии, если лимит не превшен начинаем движение в противополжную от меньшего баланса сторону ===========
+                    //array_unshift($single_line_right, $referral_network_user);//!!!!!!!добавляем рефовода который предоставил ссылку в массив с права , так как сначала масивы участников строились слева и спава от рефовода, самого рефовода
+                    //нет в массивах, теперь чтобы начислять награды двигаясь по линии и сравнивая балансы, рефовода нужно добаить в любой массив, в данном случае добавлен в массив справа
 
-                if($accrual_limit > $cash_back_all_summ){
-                    //теперь проделываем операции по определению наград двигаясь в левую сторону от рефовода по линии 
-                    $all_cash_right = $this -> reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back);  
-                    //теперь проделываем операции по определению наград двигаясь в правую сторону от рефовода по линии 
-                    $all_cash_left = $this -> reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
-                    $this->addFlash(
-                        'danger',
-                        'Ограничений по начислению кешбек нет'); 
-                }
-                elseif($accrual_limit <= $cash_back_all_summ){
-                    //сначала высчитаем конечную сумму выплаты по кешбэк каждому участнику 
-                    $payments_cash_back_all_summ = $accrual_limit/$cash_back_all_count; //общую предельную сумму которую можно выплачивать в сеть разделим на количество учтсников которым она причитается
-                    $all_cash_right = $this -> reward_cash_back_limit($single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$payments_cash_back_all_summ);
-                    $all_cash_left = [0];
-                    //проведем начисление кешбэк с помощью специального метода
-
-                    $this->addFlash(
-                        'danger',
-                        'Внимание! Начисление проведено с ограничением по начислению кешбек, чтобы не привысить лимит начислений 70%'); 
-                }
+                    $count_left = count($single_line_left);//количество участников слева от Рефовода
+                    $count_right = count($single_line_right);//количество участников справа от Рефовода
                     
-            } 
-            else{
-                $this->addFlash(
-                    'danger',
-                    'ВНИМАНИЕ! Сеть достигла предела накопления пакетов');
-            }       
+                    //условие начисления выплат по линии Сингл-Лайн в зависимсоти от количества проданных пакетов
+                    if($price_pakage_all > $all_pakages_summ){ 
+                        //условие начисления выплат по линии Сингл-Лайн если общее количество выплат меньше лимита суммы (сейчас 70% от суммы баланса с маньшей стороны) 
+                        //то начисление производится в размере определенного коэффициентом (сейчас 10%), если общая сумма начислений к выплате превашает установленный лимит (70%) то включаем "Цикл начисления в линию"
+                        //проверяем общее начисление и количество пользователей к начислению КешБэк в линии с помощью методов cashBackSummRight,cashBackSummLeft
+                        if($summ_single_line_left_balance > $summ_single_line_right_balance){
+                            $cash_back_all_2 = $this -> cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                            $cash_back_all_1 = $this -> cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                        }
+                        else{
+                            $cash_back_all_1 = $this -> cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                            $cash_back_all_2 = $this -> cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                        }
+                        $cash_back_all_1_summ = array_sum($cash_back_all_1); 
+                        $cash_back_all_2_summ = array_sum($cash_back_all_2);
+                        $cash_back_all_1_count = count($cash_back_all_1); 
+                        $cash_back_all_2_count = count($cash_back_all_2);
+
+                        $cash_back_all_summ = $cash_back_all_1_summ + $cash_back_all_2_summ;//совокупная расчетная сумма для начислений по программе КешБек по правилу №1 
+                        $cash_back_all_count = $cash_back_all_1_count + $cash_back_all_2_count;//количество участников которым полагается выплата по правилу №1 
+
+                        //расчет начислений КешБек в линию, если общая сумма начисления не превышает лимит выплаты (70%) то начисляем по правилу №1
+                        //если сумма выплат превышает лимит то начисление проводим по правилу "Цикла"
+                        if($accrual_limit >= $cash_back_all_summ){
+                            //теперь проделываем операции по определению наград двигаясь в  обе стороны  от Рефовода по линии по правилу №1 и общую сумму начисления в сеть
+                            $all_cash_right = $this -> reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back);
+                            $all_cash_left = $this -> reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                            // if($summ_single_line_left_balance > $summ_single_line_right_balance){
+                            //     $all_cash_right = $this -> reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back);
+                            //     if($accrual_limit > $all_cash_right){
+                            //         $all_cash_left = $this -> reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                            //     }
+                            //     else{
+                            //         $all_cash_left = 0;
+                            //     }
+                            // }
+                            // else{
+                            //     //если лимит выплат не превышен проделываем операции по определению наград двигаясь в противоположную сторону от меньшего баланса относительно Рефовода по линии пока не достигнем предела выплат
+                            //     $all_cash_left = $this -> reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back);
+                            //     if($accrual_limit > $all_cash_left){
+                            //         $all_cash_right = $this -> reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back);
+                            //     }
+                            //     else{
+                            //         $all_cash_right = 0;
+                            //     }
+                            // } 
+                            if($price_pakage_all > $all_pakages_summ){   
+                                $all_cash_right_summ = array_sum($all_cash_right);
+                                $all_cash_left_summ = array_sum($all_cash_left);
+                            }
+                            else{
+                                $all_cash_right_summ = 0;
+                                $all_cash_left_summ = 0;
+                            }
+                            $payments_cash = $all_cash_right_summ + $all_cash_left_summ;//общая сумма начислений КешБек в сеть
+                            $this->addFlash(
+                                'danger',
+                                'Начисление КешБек проведено поправилу №1'); 
+                        }
+                        elseif($accrual_limit < $cash_back_all_summ){
+                            //сначала высчитаем конечную сумму выплаты по кешбэк каждому участнику про правилу "Цикла" и общую сумму выплаты в сеть
+                            $payments_cash = $this -> cycleRule($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$referral_network_all, $k_payments_direct);
+                            $this->addFlash(
+                                'danger',
+                                'Внимание! Начисление КешБек  проведено по равилу "Цикла"'); 
+                        }
+                            
+                    } 
+                    else{
+                        $this->addFlash(
+                            'danger',
+                            'ВНИМАНИЕ! Сеть достигла предела накопления пакетов, выплат и начислений нет');
+                    }       
 
                     //=====запись текущих начислений и выплат в сети ========
-            //условие начисления выплат по линии Сингл-Лайн в зависимсоти от количества проданных пакетов
-            if($price_pakage_all > $all_pakages_summ){   
-                    $all_cash_right_summ = array_sum($all_cash_right);
-                    $all_cash_left_summ = array_sum($all_cash_left);
-            }
-            else{
-                    $all_cash_right_summ = 0;
-                    $all_cash_left_summ = 0;
-            }
-                    $payments_cash = $all_cash_right_summ + $all_cash_left_summ;
-                    $referral_network -> setPaymentsNetwork($bonus);//direct начисление статистики за текущиую итерацию сети
-                    //dd($all_cash_left_summ);
-                    $referral_network -> setPaymentsCash($payments_cash);//начисление single-line
+                    //условие начисления выплат по линии Сингл-Лайн в зависимсоти от количества проданных пакетов
+                    // if($price_pakage_all > $all_pakages_summ){   
+                    //         $all_cash_right_summ = array_sum($all_cash_right);
+                    //         $all_cash_left_summ = array_sum($all_cash_left);
+                    // }
+                    // else{
+                    //         $all_cash_right_summ = 0;
+                    //         $all_cash_left_summ = 0;
+                    // }
+
+                    //запись начисления КешБек Рефоводу
+                    if($summ_single_line_left_balance < $summ_single_line_right_balance){
+                        $current_referral_user_reward = $referral_network_referral -> getReward();
+                        $current_referral_user_cash = $referral_network_referral -> getCash();
+                        $user_referral_cashback = ($summ_single_line_left_balance * $k_cash_back) + $current_referral_user_cash;//новый баланс КешБек бонуса рефовода (старый плюс новые начисления)
+                        $user_referral_reward = ($summ_single_line_left_balance * $k_cash_back) + $current_referral_user_reward;//новый баланс Всех начислений  рефовода (старые плюс новые начисления)
+                        $referral_network_referral -> setCash($user_referral_cashback);//запись   single-line КешБек рефоводу
+                        $referral_network_referral -> setReward($user_referral_reward);//запись общего начисления поплнение общего количества начислений рефоводу  на момент автивации нового пакета
+                        $entityManager->flush();    
+                    }
+                    else{
+                        $current_referral_user_reward = $referral_network_referral -> getReward();
+                        $current_referral_user_cash = $referral_network_referral -> getCash();
+                        $user_referral_cashback = ($summ_single_line_right_balance * $k_cash_back) + $current_referral_user_cash;//новый баланс КешБек бонуса рефовода (старый плюс новые начисления)
+                        $user_referral_reward = ($summ_single_line_right_balance * $k_cash_back) + $current_referral_user_reward;//новый баланс Всех начислений  рефовода (старые плюс новые начисления)
+                        $referral_network_referral -> setCash($user_referral_cashback);//запись   single-line КешБек рефоводу
+                        $referral_network_referral -> setReward($user_referral_reward);//запись общего начисления поплнение общего количества начислений рефоводу  на момент автивации нового пакета
+                        $entityManager->flush();    
+                    }
+                    //$payments_cash - общая сумма начислений КешБек в сеть на момент активации пакета
+                    $referral_network -> setPaymentsNetwork($bonus);//direct начисление  за текущиую итерацию сети (на момент активации нового пакета)
+                    $referral_network -> setPaymentsCash($payments_cash);//запись общего начисления  single-line КешБек на момент автивации нового пакета
 
                     //вычисление суммы к погашению и зачислению в проект
-                    $repayment_amount =0;
-                    //сумма к погашению в стеи и начислению в проект
+                    $repayment_amount =0;//сумма погашения пакетов для начисления в систему 
+                    //сумма  погашения пакетов в сети и начисления в систему
                     if($summ_single_line_left_balance < $summ_single_line_right_balance){
-                        $repayment_amount = ($summ_single_line_left_balance * 2) - ($bonus + $payments_cash);
+                        $repayment_amount = ($summ_single_line_left_balance * 2) - ($bonus + $payments_cash + $system_revenues);
                     }
                     elseif($summ_single_line_left_balance > $summ_single_line_right_balance){
-                        $repayment_amount = ($summ_single_line_right_balance * 2) - ($bonus + $payments_cash);
+                        $repayment_amount = ($summ_single_line_right_balance * 2) - ($bonus + $payments_cash + $system_revenues);
                     }
                     elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
-                        $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - ($bonus + $payments_cash);
+                        $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - ($bonus + $payments_cash + $system_revenues);
                     }
-                    //dd($repayment_amount);
 
 
                     //==============проводим погашение баланса пакетов пользователей в линии=============
@@ -867,28 +878,14 @@ class ReferralNetworkController extends AbstractController
                                 $single_line_left_balance_pakege[$i] -> setBalance(0);
                                 $entityManager->flush();
                             }
-                        }      
-                    $referral_network -> setCurrentNetworkProfit($repayment_amount);// запись начисления погашаемой суммы в компанию
-            
+                        }
+                         
+                    $referral_network -> setCurrentNetworkProfit($repayment_amount);// запись в таблицу начисления погашаемой суммы в систему
+                    $referral_network -> setSystemRevenues($system_revenues);// запись в таблицу начисления  суммы дохода системы  (30%)
+                    $entityManager->persist($referral_network);
+                    $entityManager->flush();    
             
         }
-     
-     
-        
-        //запишем общий баланс дохода сети
-        // foreach($referral_network_all as $all_cash){
-        //     $array_balance_network_all_cash[] = $all_cash -> getCash();
-        // }
-        // foreach($referral_network_all as $all_direct){
-        //     $array_balance_network_all_direct[] = $all_direct -> getCash();
-        // }
-        // foreach($pakege_all as $all_pakege_cash){
-        //     $array_balance_network_all_pakege[] = $all_pakege_cash -> getPrice();
-        // }
-        //$profit_network_all = array_sum($array_balance_network_all_pakege) - (array_sum($array_balance_network_all_cash) + array_sum($array_balance_network_all_direct));
-        //$list_network->setProfitNetwork($profit_network_all);
-        
-
         $entityManager->persist($referral_network);
         $entityManager->flush();
     }
@@ -897,75 +894,83 @@ class ReferralNetworkController extends AbstractController
 
     
     
-    private function singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus)
+    private function singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$doctrine)
     {
+        $entityManager = $doctrine->getManager();
+        $k_system_revenues = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getSystemRevenues();//коэффициент в процентах - доход системы , отчисляется всегда от баланса с меньшей стороны или если одни пакет то от стоимости пакета с меньшей стороны
         //первое выстраиваивание линии из двух участников реферальной сети  и начисление вознаграждений       
         if($referral_network_left -> getBalance() == $referral_network_right -> getBalance()){
-            $balance_pakege_right = $referral_network_right -> getBalance();
-            $balance_pred = $referral_network_left -> getBalance();
-            $cash_refovod = $referral_network_user -> getCash();
+            $balance_pakege_right = $referral_network_right -> getBalance();//баланс с права
+            $balance_pred = $referral_network_left -> getBalance();// баланс с лева
+            $cash_refovod = $referral_network_user -> getCash();//текущий КешБек рефовода
             $referral_network_left -> setBalance(0);
             $referral_network_right -> setBalance(0);
-            $reward_user = $referral_network_user ->  getReward();
-            //$direct_user = $referral_network_user ->  getDirect();
+            $reward_user = $referral_network_user ->  getReward();//текущие общие начисления наград Рефовода
+            $direct_user = $referral_network_user ->  getDirect();//текущие начисления по программа Директ Рефовода
             //$balance = $balance_pred * 0.1;
             //$reward = $reward_user + $balance;
             //$new_cash = $cash_refovod + $balance;
             //$referral_network_user ->  setReward($reward);
-            //$referral_network_user -> setCash($new_cash);
-            $new_profit_network = ($balance_pred + $balance_pakege_right) - $bonus;
+            //$referral_network_user -> setCash($new_cash);$k_system_revenues
+            $system_revenues = $balance_pakege_right * $k_system_revenues; //баланс с любой стороны умножаем на коэфициент выплаты дохода в сеть (30%)  получаем сумму начисления в систему как дох
+            $repayment_amount = ($balance_pred + $balance_pakege_right) - ($bonus + $system_revenues);//сумма погашения пакетов которая наисляется в доход системы
             //$list_network ->setProfitNetwork($new_profit_network);
             $payments = $bonus;
-            $referral_network -> setPaymentsNetwork($payments);
-            $referral_network ->setCurrentNetworkProfit($new_profit_network);
+            $referral_network -> setCurrentNetworkProfit($repayment_amount);// запись в таблицу начисления погашаемой суммы в систему
+            $referral_network -> setSystemRevenues($system_revenues);// запись в таблицу начисления  суммы дохода системы  (30%)
+            $referral_network -> setPaymentsNetwork($payments);//запись начисления по программе Директ на момент активации пакета
+            
         }
         elseif($referral_network_left -> getBalance() < $referral_network_right -> getBalance()){
             $balance_pred_left = $referral_network_left -> getBalance();
             $balance_pred_right = $referral_network_right -> getBalance();
-            $repayment_balance = $balance_pred_left * 2;
-            $cash_refovod = $referral_network_user -> getCash();
-            $balance_right = $balance_pred_right - $balance_pred_left;
-            $referral_network_left -> setBalance(0);
-            $referral_network_right -> setBalance($balance_right);
-            $reward_user = $referral_network_user -> getReward();
-            $reward_user_wallet = $referral_network_user -> getRewardWallet();
-            $balance = $balance_pred_left * 0.1;
-            $reward = $reward_user + $balance;
-            $reward_wallet = $reward_user_wallet + $balance;
-            $new_cash = $cash_refovod + $balance;
-            $referral_network_user ->  setReward($reward);
-            $referral_network_user ->  setRewardWallet($reward_wallet);
-            $referral_network_user -> setCash($new_cash);
-            $new_profit_network = $repayment_balance - ($bonus + $balance);
+            $system_revenues = $balance_pred_left * $k_system_revenues; //баланс с меньшей стороны умножаем на коэфициент выплаты дохода в сеть (30%)  получаем сумму начисления в систему как дохода
+            $repayment_balance = $balance_pred_left * 2;//сумма погашения баланс с севой стороны (с меньшей) умножаем на 2
+            $cash_refovod = $referral_network_user -> getCash();//текущий баланс КешБек Рефовода
+            $balance_right = $balance_pred_right - $balance_pred_left;// остаток баланса остающийся в линии после погашения
+            $referral_network_left -> setBalance(0);// с меньшей стороны обнуляем баланс
+            $referral_network_right -> setBalance($balance_right);//в большую сторону в право записываем новый остаток баланса после погашения
+            $reward_user = $referral_network_user -> getReward();//текщие общие начисления наград Рефовода
+            $reward_user_wallet = $referral_network_user -> getRewardWallet();//текущие общие начисления рефовода доступные для перевода на кошелек
+            $balance = $balance_pred_left * 0.1;//начисление КешБек Рефоводу
+            $reward = $reward_user + $balance;//новый общий баланс Рефовода с учетом КешБек
+            $reward_wallet = $reward_user_wallet + $balance;//новый общий баланс Рефовода доступный для перевода на кошелек
+            $new_cash = $cash_refovod + $balance;//новый баланс КешБек Рефовода
+            $referral_network_user ->  setReward($reward);//запись нового общего баланса 
+            $referral_network_user ->  setRewardWallet($reward_wallet);//запись нового остатка начислений доступных для вывода на кошелек пользователя
+            $referral_network_user -> setCash($new_cash);//запись нового баланса КешБек  Рефовода
+            $new_profit_network = $repayment_balance - ($bonus + $balance + $system_revenues);
             //$list_network ->setProfitNetwork($new_profit_network);
             $payments = $bonus + $balance;
-            $referral_network -> setPaymentsNetwork($bonus);
-            $referral_network -> setPaymentsCash($balance);
-            $referral_network ->setCurrentNetworkProfit($new_profit_network);
+            $referral_network -> setSystemRevenues($system_revenues);// запись в таблицу начисления  суммы дохода системы  (30%)
+            $referral_network -> setPaymentsNetwork($bonus);//начисление в сеть попрограмме Директ в момент активации нового пакета
+            $referral_network -> setPaymentsCash($balance);//начисление в сеть по программе КешБек в момент активации пакета
+            $referral_network ->setCurrentNetworkProfit($new_profit_network);//запись в таблицу погашенной суммы пакетов
         }
         elseif($referral_network_left -> getBalance() > $referral_network_right -> getBalance()){
             $balance_pred_left = $referral_network_left -> getBalance();
             $balance_pred_right = $referral_network_right -> getBalance();
-            $repayment_balance = $balance_pred_right * 2;
-            $cash_refovod = $referral_network_user -> getCash();
-            $balance_left = $balance_pred_left - $balance_pred_right;
-            $referral_network_left -> setBalance($balance_left);
-            $referral_network_right -> setBalance(0);
-            $reward_user = $referral_network_user ->  getReward();
-            $reward_user_wallet = $referral_network_user -> getRewardWallet();
-            $balance = $balance_pred_right * 0.1;
-            $reward = $reward_user + $balance;
-            $reward_wallet = $reward_user_wallet + $balance;
-            $referral_network_user ->  setReward($reward);
-            $referral_network_user ->  setRewardWallet($reward_wallet);
-            $new_cash = $cash_refovod + $balance;
-            $referral_network_user -> setCash($new_cash);
-            $new_profit_network = $repayment_balance - ($bonus + $balance);
+            $system_revenues = $balance_pred_right * $k_system_revenues; //баланс с меньшей стороны умножаем на коэфициент выплаты дохода в сеть (30%)  получаем сумму начисления в систему как дох
+            $repayment_balance = $balance_pred_right * 2;//сумма погашения пакетов
+            $cash_refovod = $referral_network_user -> getCash();//текущий баланс Кешбек Рефовода
+            $balance_left = $balance_pred_left - $balance_pred_right;//остаток суммы остающейся в линии после погашения
+            $referral_network_left -> setBalance($balance_left);//запись нового баланса в линии после погашения
+            $referral_network_right -> setBalance(0);//обнуление баланса с меньшей стороны
+            $reward_user = $referral_network_user ->  getReward();//текущие общие начисления бонусов Рефовода
+            $reward_user_wallet = $referral_network_user -> getRewardWallet();//текущая обая сумма доступная для перевода на кошелек Рефовода
+            $balance = $balance_pred_right * 0.1;//расчет КешБек Рефовода
+            $reward = $reward_user + $balance;//новая сумма общих совокупных бонусов Рефовода
+            $reward_wallet = $reward_user_wallet + $balance;//новая совокупная сумма доступная Рефоводу для перевода на его кошелек
+            $referral_network_user ->  setReward($reward);//запись новой совокупной суммы начислений Рефовода
+            $referral_network_user ->  setRewardWallet($reward_wallet);//запсиь общей совокупной новой суммы доступной Рефоводу для перевода на его кошелек
+            $new_cash = $cash_refovod + $balance;//новая сумма КешБек Рефовода
+            $referral_network_user -> setCash($new_cash);//запись новой суммы КешБек Рефовода
+            $new_profit_network = $repayment_balance - ($bonus + $balance + $system_revenues);//сумма начислений в систему от погашения пакетов
             $payments = $bonus + $balance;
-            $referral_network -> setPaymentsNetwork($bonus);
-            $referral_network -> setPaymentsCash($balance);
-            //$list_network ->setProfitNetwork($new_profit_network);
-            $referral_network -> setCurrentNetworkProfit($new_profit_network);
+            $referral_network -> setSystemRevenues($system_revenues);// запись в таблицу начисления  суммы дохода системы  (30%)
+            $referral_network -> setPaymentsNetwork($bonus);//начисление в сеть попрограмме Директ в момент активации нового пакета
+            $referral_network -> setPaymentsCash($balance);//начисление в сеть по программе КешБек в момент активации пакета
+            $referral_network ->setCurrentNetworkProfit($new_profit_network);//запись в таблицу погашенной суммы пакетов
         } 
              
     }
@@ -1049,13 +1054,7 @@ class ReferralNetworkController extends AbstractController
                 } 
                 elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
                     $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    // $cash_refovod2 = $user -> getCash();
-                    // $reward2 = $user -> getReward();
-                    // $new_cash2 = $cash_refovod2 + $reward_user_new2; 
-                    // $reward_user2 = $reward_user_new2 + $reward2; 
-                    // $user -> setReward($reward_user2);
-                    // $user -> setCash($new_cash2);
-                    // $entityManager->flush();   
+                    //ничего не начисляем 
                 } 
                 array_unshift($single_line_left_r, $user);//добавляем  пользователя  в массив с левой стороны
                 
@@ -1131,13 +1130,7 @@ class ReferralNetworkController extends AbstractController
                 }
                 elseif($summ_single_line_left_balance_new == $summ_single_line_right_balance_new){
                     $reward_user_new4 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    // $cash_refovod4 = $user -> getCash();
-                    // $reward4 = $user -> getReward();
-                    // $new_cash4 = $cash_refovod4 + $reward_user_new4;  
-                    // $reward_user4 = $reward_user_new4 + $reward4; 
-                    // $user -> setReward($reward_user4);
-                    // $user -> setCash($new_cash4);
-                    // $entityManager->flush();   
+                    //ничего не начисляем
                 }
                 array_unshift($single_line_right_l, $user);//добавляем  пользователя  в массив с правой стороны
         }
@@ -1156,59 +1149,58 @@ class ReferralNetworkController extends AbstractController
 
     private function cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back){
         
-        //расчет сумм и количества участников путем записи сумм начисления в массив для начислений по кешбэк в линии
+        //расчет сумм и количества участников путем записи сумм начисления в массив для начислений по кешбэк в линии двигаемся в правую сторону линии относительно Рефовода
         $i = 1;
-        $single_line_right_r = $single_line_right;
-        $single_line_left_r = $single_line_left;
-        $cash_all = [];
+        $single_line_right_r = $single_line_right;//линия справа
+        $single_line_left_r = $single_line_left;//линия слева
+        $cash_all = [];//расчетная сумма начислений КешБек при использовании правила №1
         while($i < count($single_line_right_r))
         {
                 $entityManager = $doctrine->getManager();
                 $user = array_shift($single_line_right_r);// убираем одного пользователя с левой  стороны которого достали из массива , относительно которого рассчитываем баланс слева и справа
-                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
-                $single_line_left_balance_new = [];
+                $reward = $user -> getReward();//текущие награды (Директ+КешБек) каждого юзера вызанного из массива
+                //при движении по линии относительно Рефовода каждый раз высчитываем новй баланс слева и справа, относительно того участника к которому пришли двигаясь по линии,он может меняться
+                $single_line_left_balance_new = [];//новый бланас с учетом изменения количества участников в линии при движении по линии в право
                 for($j = 0; $j < count($single_line_left_r); $j++){
                     $single_line_left_balance_new[] = $single_line_left_r[$j] -> getBalance();
                 }
                 $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
-                $single_line_right_balance_new = [];
+                $single_line_right_balance_new = [];//новый бланас с учетом изменения количества участников в линии при движении по линии в право
                 for($k = 0; $k < count($single_line_right_r); $k++){
                     $single_line_right_balance_new[] = $single_line_right_r[$k] -> getBalance();
                 }
                 $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
 
+                //сравниваем новый баланс слева и справа относительно того участника к которому пришли в линии и для которого расчитываем начисление КешБек
                 if($summ_single_line_left_balance_new > $summ_single_line_right_balance_new){
-                    $reward_user_new1 = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
+                    $reward_user_new1 = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды(это меньшая сторона)
                     $user_id_pakege = $user -> getPakage();
-                    $limit_cash_back = $k_cash_back * $user_id_pakege;
+                    $limit_cash_back = $k_cash_back * $user_id_pakege;//макисмальная сумма начислений которую может получить участник, она зависит от стоимости пакета и коэффициента
                     //$pakege_user_network = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);// получаем оъект пакета  участника реферальной сети
                     $reward1 = $user -> getReward();
-                    //учитываем начисление КэшБэк если участник не превыисл коэффициент личтных выплат (коэффициент - сейчас 300%)
+                    //учитываем начисление КэшБэк если участник превысил или нет, предельную сумму начислений всех Директ и КешБек личных выплат (коэффициент - сейчас 300%) участник
+                    //сравниваем его Лимит и с текщими начислениями всех Директ и КешБек начислений
+                    //записваем в массив для учета общих начислений КешБек в линии только тех участников, которые не привысили свой личный лимит бунусных начислений
                     if($reward1 <= $limit_cash_back){
                         $cash_all[] = $reward_user_new1;   
                     }   
                 }
                 elseif($summ_single_line_left_balance < $summ_single_line_right_balance){
                     $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    
                     $user_id_pakege = $user -> getPakage();
                     $limit_cash_back = $k_cash_back * $user_id_pakege;
                     $reward2 = $user -> getReward();
-                    //учитываем начисление КэшБэк если участник не превыисл коэффициент личтных выплат (коэффициент - сейчас 300%)
+                    //учитываем начисление КэшБэк если участник превысил или нет, предельную сумму начислений всех Директ и КешБек личных выплат (коэффициент - сейчас 300%) участник
+                    //сравниваем его Лимит и с текщими начислениями всех Директ и КешБек начислений
+                    //записваем в массив для учета общих начислений КешБек в линии только тех участников, которые не привысили свой личный лимит бунусных начислений
                     if($reward2 <= $limit_cash_back){
                         $cash_all[] = $reward_user_new2;
                     }
                         
                 } 
                 elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
-                    $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    // $cash_refovod2 = $user -> getCash();
-                    // $reward2 = $user -> getReward();
-                    // $new_cash2 = $cash_refovod2 + $reward_user_new2; 
-                    // $reward_user2 = $reward_user_new2 + $reward2; 
-                    // $user -> setReward($reward_user2);
-                    // $user -> setCash($new_cash2);
-                    // $entityManager->flush();   
+                    //если баланс окажется равный то участника также не включем в начисления
+                    $reward_user_new2 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды   
                 } 
                 array_unshift($single_line_left_r, $user);//добавляем  пользователя  в массив с левой стороны
                 
@@ -1217,17 +1209,17 @@ class ReferralNetworkController extends AbstractController
     }
     
     private function cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back){
-        //расчет сумм и количества участников путем записи сумм начисления в массив для начислений по кешбэк в линии
+         //расчет сумм и количества участников путем записи сумм начисления в массив для начислений по кешбэк в линии, двигаемся в левую сторону линии относительно Рефовода (в сторону меньшего баланса)
         $i = 1;
-        $i = 1;
-        $single_line_right_l = $single_line_right;
-        $single_line_left_l = $single_line_left;
-        $cash_all2 = [];
+        $single_line_right_l = $single_line_right;//линия справа
+        $single_line_left_l = $single_line_left;//линия слева
+        $cash_all2 = [];//расчетная сумма начислений КешБек при использовании правила №1
         while($i < count($single_line_left_l))
         {    
                 $entityManager = $doctrine->getManager();
                 $user = array_shift($single_line_left_l);
-                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
+                $reward = $user -> getReward();//текущие награды (Директ+КешБек) каждого юзера вызанного из массива
+                //при движении по линии относительно Рефовода каждый раз высчитываем новй баланс слева и справа, относительно того участника к которому пришли двигаясь по линии,он может меняться
                 
                 //получаем баланс левой и правой части линии
                 $single_line_left_balance_new = [];
@@ -1242,12 +1234,15 @@ class ReferralNetworkController extends AbstractController
                 }
                 $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
 
+                //сравниваем новый баланс слева и справа относительно того участника к которому пришли в линии и для которого расчитываем начисление КешБек
                 if($summ_single_line_left_balance_new > $summ_single_line_right_balance_new){
                     $reward_user_new3 = $summ_single_line_right_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
                     $reward3 = $user -> getReward();
                     $user_id_pakege = $user -> getPakage();
                     $limit_cash_back = $k_cash_back * $user_id_pakege;
-                    //учитываем начисление КэшБэк если участник не превыисл коэффициент личтных выплат (коэффициент - сейчас 300%)
+                     //учитываем начисление КэшБэк если участник превысил или нет, предельную сумму начислений всех Директ и КешБек личных выплат (коэффициент - сейчас 300%) участник
+                    //сравниваем его Лимит и с текщими начислениями всех Директ и КешБек начислений
+                    //записваем в массив для учета общих начислений КешБек в линии только тех участников, которые не привысили свой личный лимит бунусных начислений
                     if($reward3 <= $limit_cash_back){
                         $cash_all2[] = $reward_user_new3;
                     }
@@ -1257,20 +1252,16 @@ class ReferralNetworkController extends AbstractController
                     $reward4 = $user -> getReward();
                     $user_id_pakege = $user -> getPakage();
                     $limit_cash_back = $k_cash_back * $user_id_pakege;
-                    //учитываем начисление КэшБэк если участник не превыисл коэффициент личтных выплат (коэффициент - сейчас 300%)
+                     //учитываем начисление КэшБэк если участник превысил или нет, предельную сумму начислений всех Директ и КешБек личных выплат (коэффициент - сейчас 300%) участник
+                    //сравниваем его Лимит и с текщими начислениями всех Директ и КешБек начислений
+                    //записваем в массив для учета общих начислений КешБек в линии только тех участников, которые не привысили свой личный лимит бунусных начислений
                     if($reward4 <= $limit_cash_back){
                         $cash_all2[] = $reward_user_new4;
                     }
                 }
                 elseif($summ_single_line_left_balance_new == $summ_single_line_right_balance_new){
+                     //если баланс окажется равный то участника также не включем в начисления
                     $reward_user_new4 = $summ_single_line_left_balance_new * 0.1;//контрольная сумма баланса правой части линии по которой начисляются награды
-                    // $cash_refovod4 = $user -> getCash();
-                    // $reward4 = $user -> getReward();
-                    // $new_cash4 = $cash_refovod4 + $reward_user_new4;  
-                    // $reward_user4 = $reward_user_new4 + $reward4; 
-                    // $user -> setReward($reward_user4);
-                    // $user -> setCash($new_cash4);
-                    // $entityManager->flush();   
                 }
                 array_unshift($single_line_right_l, $user);//добавляем  пользователя  в массив с правой стороны
         }
@@ -1283,7 +1274,7 @@ class ReferralNetworkController extends AbstractController
         array_pop($single_line); //убираем последнего участника (с правой стороны линии) сети которому не причитается выплата
         array_shift($single_line);//вырезаем первого участника массива (который имеет крайнюю позицию в линии слева) которому не причитается выплата 
         $cash_all = [];
-        $reward_user_new1 = $payments_cash_back_all_summ;//контрольная для начисления награды кешбэк
+        $reward_user_new1 = $payments_cash_back_all_summ;//контрольная сумма  для начисления награды кешбэк
 
         foreach($single_line as $user){
             $cash_refovod = $user -> getCash();
@@ -1301,5 +1292,149 @@ class ReferralNetworkController extends AbstractController
         }   
         return $cash_all;
     } 
+
+    
+    private function cycleRule($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$referral_network_all, $k_payments_direct){
+       //расчет сумм и количества участников путем записи сумм начисления в массив для начислений по кешбэк в линии, двигаемся в левую сторону линии относительно Рефовода (в сторону меньшего баланса)
+       $i = 5;
+       $entityManager = $doctrine->getManager();
+       //правилу циклов начисление проводится :
+       //начисление рефоводу 10% КешБек 
+       //начисление организаторам 10% на всех организаторов
+       //начиление 4-м участникам с конца линии со стороны меньшего баланса не считая крайнего участника по 10% каждому
+       //если в хвосте линии меньше 4-х участников до КешБек доначисляется участникам с противоположной стороны от рефовода в сторону большего баланса
+
+        //начисление КешБек организаторам линии
+        $referral_network_all;
+        $k_cash_organizer = $k_payments_direct / $i;
+        if($summ_single_line_left_balance > $summ_single_line_right_balance){
+            $cash_organizer = $summ_single_line_right_balance * $k_cash_organizer;
+        }
+        else{
+            $cash_organizer = $summ_single_line_left_balance * $k_cash_organizer;
+        }
+           
+            for($j = 0; $j < $i; $j++){
+                $single_line_organizer_new[] = $referral_network_all[$j] -> getBalance();
+                $current_organizer_reward = $referral_network_all[$j] -> getReward();
+                $current_organizer_cash = $referral_network_all[$j] -> getCash();
+                $user_organizer_cash_new = $cash_organizer + $current_organizer_cash;
+                $user_organizer_reward_new = $cash_organizer + $current_organizer_reward;
+                $referral_network_all[$j] -> setCash($user_organizer_cash_new);
+                $referral_network_all[$j] -> setreward($user_organizer_reward_new);
+                $entityManager->flush();
+            } 
+        $summ_single_line_organizer_new = array_sum($single_line_organizer_new); 
+        
+        
+       //начисление КешБек  участникам линии 
+       $single_line_right_l = $single_line_right;//линия справа
+       $single_line_left_l = $single_line_left;//линия слева
+       $cash_all_cycle = [];//расчетная сумма начислений КешБек при использовании правила №1
+       if($summ_single_line_left_balance > $summ_single_line_right_balance){
+           $cash_user_single = $summ_single_line_right_balance * $k_cash_back;
+           if(count($single_line_right_l) >= $i){
+                $single_line_right_l_reverse = array_reverse($single_line_right_l);//переворачиваем массив чтобы сначала брать  последние записи
+                $single_line_right_balance_new = [];
+                //начисление начинаем со второго участника так как первый участник в массиве это последний учстник линии которому не начиляются бонусы
+                for($j = 1; $j < $i; $j++){
+                    $single_line_right_balance_new[] = $single_line_right_l_reverse[$j] -> getBalance();
+                    $current_user_reward = $single_line_right_l_reverse[$j] -> getReward();
+                    $current_user_cash = $single_line_right_l_reverse[$j] -> getCash();
+                    $user_cash_new = $cash_user_single + $current_user_cash;
+                    $user_reward_new = $cash_user_single + $current_user_reward;
+                    $single_line_right_l_reverse[$j] -> setCash($user_cash_new);
+                    $single_line_right_l_reverse[$j] -> setreward($user_reward_new);
+                    $entityManager->flush();
+                } 
+                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new); 
+                $summ_single_line_left_balance_new = 0;  
+            }
+            else{
+                $single_line_right_l_reverse = array_reverse($single_line_right_l);//переворачиваем массив чтобы сначала брать  последние записи
+                $single_line_right_balance_new = [];
+                //начисление начинаем со второго участника так как первый участник в массиве это последний учстник линии которому не начиляются бонусы
+                //перебираем всех которые есть  остальных участников берем с лева от рефовода
+                for($j = 1; $j < count($single_line_right_l); $j++){
+                    $single_line_right_balance_new[] = $single_line_right_l_reverse[$j] -> getBalance();
+                    $current_user_reward = $single_line_right_l_reverse[$j] -> getReward();
+                    $current_user_cash = $single_line_right_l_reverse[$j] -> getCash();
+                    $user_cash_new = $cash_user_single + $current_user_cash;
+                    $user_reward_new = $cash_user_single + $current_user_reward;
+                    $single_line_right_l_reverse[$j] -> setCash($user_cash_new);
+                    $single_line_right_l_reverse[$j] -> setreward($user_reward_new);
+                    $entityManager->flush();
+                } 
+                //оставшихся участников(с меньшей стороны их меньше 4-х) берем с противоположной строны (со стороны большего баланса)
+                //но в этом случаем берем не перевернутый массив (нормальный) начинаем перебор с "0" участника массива который стоит сразу после рефовода
+                for($j = 0; $j < ($i - count($single_line_right_l)); $j++){
+                    $single_line_left_balance_new[] = $single_line_left_l[$j] -> getBalance();
+                    $current_user_reward = $single_line_left_l[$j] -> getReward();
+                    $current_user_cash = $single_line_left_l[$j] -> getCash();
+                    $user_cash_new = $cash_user_single + $current_user_cash;
+                    $user_reward_new = $cash_user_single + $current_user_reward;
+                    $single_line_left_l[$j] -> setCash($user_cash_new);
+                    $single_line_left_l[$j] -> setreward($user_reward_new);
+                    $entityManager->flush();
+                }
+                    $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
+                    $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
+            }
+            
+       }
+       else{
+        $cash_user_single = $summ_single_line_left_balance * $k_cash_back;
+            if(count($single_line_left_l) >= $i){
+                $single_line_left_l_reverse = array_reverse($single_line_left_l);//переворачиваем массив чтобы сначала брать  последние записи
+                $single_line_left_balance_new = [];
+                //начисление начинаем со второго участника так как первый участник в массиве это последний учстник линии которому не начиляются бонусы
+                for($j = 1; $j < $i; $j++){
+                    $single_line_left_balance_new[] = $single_line_left_l_reverse[$j] -> getBalance();
+                    $current_user_reward = $single_line_left_l_reverse[$j] -> getReward();
+                    $current_user_cash = $single_line_left_l_reverse[$j] -> getCash();
+                    $user_cash_new = $cash_user_single + $current_user_cash;
+                    $user_reward_new = $cash_user_single + $current_user_reward;
+                    $single_line_left_l_reverse[$j] -> setCash($user_cash_new);
+                    $single_line_left_l_reverse[$j] -> setreward($user_reward_new);
+                    $entityManager->flush();
+                } 
+                    $summ_single_line_right_balance_new = 0;
+                    $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);  
+            }
+            else{
+                $single_line_left_l_reverse = array_reverse($single_line_left_l);//переворачиваем массив чтобы сначала брать  последние записи
+                $single_line_left_balance_new = [];
+                //начисление начинаем со второго участника так как первый участник в массиве это последний учстник линии которому не начиляются бонусы
+                //перебираем всех которые есть  остальных участников берем с лева от рефовода
+                for($j = 1; $j < count($single_line_left_l); $j++){
+                    $single_line_left_balance_new[] = $single_line_left_l_reverse[$j] -> getBalance();
+                    $current_user_reward = $single_line_left_l_reverse[$j] -> getReward();
+                    $current_user_cash = $single_line_left_l_reverse[$j] -> getCash();
+                    $user_cash_new = $cash_user_single + $current_user_cash;
+                    $user_reward_new = $cash_user_single + $current_user_reward;
+                    $single_line_left_l_reverse[$j] -> setCash($user_cash_new);
+                    $single_line_left_l_reverse[$j] -> setreward($user_reward_new);
+                    $entityManager->flush();
+                } 
+                //оставшихся участников(с меньшей стороны их меньше 4-х) берем с противоположной строны (со стороны большего баланса)
+                //но в этом случаем берем не перевернутый массив (нормальный) начинаем перебор с "0" участника массива который стоит сразу после рефовода
+                for($j = 0; $j < ($i - count($single_line_left_l)); $j++){
+                    $single_line_right_balance_new[] = $single_line_right_l[$j] -> getBalance();
+                    $current_user_reward = $single_line_right_l[$j] -> getReward();
+                    $current_user_cash = $single_line_right_l[$j] -> getCash();
+                    $user_cash_new = $cash_user_single + $current_user_cash;
+                    $user_reward_new = $cash_user_single + $current_user_reward;
+                    $single_line_right_l[$j] -> setCash($user_cash_new);
+                    $single_line_right_l[$j] -> setreward($user_reward_new);
+                    $entityManager->flush();
+                }
+                    $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);
+                    $summ_single_line_left_balance_new = array_sum($single_line_left_balance_new);
+            }     
+       }
+       $summ_single_line_balance_new = $summ_single_line_right_balance_new + $summ_single_line_left_balance_new + $summ_single_line_organizer_new;//общая сумма начислений КешБек
+       return $summ_single_line_balance_new;
+   }
+
 
 }
