@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Form\ChangeRoleType;
+use App\Form\ChangeEmailType;
 use App\Entity\FastConsultation;
 use App\Form\FastConsultationType;
 use App\Repository\UserRepository;
@@ -16,6 +17,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/user')]
@@ -54,7 +56,9 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user->setCreatedAt(new \DateTimeImmutable());
             $userRepository->add($user);
+            $entityManager->flush();
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -127,6 +131,7 @@ class UserController extends AbstractController
                 return $this->redirectToRoute('app_user_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
             }
             $email = $request->get('new_email');
+            $user->setUpdatedAt(new \DateTimeImmutable());
             $user->setEmail($email);
             $user->setUsername($request->get('user')->getUsername());
             $entityManager->persist($user);
@@ -173,7 +178,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/role/edit', name: 'app_user_role_edit', methods: ['GET', 'POST'])]
-    public function role(Request $request, User $user, EntityManagerInterface $entityManager, UserRepository $userRepository, int $id): Response
+    public function role(Request $request, User $user, EntityManagerInterface $entityManager, UserRepository $userRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_SUPER_ADMIN');
@@ -208,6 +213,7 @@ class UserController extends AbstractController
             if($value == "Отозвать роль админ"){
                 $roles = [];
             }
+            $user->setUpdatedAt(new \DateTimeImmutable());
             $user->setRoles($roles);
             $entityManager->persist($user);
             $entityManager->flush();
@@ -218,19 +224,32 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_user_show', ['id' => $id], Response::HTTP_SEE_OTHER);
         }
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->renderForm('user/role.html.twig', [
             'user' => $user,
             'form' => $form,
             'roles' => $weaving_role,
             'role_super_admin' => $role_super_admin,
             'role_admin' => $role_admin,
+            'fast_consultation_form' => $fast_consultation_form,
         ]);
     }
 
-    #[Route('/{id}/chenge/email', name: 'app_user_change_email', methods: ['GET', 'POST'])]
-    public function changeEmail(Request $request, User $user, UserRepository $userRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
+    #[Route('/{id}/change/email', name: 'app_user_change_email', methods: ['GET', 'POST'])]
+    public function changeEmail(Request $request, User $user, UserRepository $userRepository, EntityManagerInterface $entityManager,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
+        
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $entityManager = $doctrine->getManager();
         $user_id = $this->getUser() -> getId();
     
         if($user_id != $id)
@@ -238,10 +257,11 @@ class UserController extends AbstractController
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
 
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(ChangeEmailType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            //dd('jjdhfg');
             if ($request->get('new_email') != $request->get('confirm_email')){
                 $this->addFlash(
                     'danger',
@@ -249,6 +269,7 @@ class UserController extends AbstractController
                 return $this->redirectToRoute('app_user_change_email', ['id' => $id], Response::HTTP_SEE_OTHER);
             }
             $email = $request->get('new_email');
+            $user->setUpdatedAt(new \DateTimeImmutable());
             $user->setEmail($email);
             $entityManager->persist($user);
             $entityManager->flush();
@@ -291,6 +312,7 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setUsername($request->get('user')->getUsername());
+            $user->setUpdatedAt(new \DateTimeImmutable());
             $entityManager->persist($user);
             $entityManager->flush();
             $this->addFlash(

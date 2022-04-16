@@ -46,6 +46,7 @@ class SettingOptionsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $settingOptionsRepository -> setCreatedAt(new \DateTime());
             $settingOptionsRepository->add($settingOption);
             return $this->redirectToRoute('app_setting_options_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -91,6 +92,7 @@ class SettingOptionsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $settingOptionsRepository -> setUpdatedAt(new \DateTime());
             $settingOptionsRepository->add($settingOption);
             return $this->redirectToRoute('app_setting_options_index', [], Response::HTTP_SEE_OTHER);
         }

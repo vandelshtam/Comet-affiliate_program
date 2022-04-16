@@ -62,7 +62,7 @@
                     {% if  referral_network.rewardWallet == NULL %}     
                     <span><h6 class="card-title text-dark">0.00 USDT</h6></span>
                     {% else %}
-                    <span><h6 class="card-title text-dark">{{ referral_network.rewardWallet }} USDT</h6></span>
+                    <span><h6 class="card-title text-dark">{{ available_balance }} USDT</h6></span>
                     {% endif %} 
                     <a class="btn  btn-info rounded-0 btn-sm mb-1" href="{{ path('app_wallet_exchange_wallet_comet', {'id': wallet_id}) }}">Вывести на кошелек</a>    
                 </div>
@@ -108,31 +108,104 @@
             </div>
         </div>
     </div>
-    <div class=" mb-1 row justify-content-between">
-    <div class="col-sm-4 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
-                <div class="card-body row justify-content-between">    
-                    <span><h6 class="card-title">Моя личная реферальная ссылка</h6></span>
-                    {# <span><h6 class="card-title text-dark" id="myInput">{{ referral_network.memberCode }}</h6></span>  #}
-                    <!-- The text field -->
-                    {# <div class="hidden"> #}
-                    <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput">
-                    {# </div> #}
-                    <!-- The button used to copy the text -->
-                    <button class="btn btn-info rounded-0 mb-1 mt-1 btn-sm" onclick="myFunction()">Скопировать ссылку</button>
-                    <a class="btn btn-info rounded-0  btn-sm" data-fancybox data-src="#hidden-content-referral" href="javascript:;" >Отправить по емайл</a>            
+    <div class="col-sm-12">
+    <div class="row shadow p-3 mb-1">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold text-secondary">Личная реферральная ссылка</h5>
+                                    <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput">
+                                    <h5 class="card-title fw-bold text-secondary"></h5>
+                                    <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
+                                </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="">
+                                <div class="card-body row">
+                                    <button  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0" onclick="myFunction()">Скопировать ссылку</button>
+                                    {# <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> #}
+                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
+                                    <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="nav-link fw-bold fst-italic fs-5 mb-1">Отправить по почте</a>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold text-secondary">Личная реферральная ссылка</h5>
+                                    <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput">
+                                    <h5 class="card-title fw-bold text-secondary"></h5>
+                                    <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
+                                </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="">
+                                <div class="card-body row">
+                                    <button  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" onclick="myFunction()">Скопировать ссылку</button>
+                                    {# <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> #}
+                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
+                                    <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="nav-link fw-bold fst-italic fs-5 mb-1">Отправить по почте</a>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    <div class="col-sm-12 mb-1">
+            <div class="card text-secondary shadow p-3 mb-1  rounded-0">
+                <div class="row">
+                            <div class="col-sm-8">
+                                <div class="">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold text-secondary">USDT</h5>
+                                    <h5 class="card-title fw-bold text-secondary"></h5>
+                                    <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
+                                </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="">
+                                <div class="card-body row">
+                                    <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Пополнить</a>
+                                    {# <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> #}
+                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
+                                    {# <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Вывести</a> #}
+                                </div>
+                                </div>
+                            </div>
+                </div>
+                <div class="row">
+                            <div class="col-sm-8">
+                                <div class="">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold text-secondary">USDT</h5>
+                                    <h5 class="card-title fw-bold text-secondary"></h5>
+                                    <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
+                                </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="">
+                                <div class="card-body row">
+                                    <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Пополнить</a>
+                                    {# <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a>
+                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
+                                    {# <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Вывести</a>  #}
+                                </div>
+                                </div>
+                            </div>
                 </div>
             </div>
     </div>
-    <div class="col-sm-4 mb-1">
+    {# <div class="col-sm-4 mb-1">
             <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
                 <div class="card-body row justify-content-between">    
                     <h6 class="card-title">Моя команда - количество участников</h6>
                     <h6 class="card-title text-info mt-1">{{ my_team_count }}</h6>   
                     <a class="btn  btn-info rounded-0 btn-sm mb-4 mt-1" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Открыть</a> 
-                    {# <div class="hidden"> 
-                    <a class="btn  btn-info rounded-0 btn-sm mb-1" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Открыть</a>   
-                    </div>        #}
+                   
                 </div>
             </div>
     </div>
@@ -158,7 +231,7 @@
                 </div>
             </div>
     </div>
-    {% endif %}
+    {% endif %} #}
    </div>
     <div class="col-sm-12 mb-1">
             <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">

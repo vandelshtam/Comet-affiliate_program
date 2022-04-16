@@ -35,7 +35,7 @@
     {% endfor %}
     {{ include('wallet/_form.html.twig', {'button_label': 'Подтвердить'}) }}
 
-    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_index') }}">Назад</a>
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_index_admin') }}">Назад</a>
 
     {% if is_granted('ROLE_ADMIN') %}
     {{ include('wallet/_delete_form.html.twig') }}

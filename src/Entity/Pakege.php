@@ -49,8 +49,11 @@ class Pakege
     #[ORM\OneToMany(mappedBy: 'pakege', targetEntity: ListReferralNetworks::class)]
     private $listReferralNetworks;
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $created_at;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $updated_at;
 
     
     public function __construct()
@@ -220,20 +223,30 @@ class Pakege
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setCreatedAt(?\DateTime $created_at): self
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    
-   
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updated_at;
+    }
 
+    public function setUpdatedAt(?\DateTime $updated_at): self
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    
     
 }

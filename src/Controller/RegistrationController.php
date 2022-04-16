@@ -17,6 +17,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
+use Doctrine\ORM\Cache\TimestampRegion;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -41,6 +42,8 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
+       $date = date('Y-m-d H:i:s');
+//dd(date('Y-m-d H:i:s'));
         if ($form->isSubmitted() && $form->isValid()) {
             //dd($request->get('password'));
             if($request->get('password') != $form->get('plainPassword')->getData()){
@@ -69,7 +72,7 @@ class RegistrationController extends AbstractController
                 )
             );
             // $roles[] = 'ROLE_ADMIN';
-            // $user->setRoles($roles);
+            $user->setCreatedAt(new \DateTimeImmutable());
             $user->setReferralLink($referral_link);
             $user->setPakageStatus(0);
             $entityManager->persist($user);
@@ -112,6 +115,7 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
             'fast_consultation_form' => $fast_consultation_form->createView(),
             'referral_link' => $referral,
+            'date' => $date,
         ]);
     }
 

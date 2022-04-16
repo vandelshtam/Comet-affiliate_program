@@ -6,6 +6,7 @@ use App\Entity\Wallet;
 use App\Form\WalletType;
 use App\Entity\TokenRate;
 use App\Form\WalletUsdtType;
+use App\Entity\SettingOptions;
 use App\Entity\ReferralNetwork;
 use App\Entity\FastConsultation;
 use App\Form\WalletExchangeType;
@@ -86,6 +87,7 @@ class WalletController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $wallet->setUpdatedAt(new \DateTimeImmutable());
             $walletRepository->add($wallet);
             return $this->redirectToRoute('app_wallet_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -119,7 +121,7 @@ class WalletController extends AbstractController
         if($wallet == false){
             $this->addFlash(
                 'warning',
-                'У вас нет прав доступа к кошельку.');
+                'У вас нет прав доступа к кошельку или вам нужно пройти полную регистрацию');
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -156,7 +158,7 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
-        if($user_id != $wallet -> getUserId){
+        if($user_id != $wallet -> getUser() -> getId()){
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
 
@@ -196,7 +198,7 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
-        if($user_id != $wallet_user -> getUserId){
+        if($user_id != $wallet_user -> getUser() -> getId()){
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
 
@@ -204,8 +206,9 @@ class WalletController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $wallet->setUpdatedAt(new \DateTimeImmutable());
             $walletRepository->add($wallet);
-            return $this->redirectToRoute('app_wallet_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_wallet_index_admin', [], Response::HTTP_SEE_OTHER);
         }
 
         $fast_consultation = new FastConsultation();       
@@ -257,6 +260,7 @@ class WalletController extends AbstractController
             $wallet_new_deposit = $table_form + $table_usdt;
 
             $table_wallet->setUsdt($wallet_new_deposit);
+            $table_wallet->setUpdatedAt(new \DateTimeImmutable());
             $entityManager->persist($table_wallet);
             $entityManager->flush();
             $this->addFlash(
@@ -309,6 +313,7 @@ class WalletController extends AbstractController
         $table_bitcoin = $wallet -> getBitcoin();
         $table_etherium = $wallet -> getEtherium();
         $table_cometpoin = $wallet -> getCometpoin();
+        
         $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//получаем курс внутреннего токена сети
         $form = $this->createForm(WalletExchangeType::class, $wallet);
         $form->handleRequest($request);
@@ -326,7 +331,7 @@ class WalletController extends AbstractController
                 $table_form = $table_form_input / $token_rate;
                 $wallet_new_deposit = $table_form + $table_usdt;
                 $table_wallet->setUsdt($wallet_new_deposit);
-                
+                $table_wallet->setUpdatedAt(new \DateTime());
             }
             elseif($form_coin = $form->get('usdt')->getData() == 2){
                 $table_form_input = $wallet -> getCometpoin();
@@ -339,6 +344,7 @@ class WalletController extends AbstractController
                 $table_form = $table_form_input / 50;
                 $wallet_new_deposit = $table_form + $table_bitcoin;
                 $table_wallet->setBitcoin($wallet_new_deposit);
+                $table_wallet->setUpdatedAt(new \DateTime());
                 $this->addFlash(
                     'info',
                     'Извините, пока нет возможности конверитровать Cometpoin в Bitcoin');
@@ -355,6 +361,7 @@ class WalletController extends AbstractController
                 $table_form = $table_form_input / 100;
                 $wallet_new_deposit = $table_form + $table_etherium;
                 $table_wallet->setEtherium($wallet_new_deposit);
+                $table_wallet->setUpdatedAt(new \DateTime());
                 $this->addFlash(
                     'info',
                     'Извините, пока нет возможности конверитровать Cometpoin в Etherium');
@@ -433,6 +440,7 @@ class WalletController extends AbstractController
                 $table_form = $table_form_input * $token_rate;
                 $wallet_new_deposit = $table_form + $table_cometpoin;
                 $table_wallet->setCometpoin($wallet_new_deposit);
+                $table_wallet->setUpdatedAt(new \DateTime());
             }
             elseif($form_coin = $form->get('usdt')->getData() == 2){
                 $table_form_input = $wallet -> getUsdt();
@@ -445,6 +453,7 @@ class WalletController extends AbstractController
                 $table_form = $table_form_input / 50;
                 $wallet_new_deposit = $table_form + $table_bitcoin;
                 $table_wallet->setBitcoin($wallet_new_deposit);
+                $table_wallet->setUpdatedAt(new \DateTime());
                 $this->addFlash(
                     'info',
                     'Извините, пока нет возможности конверитровать Cometpoin в Bitcoin');
@@ -461,6 +470,7 @@ class WalletController extends AbstractController
                 $table_form = $table_form_input / 100;
                 $wallet_new_deposit = $table_form + $table_etherium;
                 $table_wallet->setEtherium($wallet_new_deposit);
+                $table_wallet->setUpdatedAt(new \DateTime());
                 $this->addFlash(
                     'info',
                     'Извините, пока нет возможности конверитровать Cometpoin в Etherium');
@@ -517,12 +527,28 @@ class WalletController extends AbstractController
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
 
+
         $table_wallet = $entityManager->getRepository(Wallet::class)->findOneBy(['id' => $id]);
         $user_id = $wallet -> getUser() -> getId();
         $cuttent_wallet_coin = $table_wallet -> getCometpoin();//текущие средвтсва кометапоин на кошельке
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneByReferralField($user_id);
+        $reward_all = $referral_network -> getRewardWallet();//все начисления всети сингллайн за все время
         $reward_wallet = $referral_network -> getRewardWallet();//начисления всети сингллайн доступные для перевода в кошелек
         $withdrawal_wallet = $referral_network -> getWithdrawalToWallet();//учет ввсех сумм с накоплением выведенных из  сингллайн на кошелек
+
+        //рачет - лимит вывода из сети (линии) на кошелек
+        $setting_opyions = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
+        $limit_wallet_from_line = $setting_opyions -> getLimitWalletFromLine();//коеф лимита для  вывода из сети на кошелек
+        $fast_start = $setting_opyions -> getFastStart();
+        $available_amount = ($reward_all * $limit_wallet_from_line) / 100; //общая сумма доступная для вывода - контрольная с которой сравниваем выводимые средства
+        $available_balance = $available_amount - $withdrawal_wallet;//доступный остаток для вывода в момент запроса
+
+        if($available_balance == 0 ){
+            $this->addFlash(
+                'warning',
+                'Извините, операция не может быть выполнена! Вы вывели все доступные средства, чтобы продолжить зарабатывать в сети вам нужно повысить пакет и пригласить новых партнеров');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
 
         $table_cometpoin = $wallet -> getCometpoin();
         $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//получаем курс внутреннего токена сети
@@ -531,7 +557,7 @@ class WalletController extends AbstractController
         
         if ($form->isSubmitted() && $form->isValid()) {
             $table_form = $wallet -> getCometpoin();//сумма кометпоин введенная в форму
-            if(($table_form / $token_rate) > $reward_wallet){
+            if(($table_form / $token_rate) > $available_balance){
                 $this->addFlash(
                     'warning',
                     'Сумма введенная для перевода на кошелек превышает остаток начислений в сети доступный для перевода, введите другую сумму не превышающую' .$reward_wallet.' Cometpoin');
@@ -545,6 +571,7 @@ class WalletController extends AbstractController
             $referral_network -> setRewardWallet($reward_new_singl);
             $referral_network -> getWithdrawalToWallet($withdrawal_to_wallet);
             $entityManager->persist($table_wallet);
+            $table_wallet->setUpdatedAt(new \DateTime());
             $entityManager->flush();
             $this->addFlash(
                 'info',
@@ -566,6 +593,7 @@ class WalletController extends AbstractController
             'form' => $form,
             'reward_wallet' => $reward_wallet * $token_rate,
             'fast_consultation_form' => $fast_consultation_form,
+            'available_balance' => $available_balance,
         ]);
     }
 

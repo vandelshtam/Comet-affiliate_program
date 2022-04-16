@@ -47,6 +47,7 @@ class TokenRateController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $tokenRateRepository -> setCreatedAt(new \DateTime());
             $tokenRateRepository->add($tokenRate);
             return $this->redirectToRoute('app_token_rate_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -93,6 +94,7 @@ class TokenRateController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $tokenRateRepository -> setUpdatedAt(new \DateTime());
             $tokenRateRepository->add($tokenRate);
             return $this->redirectToRoute('app_token_rate_index', [], Response::HTTP_SEE_OTHER);
         }

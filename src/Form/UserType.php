@@ -16,7 +16,7 @@ class UserType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'label' => 'Новая электронная почта',
+                'label' => 'Электронная почта',
                 'mapped' => true,
                 'required' => true,
             ])

@@ -64,6 +64,12 @@ class PersonalData
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $client_code;
 
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $created_at;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $updated_at;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -257,6 +263,30 @@ class PersonalData
     public function setClientCode(?string $client_code): self
     {
         $this->client_code = $client_code;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(?\DateTime $created_at): self
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTime $updated_at): self
+    {
+        $this->updated_at = $updated_at;
 
         return $this;
     }

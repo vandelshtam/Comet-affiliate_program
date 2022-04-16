@@ -20,6 +20,7 @@ use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ListReferralNetworksRepository;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -232,7 +233,10 @@ class ListReferralNetworksController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             $listReferralNetworksRepository->add($listReferralNetwork);
+            $listReferralNetworksRepository -> setUpdatedAt(new \DateTime());
+            $entityManager->flush();
             return $this->redirectToRoute('app_list_referral_networks_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -284,6 +288,8 @@ class ListReferralNetworksController extends AbstractController
         //$network_code - уникальный код реферальной сети
         $network_code = $pakege_id.'-'.$unique_code;//первая част до тире "id реферальной сети " - после тире "уникальный код сети" который одинаковый с уникальным кодом пакета unique_code
 
+        $date = new \DateTime();
+        
         $member_code = $listReferralNetwork_id.'-'.$id.'-'.$pakege_id.'-'.$unique_code;//инидивидуальный уникальный код записи члена реферальной сети
         $listReferralNetwork -> setOwnerId($user_id);
         $listReferralNetwork -> setOwnerName($owner_name);
@@ -293,7 +299,10 @@ class ListReferralNetworksController extends AbstractController
         $listReferralNetwork -> setProfitNetwork(0);//общая сумма очислений в проект (владельцам проекта)
         $listReferralNetwork -> setPaymentsDirect(0);//общая сумма начисленных доходов в сеть по программе Директ
         $listReferralNetwork -> setPaymentsCash(0);//общая сумма начисленных в сети доходов по программе КешБек
+        $listReferralNetwork -> setSystemRevenues(0);//общая сумма начисленных  доходов в систему (30%)
         $listReferralNetwork -> setCurrentBalance(0);//общая сумма стоимости пакетов в сети (не погашенных)
+        $listReferralNetwork -> setCreatedAt($date);
+        
         //$user_table -> setPakageStatus(1);
         //$listReferralNetwork -> setProfitNetwork($balance);
         $pakege -> setActivation('активирован');
@@ -320,6 +329,8 @@ class ListReferralNetworksController extends AbstractController
         $referral_network -> setPaymentsCash(0);//начисление в сеть по программе КешБек в момент активации нового пакета 
         $referral_network -> setRewardWallet(0);//остаток начислений доступных для вывода на кошелек пользователя
         $referral_network -> setWithdrawalToWallet(0);//общая сумма выведенных на кошелек начисленых доходов пользователя
+        $listReferralNetwork -> setSystemRevenues(0);//общая сумма начисленных  доходов в систему (30%)
+        $referral_network -> setCreatedAt($date);
 
         $referralNetworkRepository->add($referral_network);
         

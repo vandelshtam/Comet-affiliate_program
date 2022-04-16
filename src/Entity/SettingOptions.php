@@ -43,6 +43,15 @@ class SettingOptions
     #[ORM\Column(type: 'integer', nullable: true)]
     private $limit_wallet_from_line;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $payments_direct_fast;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $created_at;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $updated_at;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -164,6 +173,42 @@ class SettingOptions
     public function setLimitWalletFromLine(?int $limit_wallet_from_line): self
     {
         $this->limit_wallet_from_line = $limit_wallet_from_line;
+
+        return $this;
+    }
+
+    public function getPaymentsDirectFast(): ?int
+    {
+        return $this->payments_direct_fast;
+    }
+
+    public function setPaymentsDirectFast(?int $payments_direct_fast): self
+    {
+        $this->payments_direct_fast = $payments_direct_fast;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(?\DateTime $created_at): self
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTime $updated_at): self
+    {
+        $this->updated_at = $updated_at;
 
         return $this;
     }

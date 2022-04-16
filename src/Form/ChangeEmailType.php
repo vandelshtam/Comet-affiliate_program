@@ -12,12 +12,21 @@ class ChangeEmailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('email', EmailType::class, [
-            'label' => 'Новая электронная почта',
-            'mapped' => true,
-            'required' => true,
-        ])
-            
+            ->add('email')
+            // ->add('roles')
+            // ->add('password')
+            // ->add('isVerified')
+            // ->add('personal_data_id')
+            // ->add('username')
+            // ->add('role')
+            // ->add('referral_link')
+            // ->add('pesonal_code')
+            // ->add('pakage_status')
+            // ->add('pakage_id')
+            // ->add('updated_at')
+            // ->add('created_at')
+            // ->add('wallet')
+            // ->add('pkege')
         ;
     }
 

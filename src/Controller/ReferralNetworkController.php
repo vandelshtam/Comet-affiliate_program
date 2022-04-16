@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/referral/network')]
@@ -125,6 +126,7 @@ class ReferralNetworkController extends AbstractController
         $username = $user -> getUsername();
         if ($form->isSubmitted() && $form->isValid()) {
             //проводим предварительное создание записи в таблицу строки нового участника реферальной сети 
+            $referralNetwork -> setCreatedAt(new \DateTime());
             $referralNetworkRepository->add($referralNetwork);
             //запись нового участника в линию single_line
             $referral_network_id = $this -> newConfirm($request,$referralNetworkRepository, $doctrine,$member_code,$id,$referral_link);
@@ -272,6 +274,14 @@ class ReferralNetworkController extends AbstractController
             return $this->redirectToRoute('app_referral_network_show', ['id' => $id], Response::HTTP_SEE_OTHER);
         }
 
+        //рачет - лимит вывода из сети (линии) на кошелек
+        $setting_opyions = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
+        $withdrawal_wallet = $referral_network -> getWithdrawalToWallet();//учет ввсех сумм с накоплением выведенных из  сингллайн на кошелек
+        $limit_wallet_from_line = $setting_opyions -> getLimitWalletFromLine();//коеф лимита для  вывода из сети на кошелек
+        $reward_all = $referral_network -> getRewardWallet();//все начисления всети сингллайн за все время
+        $available_amount = ($reward_all * $limit_wallet_from_line) / 100; //общая сумма доступная для вывода - контрольная с которой сравниваем выводимые средства
+        $available_balance = $available_amount - $withdrawal_wallet;//доступный остаток для вывода в момент запроса
+
            
         $referral_link_to_email_form = $this->createForm(ReferralToEmailType::class);
         $referral_link_to_email_form->handleRequest($request);
@@ -292,6 +302,7 @@ class ReferralNetworkController extends AbstractController
             'referral_link_to_email_form' => $referral_link_to_email_form,
             'wallet_id' => $wallet_id,
             'limit_cashback' => $limit_cash_back,
+            'available_balance' => $available_balance
         ]);
     }
 
@@ -307,6 +318,7 @@ class ReferralNetworkController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $referralNetworkRepository -> setUpdatedAt(new \DateTime());
             $referralNetworkRepository->add($referralNetwork);
             return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -370,6 +382,7 @@ class ReferralNetworkController extends AbstractController
         $status_user = $referral_network_status[1]->getUserStatus();//получаем запись самого нового участника сети ,определяем его положение в линии "слева" или "справа"
         $status = $this -> status($status_user);// присваеваем новому участнику сети положение в линии  слева или справа
         $referral_network_referral = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]);//получаем объект пользователя участника  реферальной сети который предоставил реферальную ссылку Рефовод
+        $pakege_id_refovod = $referral_network_referral -> getPakegeId();//АйДи пакета рефовода
         $referral_network = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code]);//получаем данные нового участника в реферальной сети  чтобы дополнить информацию всеми необходимыми данными
         $network_code = $referral_network_referral -> getNetworkCode();//получаем индивидуальный идентификационный код родительской сети
         $list_network = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['network_code' => $network_code]);//обект родительской сети
@@ -401,8 +414,43 @@ class ReferralNetworkController extends AbstractController
         $user_referral_id = $referral_network_referral -> getUserId();//id пользователя системы участвующего в реферальной сети и предоставившего реферальную ссылку (рефовода)
 
         //расчет награды за приглашенного участника члену сети предоставишему реферальную ссылку (рефовода) DIRECT
-        $bonus = $balance * 0.1;//direct начисление за приглашенного участника
-        
+        $setting_opyions = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
+        $pakage_comet = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $pakege_id_refovod]);
+        $update_day = $setting_opyions -> getUpdateDay();
+        $fast_start = $setting_opyions -> getFastStart();
+        $payments_direct = $setting_opyions -> getPaymentsDirect();
+        $payments_direct_fast = $setting_opyions -> getPaymentsDirectFast();
+        $payments_singleline = $setting_opyions -> getPaymentsSingleline();
+        //проверка срока быстрого старта и получения двойного бонуса Директ 20%
+        if($pakage_comet -> getUpdatedAt() != NULL){
+            $datetime = $pakage_comet -> getUpdatedAt();
+            $timestamp = $datetime->getTimestamp();
+            date_modify($datetime, $fast_start.'day');
+            //dd(time() - $this->timestamp = $datetime->getTimestamp());
+            if(time() > $timestamp){
+                $k_direct = $payments_direct_fast;
+            }
+            else{
+                $k_direct = $payments_direct;
+            }    
+        }
+        else{
+            $datetime = $pakage_comet -> getCreatedAt();
+            $timestamp = $datetime->getTimestamp();
+            //dd($timestamp);
+            date_modify($datetime, $fast_start.'day');
+            //dd(time() - $this->timestamp = $datetime->getTimestamp());
+            if(time() > $timestamp){
+                $k_direct = $payments_direct_fast;
+            }
+            else{
+                $k_direct = $payments_direct;
+            }      
+        }
+       // dd($k_direct);
+        //начисления рефовода
+        $bonus = ($balance * $k_direct) / 100;//direct начисление за приглашенного участника
+
         $referral_network_referral_bonus = $referral_network_referral -> getReward();//текущие начисления общие у рефовода
         $referral_network_referral_Rewardwallet = $referral_network_referral -> getRewardWallet();//текущие доступные общие начисления для вывода на кошелек у рефовода
         $referral_network_referral_direct = $referral_network_referral -> getDirect();//директ бонусы текущие у рефовода 
@@ -414,6 +462,7 @@ class ReferralNetworkController extends AbstractController
         $referral_network_referral -> setReward($reward);
         $referral_network_referral -> setDirect($direct);
         $referral_network_referral -> setRewardWallet($reward_wallet);
+        $referral_network_referral -> setUpdatedAt(new \DateTime());
         
         //записываем и сохраняем в таблицу нового участника реферальной сети и все дополнительные и обязательные данные
         $user = $this -> getUser();    
@@ -436,7 +485,8 @@ class ReferralNetworkController extends AbstractController
         $referral_network -> setPaymentsCash(0);//начисление в сеть по программе КешБек в момент активации нового пакета 
         $referral_network -> setRewardWallet(0);//остаток начислений доступных для вывода на кошелек пользователя
         $referral_network -> setWithdrawalToWallet(0);//общая сумма выведенных на кошелек начисленых доходов пользователя
-        $referral_network -> setsystemRevenues(0);//сумма начисления дохода системы (30%) в момент активации пакета
+        $referral_network -> setSystemRevenues(0);//сумма начисления дохода системы (30%) в момент активации пакета
+        //$referral_network -> setCreatedAt(new \DateTime());
         //$referral_network -> setReward($reward);
         //$referral_network_referral -> setRewardWallet($reward);
         $referral_network -> setMemberCode($member_code);//первая часть до первого тире "id пакета приглашенного участника сети (т.е. id пакета приглашенного )" -  вторая часть перед вторым тире, "id пакета владельца сети (т.е. id пакета)" - после тире "уникальный код сети" 
@@ -457,7 +507,7 @@ class ReferralNetworkController extends AbstractController
         //первое построение линии из трех участников реферальной сети. Когда происходит активация пакета 3-го участника в сети числится еще 2 участника, поэтому в условии установлена цифра 2 участника активных 
         if($list_network_all_count == 2){
             $referral_network_user = $referral_network_referral;
-            $this -> singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$k_system_revenues);
+            $this -> singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$doctrine, $payments_singleline);
             $entityManager->persist($referral_network);
             $entityManager->persist($referral_network_referral);
             $entityManager->flush();
@@ -481,6 +531,11 @@ class ReferralNetworkController extends AbstractController
 
         //==================получаем и записываем  все начисления и погашеня сети ==============================================
         $list_network_all_new = $entityManager->getRepository(ReferralNetwork::class)->findByMemberField([$network_code]);//обновляем все обекты родительской сети
+        $curren_network = [];
+        $payments_direct = [];
+        $payments_cash = [];
+        $current_price = [];
+        $system_revenues = [];
         foreach($list_network_all_new as $curren_network_profit){
             $curren_network[] = $curren_network_profit -> getCurrentNetworkProfit();
         } 
@@ -492,17 +547,23 @@ class ReferralNetworkController extends AbstractController
         }
         foreach($list_network_all_new as $price_network){
             $current_price[] = $price_network -> getBalance();
-        }  
+        } 
+        foreach($list_network_all_new as $system_revenues){
+            $current_system_revenues[] = $system_revenues -> getSystemRevenues();
+        }   
         $curren_network_summ = array_sum($curren_network);//общая сумма погашения пакетов на момент активации последнего пакета
         $payments_direct_summ = array_sum($payments_direct);//общая сумма начислений попрограмме Директ на момент активации последнего пакета в сети
         $payments_cash_summ = array_sum($payments_cash);//общая сумма начислений по программе КешБек на момент активации последнего пакета в сети
         $current_price_summ = array_sum($current_price);//текущая общая сумма оставшихся не погашенных пакетов в сети на момент активации последнего пакета
+        $current_system_revenues_summ = array_sum($current_system_revenues);//текущая общая сумма отчислений в доход системы (30%)
 
         //запись данных начислений во всей сети в родительский объект сети
         $listReferralNetwork -> setProfitNetwork($curren_network_summ);//общая сумма погашения пакетов на момент активации последнего пакета
         $listReferralNetwork -> setPaymentsDirect($payments_direct_summ);//общая сумма начислений попрограмме Директ на момент активации последнего пакета в сети
         $listReferralNetwork -> setPaymentsCash($payments_cash_summ);//общая сумма начислений по программе КешБек на момент активации последнего пакета в сети
         $listReferralNetwork -> setCurrentBalance($current_price_summ);//текущая общая сумма оставшихся не погашенных пакетов в сети на момент активации последнего пакета
+        $listReferralNetwork -> setSystemRevenues($current_system_revenues_summ);//текущая общая сумма отчислений в доход системы (30%)
+        $listReferralNetwork -> setUpdatedAt(new \DateTime());
         //=========== =========================================================== ==============================================
 
 
@@ -894,7 +955,7 @@ class ReferralNetworkController extends AbstractController
 
     
     
-    private function singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$doctrine)
+    private function singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$doctrine,$payments_singleline)
     {
         $entityManager = $doctrine->getManager();
         $k_system_revenues = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getSystemRevenues();//коэффициент в процентах - доход системы , отчисляется всегда от баланса с меньшей стороны или если одни пакет то от стоимости пакета с меньшей стороны
@@ -905,14 +966,15 @@ class ReferralNetworkController extends AbstractController
             $cash_refovod = $referral_network_user -> getCash();//текущий КешБек рефовода
             $referral_network_left -> setBalance(0);
             $referral_network_right -> setBalance(0);
+            //начисления рефовода
             $reward_user = $referral_network_user ->  getReward();//текущие общие начисления наград Рефовода
             $direct_user = $referral_network_user ->  getDirect();//текущие начисления по программа Директ Рефовода
-            //$balance = $balance_pred * 0.1;
-            //$reward = $reward_user + $balance;
-            //$new_cash = $cash_refovod + $balance;
-            //$referral_network_user ->  setReward($reward);
-            //$referral_network_user -> setCash($new_cash);$k_system_revenues
-            $system_revenues = $balance_pakege_right * $k_system_revenues; //баланс с любой стороны умножаем на коэфициент выплаты дохода в сеть (30%)  получаем сумму начисления в систему как дох
+            $cash_bonus_refovod = ($balance_pred * $payments_singleline) / 100;
+            $new_cash_refovod = $cash_refovod + $cash_bonus_refovod;
+            $reward = $reward_user + $new_cash_refovod;
+            $referral_network_user ->  setReward($reward);
+            $referral_network_user -> setCash($new_cash_refovod);
+            $system_revenues = ($balance_pakege_right * $k_system_revenues) / 100; //баланс с любой стороны умножаем на коэфициент выплаты дохода в сеть (30%)  получаем сумму начисления в систему как дох
             $repayment_amount = ($balance_pred + $balance_pakege_right) - ($bonus + $system_revenues);//сумма погашения пакетов которая наисляется в доход системы
             //$list_network ->setProfitNetwork($new_profit_network);
             $payments = $bonus;

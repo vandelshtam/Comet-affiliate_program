@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\User;
 use App\Entity\Wallet;
-use App\Entity\PersonalData;
 
+use App\Entity\PersonalData;
 use App\Form\PersonalDataType;
 use App\Entity\FastConsultation;
+use App\Form\EditPersonalDataType;
 use App\Form\FastConsultationType;
 use App\Controller\MailerController;
 use App\Repository\WalletRepository;
@@ -25,14 +27,25 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class PersonalDataController extends AbstractController
 {
     #[Route('/admin', name: 'app_personal_data_index', methods: ['GET'])]
-    public function index(PersonalDataRepository $personalDataRepository): Response
+    public function index(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine,EntityManagerInterface $entityManager, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
+        $fast_consultation = new FastConsultation();       
+        $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
+        $fast_consultation_form->handleRequest($request);
+        if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
+            $email_client = $fast_consultation_form -> get('email')->getData(); 
+            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+        }
+
         return $this->render('personal_data/index.html.twig', [
             'personal_datas' => $personalDataRepository->findAll(),
             'title' => 'Personal data',
+            'fast_consultation_form' => $fast_consultation_form -> createView(),
         ]);
     }
 
@@ -55,14 +68,16 @@ class PersonalDataController extends AbstractController
         $entityManager = $doctrine->getManager();
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $personalDatum -> setCreatedAt(new \DateTimeImmutable());
             $personalDataRepository->add($personalDatum);
             $wallet -> setUser($user);
             $wallet -> setUsdt(0);
             $wallet -> setBitcoin(0);
             $wallet -> setCometpoin(0);
             $wallet -> setEtherium(0);
-
+            $wallet -> setCreatedAt(new \DateTimeImmutable());
             $walletRepository->add($wallet);
+
             $personalData = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
             $user_table = $entityManager->getRepository(User::class)->findOneBy(['id' => $user -> getId()]);
             $user_table->setPersonalDataId($personalData -> getId());
@@ -70,6 +85,7 @@ class PersonalDataController extends AbstractController
             $client_code = $user -> getId().$random_code;
             $user_table->setPesonalCode($client_code);
             $personalData->setClientCode($client_code);
+            
             $entityManager->persist($user_table);
             $entityManager->flush();
             $this->addFlash(
@@ -169,10 +185,11 @@ class PersonalDataController extends AbstractController
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
         $user = $this->getUser();
-        $form = $this->createForm(PersonalDataType::class, $personalDatum);
+        $form = $this->createForm(EditPersonalDataType::class, $personalDatum);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $personalDatum -> setUpdatedAt(new \DateTimeImmutable());
             $personalDataRepository->add($personalDatum);
             return $this->redirectToRoute('app_personal_data_show', ['personal_user_id' => $id], Response::HTTP_SEE_OTHER);
         }
@@ -187,7 +204,7 @@ class PersonalDataController extends AbstractController
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('personal_data/edit.html.twig', [
+        return $this->renderForm('personal_data/editPersonalData.html.twig', [
             'personal_datum' => $personalDatum,
             'form' => $form,
             'new_user_make' => false,

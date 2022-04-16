@@ -53,6 +53,7 @@ class TablePakageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $tablePakageRepository -> setCreatedAt(new \DateTime());
             $tablePakageRepository->add($tablePakage);
             return $this->redirectToRoute('app_table_pakage_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -102,6 +103,7 @@ class TablePakageController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $tablePakageRepository -> setUpdatedAt(new \DateTime());
             $tablePakageRepository->add($tablePakage);
             return $this->redirectToRoute('app_table_pakage_index', [], Response::HTTP_SEE_OTHER);
         }
