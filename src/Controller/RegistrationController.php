@@ -42,8 +42,7 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-       $date = date('Y-m-d H:i:s');
-//dd(date('Y-m-d H:i:s'));
+       
         if ($form->isSubmitted() && $form->isValid()) {
             //dd($request->get('password'));
             if($request->get('password') != $form->get('plainPassword')->getData()){
@@ -72,7 +71,7 @@ class RegistrationController extends AbstractController
                 )
             );
             // $roles[] = 'ROLE_ADMIN';
-            $user->setCreatedAt(new \DateTimeImmutable());
+            $user->setCreatedAt(new \DateTime());
             $user->setReferralLink($referral_link);
             $user->setPakageStatus(0);
             $entityManager->persist($user);

@@ -30,7 +30,7 @@ class Pakege
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $client_code;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'pakeges')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'pakege')]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 

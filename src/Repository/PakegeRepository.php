@@ -62,6 +62,23 @@ class PakegeRepository extends ServiceEntityRepository
     }
     
 
+     /**
+      * @return Pakege[] Returns an array of Pakege objects
+      */
+    
+      public function findByExampleClientField($value)
+      {
+          return $this->createQueryBuilder('p')
+              ->andWhere('p.client_code = :val')
+              ->setParameter('val', $value)
+              ->orderBy('p.id', 'ASC')
+              ->setMaxResults(10000)
+              ->getQuery()
+              ->getResult()
+          ;
+      }
+      
+
     
     public function findOneBySomeField($value): ?Pakege
     {
@@ -70,6 +87,20 @@ class PakegeRepository extends ServiceEntityRepository
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()
+        ;
+    }
+
+    public function findByPakageActionField($name_multi_pakage, $user_id, $multi_pakage_day)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.name = :val','r.user_id = :uid', 'r.created_at < :day')
+            ->setParameter('val', $name_multi_pakage)
+            ->setParameter('day', $multi_pakage_day)
+            ->setParameter('uid', $user_id)
+            ->orderBy ('r.id', 'ASC')
+            ->setMaxResults(10000)
+            ->getQuery()
+            ->getResult()
         ;
     }
     

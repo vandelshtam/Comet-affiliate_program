@@ -260,7 +260,7 @@ class WalletController extends AbstractController
             $wallet_new_deposit = $table_form + $table_usdt;
 
             $table_wallet->setUsdt($wallet_new_deposit);
-            $table_wallet->setUpdatedAt(new \DateTimeImmutable());
+            $table_wallet->setUpdatedAt(new \DateTime());
             $entityManager->persist($table_wallet);
             $entityManager->flush();
             $this->addFlash(
@@ -413,7 +413,7 @@ class WalletController extends AbstractController
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
-        if($user_id != $wallet_user -> getUserId){
+        if($user_id != $wallet_user -> getUser() -> getId()){
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
 

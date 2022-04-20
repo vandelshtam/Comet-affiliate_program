@@ -90,4 +90,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ;
     }
     */
+
+
+    public function findOneByIdJoinedToPakege(int $userId): ?User
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT p, c
+            FROM App\Entity\User p
+            INNER JOIN p.pakege c
+            WHERE p.id = :id'
+        )->setParameter('id', $userId);
+
+        return $query->getOneOrNullResult();
+    }
 }

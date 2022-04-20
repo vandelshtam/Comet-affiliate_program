@@ -11,18 +11,28 @@
 {{ form_start(form) }}
 <div class="form_box-inner">   
     <div class="form_box-left">
-    {{ form_row(form.name) }}<div id="emailHelp" class="form-text">Eсли у вас нет реферальной ссылки или кода клиента, то пожалуйста не заполняйте это поле!</div> 
-    {% if user_referral_link != NULL%}
-    <div class="hidden">  
+    {# {{ form_row(form.name) }}<div id="emailHelp" class="form-text mb-3">Выберите пакет</div>  #}
+    {# {% if user_referral_link != NULL%} #}
+    <div id="emailHelp" class="text mb-1 mt-1">Наименование пакета</div> 
+    <select class="form-select mb-1" aria-label="Default select example" name="select">
+      {% for chois in choise  %}
+      <option value="{{ chois }}">{{ chois }}</option>
+      {% endfor %}
+    </select>
+    <div id="emailHelp" class="form-text mb-3">Выберите пакет</div> 
+    {# <div id="emailHelp" class="form-text mb-3 mt-0">Выберите пакет</div> #}
+    {# <div class="hidden">  
     {{ form_row(form.referral_link, {'value': user_referral_link }) }}
     </div>
     {% else %}
     {{ form_row(form.referral_link) }}<div id="emailHelp" class="form-text mb-3">Введите реферальную ссылку.</div> 
-    {% endif %}
-    <select class="form-select" aria-label="Default select example" name="select">
-      <option selected>Валюта покупки</option>
-      <option value="1">USDT</option>
-      <option value="2">Cometpoin</option>
+    {% endif %} #}
+    <div id="emailHelp" class="text mb-1 mt-1">Монета покупки</div> 
+    <select class="form-select mb-1" aria-label="Default select example" name="select2">
+      <option value="0" selected>USDT</option>
+      <option value="1">CoMetaCoin</option>
+      <option value="2">Bitcoin</option>
+      <option value="3">Etherium</option>
     </select>
     <div id="emailHelp" class="form-text mb-3">Выберите валюту покупки.</div> 
     {% if is_granted('ROLE_ADMIN') %}
@@ -34,9 +44,9 @@
     {{ form_row(form.activation) }}
     </div>
     {% endif %} 
-    <div class="hidden">
+    {# <div class="hidden">
       {{ form_row(form.unique_code, {'value': unique_code }) }}
-    </div>
+    </div> #}
     <button class="btn btn-info rounded-0 mb-1">{{ button_label|default('Купить') }}</button>
     </div>
 </div>

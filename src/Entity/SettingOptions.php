@@ -52,6 +52,12 @@ class SettingOptions
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
 
+    #[ORM\Column(type: 'datetime', length: 255, nullable: true)]
+    private $multi_pakage_day;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $name_multi_pakage;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -209,6 +215,30 @@ class SettingOptions
     public function setUpdatedAt(?\DateTime $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getMultiPakageDay(): ?\DateTime
+    {
+        return $this->multi_pakage_day;
+    }
+
+    public function setMultiPakageDay(?\DateTime $multi_pakage_day): self
+    {
+        $this->multi_pakage_day = $multi_pakage_day;
+
+        return $this;
+    }
+
+    public function getNameMultiPakage(): ?string
+    {
+        return $this->name_multi_pakage;
+    }
+
+    public function setNameMultiPakage(?string $name_multi_pakage): self
+    {
+        $this->name_multi_pakage = $name_multi_pakage;
 
         return $this;
     }

@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">{{ controller_name }}</h1>
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success rounded-0" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-warning rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
+    {# <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ pakege.id }}</td>
+            </tr>
+            <tr>
+                <th>Название</th>
+                <td>{{ pakege.name }}</td>
+            </tr>
+            <tr>
+                <th>User_id</th>
+                <td>{{ pakege.userId }}</td>
+            </tr>
+            <tr>
+                <th>Стоимость USDT</th>
+                <td>{{ pakege.price }}</td>
+            </tr>
+            <tr>
+                <th>Идентификационный номер реферальной сети</th>
+                <td>{{ pakege.referralNetworksId }}</td>
+            </tr>
+            <tr>
+                <th>Уникальный код клиента</th>
+                <td>{{ pakege.clientCode }}</td>
+            </tr>
+        </tbody>
+    </table> #}
+{# <p class="card-text fw-lighter fst-italic alert alert-warning rounded-0">Внимание! В настоящее время действует акция "Двойной бонус Direct". Приобретая пакет во время дейтвия акции вы будете получать бонус попрограмме "Direct" в размере  </p> #}
+                    <div class="row  mb-1">
+                        <div class="row">    
+                            <div class="col-sm-8">
+                                <div class="">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold text-secondary">Персональная ссылка для приобретения дополнительного пакета</h5>
+                                        {# <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput"> #}
+                                        <p class="card-text fw-lighter fst-italic">Переходя по этой ссылке, окажетесь на странице приобретения дополнительного пакета, там вы можете выбрать пакет для приобретения. Вы приобретаете пакет по обычным правилам.</p>    
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="col-sm-4">
+                                <div class="">
+                                <div class="card-body row">
+                                    <a  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}">Перейти по ссылке</a>
+                                    {# <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> 
+                                    <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> 
+                                    <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="nav-link fw-bold fst-italic fs-5 mb-1">Отправить по почте</a> #}
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    {% if is_granted('ROLE_ADMIN') %}  
+    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_index_admin') }}">Назад</a>
+    {% else %}
+    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">Назад</a>
+    {% endif %}
+    {# {% if pakege.activation == NULL %} #}
+        {# <a class="btn btn-danger rounded-0 mb-1" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать пакет</a> #}
+    {# {% endif %} #}
+    {% if is_granted('ROLE_ADMIN') %}   
+    {# <a  class="btn btn-warning rounded-0 mb-1" href="{{ path('app_pakege_edit_admin', {'id': pakege.id}) }}">Редактировать</a> #}
+
+    {# {{ include('pakege/_delete_form.html.twig') }} #}
+    {% endif %}
+</div>
+
+{% if time_control > 0 %}
+<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
+    <div class="">
+        <div class="card-body">
+            {# <h5 class="card-title fw-bold text-secondary">Песональная ссылка для приобретения дополнительного пакета</h5> #}
+            {# <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput"> #}
+            <p class="card-text fw-lighter fst-italic alert alert-warning rounded-0">Внимание! В вашем портфеле есть пакеты на которые распространяется акция системы. В настоящее время действует акция "Три пакета по цене двух". Если вы приобретаете новый пакет  уровнем не ниже вашего текщего пакета, а уровень вашего текущего пакета не ниже чем "{{ name_multi_pakage }}", ты вы получаете в подарок один пакет равный уровню вашего текущего пакета. Если у Вас есть нексколько пакетов которые могут участвовать в акции, то система выводит ниже их список со ссылками на участие в акции. Для участия в акции нужно перейти по ссылке напротив пакета участвующего в акции, таким образом продет операции по приобретению пакета и участие в акции относительно стоимости пакета по ссылке которого вы перешли на страницу покупки.</p>
+            <h6 class="card-title fw-bold fst-italic text-secondary alert alert-warning rounded-0">Акция распространяется на любой  пакет приобретенный до даты истечения акции и имеющий уровень "{{ name_multi_pakage }}" с момента приобретения пакета. Если у пакета истек срок участия в акции или вы использовали акцию, то такой пакет не принимает участие в акции. </h6> 
+            <h6 class="card-title fw-bold fst-italic text-secondary alert alert-danger rounded-0">До окончания Акции осталось {{ stop_action[2] }} Days, {{ stop_action[3] }} h. {{ stop_action[4] }} m. </h6>  
+        </div>
+    </div>
+    <h3 class="d-flex justify-content-center text-secondary mb-5" >Список пакетов участвующих в акции</h3>
+                {% for pakege in pakeges %}                    
+                    <div class="row  mb-1">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold fst-italic text-secondary">{{ pakege.name }}</h5>
+                                    <h6 class="card-title fw-bold fst-italic text-secondary">{{ pakege.price }} USDT</h6>
+                                    <p class="card-text fw-lighter fst-italic  rounded-0">Дата приобретения {{ pakege.createdAt| date() }}</p>
+                                    {# <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput"> #}
+                                    <h5 class="card-title fw-bold text-secondary"></h5>
+                                    <p class="card-text fw-lighter fst-italic"></p>
+                                     
+                                </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="">
+                                <div class="card-body row">
+                                    <a  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_new',{'unique_code_get' : pakege.uniqueCode }) }}">Перейти по ссылке</a>
+                                    {# <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> #}
+                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
+                                    {# <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="nav-link fw-bold fst-italic fs-5 mb-1">Отправить по почте</a> #}
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor%}
+
+</div>
+{% endif %}
+{% endblock %}

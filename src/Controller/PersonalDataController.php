@@ -68,14 +68,14 @@ class PersonalDataController extends AbstractController
         $entityManager = $doctrine->getManager();
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $personalDatum -> setCreatedAt(new \DateTimeImmutable());
+            $personalDatum -> setCreatedAt(new \DateTime());
             $personalDataRepository->add($personalDatum);
             $wallet -> setUser($user);
             $wallet -> setUsdt(0);
             $wallet -> setBitcoin(0);
             $wallet -> setCometpoin(0);
             $wallet -> setEtherium(0);
-            $wallet -> setCreatedAt(new \DateTimeImmutable());
+            $wallet -> setCreatedAt(new \DateTime());
             $walletRepository->add($wallet);
 
             $personalData = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user -> getId()]);
@@ -83,7 +83,9 @@ class PersonalDataController extends AbstractController
             $user_table->setPersonalDataId($personalData -> getId());
             $random_code = 'CP'.mt_rand();
             $client_code = $user -> getId().$random_code;
+            $secret_code = mt_rand().'-'.mt_rand();
             $user_table->setPesonalCode($client_code);
+            $user_table->setSecretCode($secret_code);
             $personalData->setClientCode($client_code);
             
             $entityManager->persist($user_table);
