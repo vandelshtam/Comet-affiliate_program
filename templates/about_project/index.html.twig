@@ -3,85 +3,132 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl">
-
-    {# {% if user.PersonalDataId == NULL %}
-    <div class="alert alert-warning" role="alert">
-    Важная информация:
-        <ul>
-            <li>Вы обязательно должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">перейти к заполнению</a></code></li>
-        </ul>
-    </div>
-    {% endif %} #}
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-success" role="alert">
-                {{ message }}
-            </div>
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl" style="background: rgb(223, 230, 245);">
+        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['success', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-success rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
         {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-info" role="alert">
-                {{ message }}
-            </div>
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
         {% endfor %}
-    {% endfor %}
-  <div class="example-wrapper">
-      <h1>{{ controller_name }}</h1>
-  </div>
-  <div class="accordion accordion-flush" id="accordionExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingOne">
-        <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Информация о проекте 
-        </button>
-      </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-              <a class="nav-link link-secondary" href="https://miro.com/app/board/uXjVOHUMn6U=/">Mindmap проекта</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link link-secondary" href="">Персональные данные</a>
-              </li>
-          </ul> 
-        </div>
-      </div>
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        <div class="shadow mb-3 bg-white">
+                <div class="row ">    
+                    <div class="col-sm-3 text-center rounded-0">
+                        <div class=" ">
+                        <img src="{{ asset('asset/img/cometa-project-logo.jpg') }}" class="card-img-top rounded-0" alt="..." style="max-width: 300px;">    
+                        </div>
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="mt-3">
+                            <div class="card-body  mt-0 header_contacts">
+                                <h5 class="card-title  fst-italic text-secondary" style="font-size: 30px;">Планируемые к получению лицензии</h5>
+                                <p class="card-text text-secondary fst-italic pakage_table_name-1">Банковская лицензия</p> 
+                                <p class="card-text text-secondary fst-italic pakage_table_name-1">Лицензия IFS</p>
+                                <p class="card-text text-secondary fst-italic pakage_table_name-1">Брокерская лицензия</p>        
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+            <div class="shadow mb-3 bg-white">
+                <div class="row ">    
+                    <div class="col-sm-3 text-center rounded-0">
+                        <div class=" ">
+                        <img src="{{ asset('asset/img/cometa-project-logo.jpg') }}" class="card-img-top rounded-0" alt="..." style="max-width: 300px;">    
+                        </div>
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="mt-3">
+                            <div class="card-body  mt-0 header_contacts">
+                                <h5 class="card-title  fst-italic text-secondary" style="font-size: 30px;">Планируемый перечень он-лайн платфом с которыми планируется интеграция проекта</h5>
+                                <h6 class="card-title  fst-italic text-secondary">CoMetaCoin – будет доступен для покупки и обмена  на интегрированных платформах, чтобы вы могли начать работу. 
+                                Чем больше доступно для обмена, тем больше CoMetaCoin будет доступен для людей и его крупных транзакций PancakeSwap и другие.</h6>
+                                <p class="card-text text-secondary fst-italic pakage_table_name-1">Платформы децентрализованного обмена <a class="fst-italic border-0 bg-white" href="https://pancakeswap.finance/" style="color:  rgb(72, 109, 169);">PancakeSwap</a> и другие .</p> 
+                                <p class="card-text text-secondary fst-italic pakage_table_name-1">Платформы децентрализованных кошельков <a class="fst-italic border-0 bg-white" href="https://klever.io/" style="color:  rgb(72, 109, 169);">Klever</a>, <a class="fst-italic border-0 bg-white" href="https://trustwallet.com/ru/" style="color:  rgb(72, 109, 169);">Trust Wallet</a> и другие.</p>
+                                <p class="card-text text-secondary fst-italic pakage_table_name-1">Сайты по обмену и использованию коинов <a class="fst-italic border-0 bg-white" href="https://www.coingecko.com/ru" style="color:  rgb(72, 109, 169);">CoinGeko</a>, <a  class=" fst-italic border-0 bg-white" href="https://coinmarketcap.com/" style="color:  rgb(72, 109, 169);">CoinMarketCap</a> и другие.</p>        
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div> 
+            <div class="shadow mb-3 bg-white">
+                <div class="row ">    
+                    <div class="col-sm-3 text-center rounded-0">
+                        <div class=" ">
+                        <img src="{{ asset('asset/img/cometa-project-logo.jpg') }}" class="card-img-top rounded-0" alt="..." style="max-width: 300px;">    
+                        </div>
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="mt-3">
+                            <div class="card-body  mt-0 header_contacts">
+                                <h5 class="card-title  fst-italic text-secondary mb-5" style="font-size: 30px;">Этапы развития CoMetaCoin</h5>        
+                        </div>
+                    </div>
+                </div> 
+                <div class="row  justify-content-center mb-3 mt-5" style="hight: 300px;">
+                    <div class="col-sm-2 text-center  card-text text-light fst-italic fw-bold pt-4" style="background:  rgb(72, 109, 169); font-size: 30px;">
+                        <div class="text-center ">
+                            <img src="{{ asset('asset/img/file-2.png') }}" class="card-img-top rounded-0" alt="..." style="max-width: 60px;">    
+                        </div>
+                            PRE - ICO 
+                        <p class="card-text text-start text-light fw-light fs-6 fst-italic pakage_table_name-1">{{ date_info| date() }}</p> 
+                    </div>
+                    <div class="col-sm-1 text-center card-text text-light fw-bold" style="">
+                        <p class="card-text text-white mt-4 pakage_who" style="font-size: 70px;"></p> 
+                    </div>
+                    <div class="col-sm-2 text-center card-text text-light fst-italic fw-bold pt-4"  style="background:  rgb(72, 109, 169); font-size: 30px;">
+                        <div class="text-center">
+                            <img src="{{ asset('asset/img/diagram-3.jpeg') }}" class="card-img-top rounded-0" alt="..." style="max-width: 120px;">    
+                        </div>
+                        ICO 
+                        <p class="card-text text-start text-light fw-light fs-6 fst-italic pakage_table_name-1">{{ date_ico| date() }}</p> 
+                    </div>
+                    <div class="col-sm-1 text-center card-text text-light fw-bold" style="">
+                        <p class="card-text text-white mt-4 pakage_who" style="font-size: 70px;"></p> 
+                    </div>
+                    <div class="col-sm-2 text-center card-text text-light fst-italic fw-bold pt-4"  style="background:  rgb(72, 109, 169); font-size: 25px;">
+                        <div class="text-center ">
+                            <img src="{{ asset('asset/img/setting-1.png') }}" class="card-img-top rounded-0" alt="..." style="max-width: 60px;">    
+                        </div>
+                        Запуск обмена  
+                        <p class="card-text text-start text-light fw-light fs-6 fst-italic pakage_table_name-1">{{ date_start| date() }}</p> 
+                    </div>
+                    <div class="col-sm-1 text-center card-text text-light  fw-bold" style="">
+                        <p class="card-text text-white mt-4  pakage_who" style="font-size: 70px;"></p> 
+                    </div>
+                    <div class="col-sm-2 text-center card-text text-light fst-italic fw-bold pt-4"  style="background:  rgb(72, 109, 169); font-size: 18px;">
+                        <div class="text-center ">
+                            <img src="{{ asset('asset/img/reward-4.png') }}" class="card-img-top rounded-0" alt="..." style="max-width: 60px;">    
+                        </div>
+                        Айрдроп, Награды, Аукцыоны 
+                        <p class="card-text text-start text-light fw-light fs-6 fst-italic pakage_table_name-1">{{ date_reward| date() }}</p> 
+                    </div>
+                  </div>                       
+              </div>
+            </div>                 
     </div>
-    <div class="accordion-item mb-5">
-      <h2 class="accordion-header" id="headingFour">
-        <button class="accordion-button link-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-          резервный блок 
-        </button>
-      </h2>
-      <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-              <a class="nav-link link-secondary" href="">резерв</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link link-secondary" href="">резерв</a>
-              </li>
-              <li class="nav-item">
-              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Резерв</a>
-              </li>
-          </ul> 
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="card mb-3">
-        <img src="{{ asset('asset/img/cometa-coin-1.jpeg') }}" class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">Проект "Co-Meta point"</h5>
-            <p class="card-text">Этот проект является электронной площадкой для пользователей, где они могут покупать, обменивать, продавать криптовалюту, локальные токены проекта, а так же товары и услуги.</p>
-            <p class="card-text"><small class="text-muted">Опубликовано 16 марта 2022 года</small></p>
-        </div>
-        </div>
-  </div>
 </div>
-
 {% endblock %}

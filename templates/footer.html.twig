@@ -1,45 +1,44 @@
 {% block footer %}
-<footer class="mb-0">
-        <div class="footer_content bg-secondary mt-5">
-            <div class="container">
+<footer class="mb-0 mt-0">
+        <div class="bg-secondary">
+            <div class="container-xxl">
                 <div class="footer_inner">
-                    <div class="footer_info">
-                        <div class="footer_title">
-                            Нужен постоянный и надежный доход
+                    <div class="footer_info hedaer_contacts">
+                        <div class="card-text fw-lighter fst-italic text-white mb-1 pt-3">
+                            Нужен постоянный и надежный доход?
                         </div>
-                        <div class="footer_text">
-                            Хоите обеспечить себе будущее
+                        <div class="card-text fw-lighter fst-italic text-white mb-1 mt-1">
+                            Хоите встать среди первых и получить большее?
                         </div>
-                        <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn rounded-0 mb-1 btn-sm" style="background: #5eabeb;">
-                            Бесплатная консультация
+                        <div class="card-text fw-lighter fst-italic text-white mb-1 mt-1">
+                            Тогда наш проект для Вас!
+                        </div>
+                        <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn rounded-0 mb-2 btn-sm header_send_footer" style="background: #5eabeb;">
+                            Поддержка
                         </a>
-                        <div class="">
-                            <li class="nav-item">
-                                <a class="footer_phone" href="tel:">comet-ap@gmail.com</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="mailto:ficakki48@gmail.com">comet-ap@gmail.com</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="footer_telegramm" href="">Наш телеграмм канал</a>
-                            </li>
-                            
-                        </div>
-                        
+                        <div class="card-text fw-lighter text-white mb-1 mt-1 ml-0">
+                            <a class="nav-link header_phone text-light" href="tel:">xxx-xxx-xx-xx</a>
+                            <a class="nav-link header_mail text-light header_email_footer" href="mailto:ficakki48@gmail.com">CoMetaCoinMail@gmail.com</a>
+                            <a class="nav-link footer_telegramm header_telegram text-light" href="">Наш Telegram канал</a> 
+                            <a class="nav-link footer_telegramm header_telegram text-light" href="">Наша группа Telegram</a>
+                            <a class="nav-link footer_telegramm header_whatsapp text-light" href="">Наша группа в WhatsApp</a> 
+                            <a class="nav-link footer_telegramm header_facebook text-light" href="">Наш Facebook</a>     
+                        </div>   
                     </div>
                     {# <div class="footer_map">
                         <iframe src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d12771.940851356836!2d30.625297857463924!3d36.84283019391609!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e0!4m0!4m5!1s0x14c3915e30249457%3A0x776491dcda6f4d61!2z0JDQvdGC0LDQu9GM0Y8sINCa0L7QvdGM0Y_QsNC70YLRiy_QkNC90YLQsNC70LjRjw!3m2!1d36.8528574!2d30.625562499999997!5e0!3m2!1sru!2str!4v1643370914036!5m2!1sru!2str"  height="400px" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
                     </div> #}
                 </div>
             </div>
-            <div class="bg-dark">
-                <div class="text-light">
-                    2022. Все права защищены.
+            <div class=" bg-dark">
+                
+                <div class="container-xxl d-flex justify-content-center  text-light text-center">
+                <a class="nav-link" href="{{ path('app_home') }}">
+                <img src="{{ asset('asset/img/icone-cometa-project.jpg') }}" alt="" class="logo" style="max-width: 30px;">
+                </a> 
+                <p class="mt-3 fw-light" style="font-size: 12px;">CoMetaCoin 2022. Все права защищены.</p>
                 </div>
             </div>
         </div>
-        <div class="mt-0">
-            
-        </div>
-    </footer>
+</footer>
 {% endblock %}

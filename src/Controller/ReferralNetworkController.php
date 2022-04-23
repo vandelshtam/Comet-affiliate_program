@@ -46,6 +46,8 @@ class ReferralNetworkController extends AbstractController
         return $this->renderForm('referral_network/index.html.twig', [
             'referral_networks' => $referralNetworkRepository->findAll(),
             'fast_consultation_form' => $fast_consultation_form,
+            'controller_name' => 'Список всех участников сети',
+            'title' => 'list users network',
         ]);
     }
 
@@ -77,9 +79,11 @@ class ReferralNetworkController extends AbstractController
             $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
             return $this->redirectToRoute('app_referral_network_show', [], Response::HTTP_SEE_OTHER);
         }        
-        return $this->renderForm('referral_network/index.html.twig', [
+        return $this->renderForm('referral_network/index_my_balances.html.twig', [
             'referral_networks' => $referralNetworkRepository->findAll(),
             'fast_consultation_form' => $fast_consultation_form,
+            'controller_name' => 'Балансы моих пакетов',
+            'title' => 'my balances',
         ]);
     }
 
@@ -139,7 +143,7 @@ class ReferralNetworkController extends AbstractController
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
         
-        if($entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]) -> getUser()->getId() != $this->getUser()->getId()){
+        if($entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]) -> getUserId() != $this->getUser()->getId()){
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
       

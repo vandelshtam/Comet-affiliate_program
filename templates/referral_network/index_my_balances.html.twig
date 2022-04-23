@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <div class="container-xxl col-sm-12  mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">{{ controller_name }}</h1>
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success rounded-0" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
+    {% if is_granted('ROLE_ADMIN') %}  
+    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в  кабинет админа</a> 
+    {% else %}
+    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
+    {% endif %}
+    {% for referral_network in referral_networks %}
+    <div class="row shadow p-3  mb-1">
+        <div class="row">    
+            <div class="col-sm-8">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-secondary">Имя в сети: {{ referral_network.name }}</h5>
+                        <h6 class="card-title fw-bold text-secondary">Место в линии: {{ referral_network.userStatus }}</h6>
+                        <p class="card-text  fst-italic">Начисления по программе Direct: {{ referral_network.direct }}</p> 
+                        <p class="card-text  fst-italic">Начисления по программе Single Line: {{ referral_network.cash }}</p> 
+                        <p class="card-text  fst-italic">Общее начисление: {{ referral_network.reward }}</p> 
+                        <p class="card-text  fst-italic">Стоимость пакета: {{ referral_network.pakage }}</p>     
+                        <p class="card-text fw-lighter fst-italic">Личная реферральная ссылка: {{ referral_network.memberCode }}</p>      
+                    </div>
+                </div>
+            </div>
+                <div class="col-sm-4">
+                <div class="">
+                <div class="card-body row">
+                    <a  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_referral_network_show',{'id' : referral_network.id }) }}">Подробнее</a>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -34,7 +34,7 @@ class SettingOptions
     #[ORM\Column(type: 'integer', nullable: true)]
     private $start_day;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $fast_start;
 
     #[ORM\Column(type: 'integer', nullable: true)]
@@ -147,12 +147,12 @@ class SettingOptions
         return $this;
     }
 
-    public function getFastStart(): ?int
+    public function getFastStart(): ?\DateTime
     {
         return $this->fast_start;
     }
 
-    public function setFastStart(?int $fast_start): self
+    public function setFastStart(?\DateTime $fast_start): self
     {
         $this->fast_start = $fast_start;
 

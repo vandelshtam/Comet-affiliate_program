@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use App\Security\EmailVerifier;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
@@ -48,14 +49,24 @@ class MailerController extends AbstractController
 
     public function sendFastConsultationEmail(MailerInterface $mailer,$fast_consultation,$textSendMail,$email_client)
     {
-        $email = (new Email())
+        
+        $email = (new TemplatedEmail())
             ->from($email_client)
             ->to('Commet-AT@example.com')
             ->subject('Time for Symfony Mailer!')
-            //->text($fast_consultation->getName())
-            ->html($textSendMail)
-            //->htmlTemplate('emails/fast_consultation.html.twig')
+            //->text([$fast_consultation->getQuestion(), $fast_consultation->getPhone()])
+            //->phone($fast_consultation->getPhone())
+            //->html($textSendMail)
+            ->htmlTemplate('emails/fast_consultation.html.twig')
+            ->context([
+                'username' => $fast_consultation->getName(),
+                'date' => new \DateTime(),
+                'question' => $fast_consultation->getQuestion(),
+                'phone' => $fast_consultation->getPhone(),
+                'post_mail' => $fast_consultation->getEmail(),
+            ])
             ;
+            //dd($email);
             try {
                 $mailer->send($email);
                 $this->addFlash(

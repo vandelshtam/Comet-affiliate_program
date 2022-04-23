@@ -41,8 +41,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $role;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Pakege::class)]
-    private $pakege;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $referral_link;
@@ -70,6 +68,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $secret_code;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Pakege::class)]
+    private $pakeges;
 
 
 
@@ -198,35 +199,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Pakege>
-     */
-    public function getPakege(): Collection
-    {
-        return $this->pakege;
-    }
-
-    public function addPakege(Pakege $pakege): self
-    {
-        if (!$this->pakeges->contains($pakege)) {
-            $this->pakeges[] = $pakege;
-            $pakege->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removePakege(Pakege $pakege): self
-    {
-        if ($this->pakeges->removeElement($pakege)) {
-            // set the owning side to null (unless already changed)
-            if ($pakege->getUser() === $this) {
-                $pakege->setUser(null);
-            }
-        }
-
-        return $this;
-    }
+   
 
     public function getReferralLink(): ?string
     {
@@ -343,6 +316,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSecretCode(?string $secret_code): self
     {
         $this->secret_code = $secret_code;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pakege>
+     */
+    public function getPakeges(): Collection
+    {
+        return $this->pakeges;
+    }
+
+    public function addPakege(Pakege $pakege): self
+    {
+        if (!$this->pakeges->contains($pakege)) {
+            $this->pakeges[] = $pakege;
+            $pakege->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePakege(Pakege $pakege): self
+    {
+        if ($this->pakeges->removeElement($pakege)) {
+            // set the owning side to null (unless already changed)
+            if ($pakege->getUser() === $this) {
+                $pakege->setUser(null);
+            }
+        }
 
         return $this;
     }

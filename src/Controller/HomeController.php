@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
+use App\Entity\SettingOptions;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,6 +19,11 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
+        $setting = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
+        $start_day = round($setting -> getStartDay() / 2);
+        // $datetime1 = (new \DateTime()); //Получаем текущую дату
+        // $datetime2 = new \DateTime($start_day.'days'); //Дата акции
+
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -30,6 +36,7 @@ class HomeController extends AbstractController
         return $this->renderForm('home/index.html.twig', [
             'controller_name' => 'Главная страница',
             'fast_consultation_form' => $fast_consultation_form,
+            'start_day' => $start_day,
         ]);
     }
 }

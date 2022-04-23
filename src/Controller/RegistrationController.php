@@ -111,10 +111,12 @@ class RegistrationController extends AbstractController
         }
 
         return $this->render('registration/register.html.twig', [
+            'controller_name' => 'Страница регистрации',
+            'title' => 'registration',
             'registrationForm' => $form->createView(),
             'fast_consultation_form' => $fast_consultation_form->createView(),
             'referral_link' => $referral,
-            'date' => $date,
+            //'date' => (new \DateTime()),
         ]);
     }
 

@@ -17,13 +17,10 @@
     {{ form_row(form.block) }}<div id="emailHelp" class="form-text mb-5">Введите номер или литерное оозначение вашего корпуса/блока если такой имеется.</div>  
     {{ form_row(form.apartment) }}<div id="emailHelp" class="form-text mb-5">Введите номер вашей квартиры.</div>  
     {% if new_user_make == true %} 
-      <div class="alert rounded-0" role="alert" style="background: #5eabeb;">
-        Условия участия в программе:
-            <ul>
-                <li>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Спасибо за понимание! </li>
-            </ul>
-      </div>  
-    {{ form_row(form.agreeTerms) }} 
+    <a data-fancybox data-src="#agree_terms" href="javascript:;" class="btn rounded-0 mb-2 btn-sm" style="background: #5eabeb;">
+        Прочитать условия
+    </a>    
+    {{ form_row(form.agreeTerms) }}
     {% endif %}
       <div class="hidden">
       {{ form_row(form.user_id, {'value': user_id }) }}

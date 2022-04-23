@@ -60,6 +60,19 @@ class PakegeRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+
+    public function findByExampleIdField($value)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.user_id = :val')
+            ->setParameter('val', $value)
+            ->orderBy('p.id', 'ASC')
+            ->setMaxResults(10000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
     
 
      /**
@@ -90,13 +103,40 @@ class PakegeRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findByPakageActionField($name_multi_pakage, $user_id, $multi_pakage_day)
+    public function findByPakageActionField($name_multi_pakage, $user_id, $multi_pakage_day,$action)
     {
         return $this->createQueryBuilder('r')
-            ->andWhere('r.name = :val','r.user_id = :uid', 'r.created_at < :day')
+            ->andWhere('r.name = :val','r.user_id = :uid', 'r.updated_at < :day', 'r.action = :nl')
             ->setParameter('val', $name_multi_pakage)
             ->setParameter('day', $multi_pakage_day)
             ->setParameter('uid', $user_id)
+            ->setParameter('nl', $action)
+            ->orderBy ('r.id', 'ASC')
+            ->setMaxResults(10000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findByPakageUpdateField($client_code, $updated_at)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.client_code = :val', 'r.updated_at < : day')
+            ->setParameter('val', $client_code)
+            ->setParameter('day', $updated_at)
+            ->orderBy ('r.id', 'ASC')
+            ->setMaxResults(10000)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findByPakageNoUpdateField($client_code, $multi_pakage_day)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.client_code = :val','r.updated_at < :day')
+            ->setParameter('val', $client_code)
+            ->setParameter('day', $multi_pakage_day)
             ->orderBy ('r.id', 'ASC')
             ->setMaxResults(10000)
             ->getQuery()

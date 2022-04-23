@@ -76,7 +76,7 @@
                              <div class="col-sm-4">
                                 <div class="">
                                 <div class="card-body row">
-                                    <a  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}">Перейти по ссылке</a>
+                                    <a  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}">Приобрести дополнительный новый пакет</a>
                                     {# <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> 
                                     <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> 
                                     <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="nav-link fw-bold fst-italic fs-5 mb-1">Отправить по почте</a> #}
@@ -107,7 +107,7 @@
             {# <h5 class="card-title fw-bold text-secondary">Песональная ссылка для приобретения дополнительного пакета</h5> #}
             {# <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput"> #}
             <p class="card-text fw-lighter fst-italic alert alert-warning rounded-0">Внимание! В вашем портфеле есть пакеты на которые распространяется акция системы. В настоящее время действует акция "Три пакета по цене двух". Если вы приобретаете новый пакет  уровнем не ниже вашего текщего пакета, а уровень вашего текущего пакета не ниже чем "{{ name_multi_pakage }}", ты вы получаете в подарок один пакет равный уровню вашего текущего пакета. Если у Вас есть нексколько пакетов которые могут участвовать в акции, то система выводит ниже их список со ссылками на участие в акции. Для участия в акции нужно перейти по ссылке напротив пакета участвующего в акции, таким образом продет операции по приобретению пакета и участие в акции относительно стоимости пакета по ссылке которого вы перешли на страницу покупки.</p>
-            <h6 class="card-title fw-bold fst-italic text-secondary alert alert-warning rounded-0">Акция распространяется на любой  пакет приобретенный до даты истечения акции и имеющий уровень "{{ name_multi_pakage }}" с момента приобретения пакета. Если у пакета истек срок участия в акции или вы использовали акцию, то такой пакет не принимает участие в акции. </h6> 
+            <h6 class="card-title fw-bold fst-italic text-secondary alert alert-warning rounded-0">Акция распространяется на любой  пакет приобретенный до даты истечения акции и имеющий уровень "{{ name_multi_pakage }}" с момента приобретения пакета. Если у пакета истек срок участия в акции или вы использовали акцию, то такой пакет не принимает участие в акции. Пакеты задействование в акции, первый пакет относительно которого приобрелся второй пакет, второй приобретенный пакет и подаренный по акции пакет (все три пакета) в дальнейшем в акции не участвуют.</h6> 
             <h6 class="card-title fw-bold fst-italic text-secondary alert alert-danger rounded-0">До окончания Акции осталось {{ stop_action[2] }} Days, {{ stop_action[3] }} h. {{ stop_action[4] }} m. </h6>  
         </div>
     </div>

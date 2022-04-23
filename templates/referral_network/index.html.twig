@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ReferralNetwork index{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
     <div class=" col-sm-12  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Список всех участников сети</h1>
+    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success rounded-0" role="alert">

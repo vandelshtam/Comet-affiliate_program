@@ -3,109 +3,144 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl col-sm-8  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">{{ controller_name }}</h1>
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success rounded-0" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
+<div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl col-sm-8  mb-1 mt-3 rounded-0">
+        <h1 class="d-flex justify-content-center text-white mb-1 mt-3 pt-3 pb-3" style="background:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['success', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info rounded-0" role="alert">
+                    <div class="alert alert-success rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
+        {% endfor %}
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        <div class="col-sm-12 mb-3 mt-1 border-0">
+                <div class="card text-secondary bg-light  mb-1 rounded-0" >
+                    <div class="card-body d-flex justify-content-between mb-0">    
+                        <span><h6 class="card-title">Мои пакеты (шт.)</h6></span>
+                        <span><h6 class="card-title" style="color: rgb(72, 109, 169);">{{ count }}</h6></span>    
                     </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
+                    <div class="card-body d-flex justify-content-between mb-0 mt-0">    
+                        <span><h6 class="card-title">Общая стоимость моих пакетов CoMetaCoin</h6></span>
+                        <span><h6 class="card-title"  style="color: rgb(72, 109, 169);">{{ pakage_summ_token }}</h6></span>    
                     </div>
-                {% endfor %}            
-    {% endfor %}
-    <div class="col-sm-4 mb-3 mt-3">
-            <div class="card text-secondary  mb-1 bg-light rounded-0">
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Мои пакеты (шт.)</h6></span>
-                    <span><h6 class="card-title text-info">{{ count }}</h6></span>    
+                    <div class="card-body d-flex justify-content-between mb-0 mt-0">    
+                        <span><h6 class="card-title">Срок обновления пакетов с момента приобретения календарных дней</h6></span>
+                        <span><h6 class="card-title"  style="color: rgb(72, 109, 169);">{{ setting_option.updateDay }}</h6></span>    
+                    </div>
                 </div>
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Общая стоимость моих пакетов CoMetaCoin</h6></span>
-                    <span><h6 class="card-title text-info">{{ pakage_summ_token }}</h6></span>    
+        </div>
+        {% if is_granted('ROLE_ADMIN') %}
+        <a class="btn btn-success rounded-0 mb-3" href="{{ path('app_pakege_new') }}">Добавить новый пакет</a>
+        
+                <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">В кабинет администратора</a>       
+        {% else %}
+                <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">назад</a>
+                    
+        {% endif %}
+        {% for pakege in pakeges %}
+        <div class="shadow p-3 mb-1 bg-white mb-3 ">
+            <div class="row">    
+                <div class="col-sm-8">
+                    <div class="">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-secondary">Наименование пакета: {{ pakege.name }}</h5>
+                            <h6 class="card-title fw-bold text-secondary">Состояние активации: 
+                                {% if pakege.activation == NULL %}
+                                не активен
+                                {% else %}
+                                {{ pakege.activation }}
+                                {% endif %}
+                            </h6>
+                            <p class="card-text fst-italic mb-1">Код клиента: {{ pakege.clientCode }}</p> 
+                            <p class="card-text fst-italic mt-1 mb-1">Стоимость пакета: {{ pakege.token }} CoMetaCoin</p> 
+                            <p class="card-text fw-lighter fst-italic">Дата приобретения пакета : {{ pakege.createdAt|date() }}</p>     
+                            <p class="card-text fw-lighter fst-italic">Реферральная ссылка по которой приобретен пакет: {{ pakege.referralLink }}</p>      
+                        </div>
+                    </div>
+                </div>
+                    <div class="col-sm-4">
+                    <div class="">
+                    <div class="card-body row">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
+                        {% else %}
+                        <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть баланс</a>
+                        {# <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a> #}
+                        {% endif %}
+                        {% if pakege.activation == NULL %}
+                        <a class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white text-danger" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
+                        {% else %}
+                        <a  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_edit',{'id' : pakege.id }) }}">Повысить пакет</a>
+                        {% endif %}   
+                    </div>
+                    </div>
                 </div>
             </div>
-    </div>
-    {% if is_granted('ROLE_ADMIN') %}
-    <a class="btn btn-success rounded-0 mb-3" href="{{ path('app_pakege_new') }}">Добавить новый пакет</a>
-    
-            <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">В кабинет администратора</a>       
-    {% else %}
-            <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">назад</a>
-                
-    {% endif %}
-    
-    <table class="table  mb-3 mt-3 rounded-0">
-        <thead>
-            <tr>
-                
-                <th>Название пакета</th>
-                
-                <th>Стоимость пакета USDT</th>
-                <th>Стоимость пакета CoMeteCoin</th>
-                <th>Моя реферальная ссылка</th>
-                <th>Состояние пакета</th>
-                
-                <th>Мой код клиента</th>
-                {# <th>Уникальный код пакета</th> #}
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for pakege in pakeges %}
-            <tr>
-                
-                <td>{{ pakege.name }}</td>
-                
-                <td>{{ pakege.price }}</td>
-                <td>{{ pakege.token }}</td>
-                <td>{{ pakege.referralLink }}</td>
-                {% if pakege.activation == NULL %}
-                <td>не активен</td>
-                {% else %}
-                <td>{{ pakege.activation }}</td>
-                {% endif %}
-                
-                <td>{{ pakege.clientCode }}</td>
-                {# <td>{{ pakege.uniqueCode }}</td> #}
-                <td>
-                 {% if is_granted('ROLE_ADMIN') %}
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
-                 {% else %}
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть баланс</a>
-                    {# <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a> #}
-                {% endif %}
-                    {% if pakege.activation == NULL %}
-                    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
-                     {% endif %}
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">нет записей</td>
-            </tr>
+        </div>
         {% endfor %}
-        </tbody>
-    </table>
-
+         {% for pakege in pakeges_noupdate %}
+        <div class="shadow p-3 mb-1 bg-white mb-3 ">
+            <div class="row">    
+                <div class="col-sm-8">
+                    <div class="">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-secondary">Наименование пакета: {{ pakege.name }}</h5>
+                            <h6 class="card-title fw-bold text-secondary">Состояние активации: 
+                                {% if pakege.activation == NULL %}
+                                не активен
+                                {% else %}
+                                {{ pakege.activation }}
+                                {% endif %}
+                            </h6>
+                            <p class="card-text fst-italic mb-1">Код клиента: {{ pakege.clientCode }}</p> 
+                            <p class="card-text fst-italic mt-1 mb-1">Стоимость пакета: {{ pakege.token }} CoMetaCoin</p> 
+                            <p class="card-text fw-lighter fst-italic">Дата приобретения пакета : {{ pakege.createdAt|date() }}</p>     
+                            <p class="card-text fw-lighter fst-italic">Реферральная ссылка по которой приобретен пакет: {{ pakege.referralLink }}</p>      
+                        </div>
+                    </div>
+                </div>
+                    <div class="col-sm-4">
+                    <div class="">
+                    <div class="card-body row">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
+                        {% else %}
+                        <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть баланс</a>
+                        {# <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a> #}
+                        {% endif %}
+                        {% if pakege.activation == NULL %}
+                        <a class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white text-danger" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
+                        {# {% else %} #}
+                        {# <a  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_edit',{'id' : pakege.id }) }}">Повысить пакет</a> #}
+                        {% endif %}   
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">назад</a>        
+    </div>
 </div>    
 {% endblock %}

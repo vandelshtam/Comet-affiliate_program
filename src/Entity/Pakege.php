@@ -30,9 +30,6 @@ class Pakege
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $client_code;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'pakege')]
-    #[ORM\JoinColumn(nullable: false)]
-    private $user;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private $token;
@@ -54,6 +51,9 @@ class Pakege
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updated_at;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $action;
 
     
     public function __construct()
@@ -131,18 +131,6 @@ class Pakege
     public function __toString()
     {
       return $this->getId();
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
     }
 
     public function getToken(): ?int
@@ -243,6 +231,18 @@ class Pakege
     public function setUpdatedAt(?\DateTime $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getAction(): ?int
+    {
+        return $this->action;
+    }
+
+    public function setAction(?int $action): self
+    {
+        $this->action = $action;
 
         return $this;
     }

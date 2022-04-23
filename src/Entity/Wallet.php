@@ -13,7 +13,7 @@ class Wallet
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Column(type: 'float', nullable: true)]
     private $usdt;
 
     #[ORM\Column(type: 'float', nullable: true)]
@@ -43,48 +43,48 @@ class Wallet
         return $this->id;
     }
 
-    public function getUsdt(): ?int
+    public function getUsdt(): ?float
     {
         return $this->usdt;
     }
 
-    public function setUsdt(?int $usdt): self
+    public function setUsdt(?float $usdt): self
     {
         $this->usdt = $usdt;
 
         return $this;
     }
 
-    public function getEtherium(): ?int
+    public function getEtherium(): ?float
     {
         return $this->etherium;
     }
 
-    public function setEtherium(?int $etherium): self
+    public function setEtherium(?float $etherium): self
     {
         $this->etherium = $etherium;
 
         return $this;
     }
 
-    public function getBitcoin(): ?int
+    public function getBitcoin(): ?float
     {
         return $this->bitcoin;
     }
 
-    public function setBitcoin(?int $bitcoin): self
+    public function setBitcoin(?float $bitcoin): self
     {
         $this->bitcoin = $bitcoin;
 
         return $this;
     }
 
-    public function getCometpoin(): ?int
+    public function getCometpoin(): ?float
     {
         return $this->cometpoin;
     }
 
-    public function setCometpoin(?int $cometpoin): self
+    public function setCometpoin(?float $cometpoin): self
     {
         $this->cometpoin = $cometpoin;
 

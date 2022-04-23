@@ -113,6 +113,8 @@ class PersonalDataController extends AbstractController
             'user_id' => $user_id,
             'new_user_make' => true,
             'fast_consultation_form' => $fast_consultation_form,
+            'controller_name' => 'Страница регистрации персональных данных',
+            'title' => 'Personal data new',
         ]);
     }
 

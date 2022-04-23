@@ -70,8 +70,25 @@ class PakegeController extends AbstractController
         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $pakages_table = $entityManager->getRepository(Pakege::class)->findByExampleClientField($client_code);
+        $setting_option = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
+        $update_day = $setting_option -> getUpdateDay();
+        $ff=$setting_option->getCreatedAt();
+        $ddd = date_modify($ff, $update_day.'day');    
+        $timestamp = $ddd->getTimestamp();
+        $pakages_update = [];
+        $pakages_noupdate = [];
+        foreach($pakages_table as $pakage){
+            $date_pakage =$pakage -> getCreatedAt();
+            $date_pakage_timestamp = date_modify($date_pakage, $update_day.'day')-> getTimestamp();
+            if($date_pakage_timestamp > time()){
+                $pakages_update[] = $pakage;
+            }
+            else{
+                $pakages_noupdate[] = $pakage;
+            }
+        }
         //$user_id = $this -> getUser() -> getId();
-        //dd($pakages_table[0]->getUserId());
+        //dd($pakages_update);
         if($pakages_table == false){
             $this->addFlash(
                 'warning',
@@ -101,7 +118,6 @@ class PakegeController extends AbstractController
             $pakages_array_token[] = $pakage -> getToken();
         }
         $pakage_summ_token = array_sum($pakages_array_token);
-        
 
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
@@ -114,15 +130,19 @@ class PakegeController extends AbstractController
         }
 
         return $this->render('pakege/index_user.html.twig', [
-            'pakeges' => $pakages_table,
+            'pakeges' => $pakages_update,
             'count' => count($pakages_table),
             'controller_name' => 'Мои пакеты',
             'title' => 'Pakages',
             'fast_consultation_form' => $fast_consultation_form -> createView(),
             'pakage_summ_usdt' => $pakage_summ_usdt,
             'pakage_summ_token' => $pakage_summ_token,
+            'setting_option' => $setting_option,
+            'pakeges_noupdate' => $pakages_noupdate,
         ]);
     }
+
+    
 
     #[Route('/new/purchase/{unique_code_get?}', name: 'app_pakege_new', methods: ['GET', 'POST'])]
     public function new(Request $request, PakegeRepository $pakegeRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,ReferralNetworkRepository $referralNetworkRepository, string $unique_code_get): Response
@@ -150,62 +170,25 @@ class PakegeController extends AbstractController
             return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
         $wallet = $entityManager->getRepository(Wallet::class)->findOneBy(['id' => $wallet_id]);
-        $pakege = new Pakege();
+        if($unique_code_get == 'not'){
+            $pakege = new Pakege();
+        }
+        else{
+            $pakege = new Pakege();
+            $pakege_action = new Pakege();
+        }
+        
         $form = $this->createForm(PakegeType::class, $pakege);
         $form->handleRequest($request);
         if($unique_code_get != 'not'){
-            $pakage_user = $entityManager->getRepository(Pakege::class)->findOneBy(['unique_code' => $unique_code_get]);
-            $name_pakage = $pakage_user -> getName();
+            $pakege_user = $entityManager->getRepository(Pakege::class)->findOneBy(['unique_code' => $unique_code_get]);
+            $name_pakage = $pakege_user -> getName();
         }
         else{
             $name_pakage = NULL;
         }
         
-        if($name_pakage == NULL){
-            $choise  = [
-                'Starter'=> 'starter',
-                'Basic' => 'Basic',
-                'Networker' => 'Networker',
-                'Business' => 'Business',
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($name_pakage == 'Basic'){
-            $choise  = [
-                'Basic' => 'Basic',
-                'Networker' => 'Networker',
-                'Business' => 'Business',
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($name_pakage == 'Networker'){
-            $choise  = [
-                'Networker' => 'Networker',
-                'Business' => 'Business',
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($name_pakage == 'Business'){
-            $choise  = [
-                'Business' => 'Business',
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($name_pakage == 'Trader'){
-            $choise  = [
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($name_pakage == 'VIP'){
-            $choise  = [
-                'VIP' => 'VIP',
-            ]; 
-        }
+        $choise = $this -> choiseNew($name_pakage);
 
         $user = $this -> getUser();
         $user_referral_link = $user -> getReferralLink();
@@ -217,15 +200,14 @@ class PakegeController extends AbstractController
         
         $unique_code1 = $this->random_string(10);
         $unique_code2 = $this->random_string(10);
-        if($unique_code_get == NULL){
+        if($unique_code_get == 'not'){
             $unique_code = $unique_code1.$unique_code2;
         }
         else{
             $unique_code = $unique_code_get;
         }
         
-        $collection = new ArrayCollection();
-        $collection -> add($unique_code);
+        
 
         if ($form->isSubmitted() && $form->isValid()) {
             //$form_referral_link = $form->get('referral_link')->getData();
@@ -241,41 +223,22 @@ class PakegeController extends AbstractController
             $wallet_bitcoin = $wallet -> getBitcoin();
             $wallet_etherium = $wallet -> getEtherium();
             $wallet_cometcoin_rate =  $wallet_cometpoin / $token_rate;
-            $wallet_bitcoin_rate =  $wallet_bitcoin / 40000;
-            $wallet_etherium_rate =  $wallet_etherium / 4000;
+            $wallet_bitcoin_rate =  $wallet_bitcoin * 40000;
+            $wallet_etherium_rate =  $wallet_etherium * 4000;
             $pakage_user_price = $pakage_user -> getPricePakage();
-            if($form_referral_select2 == 0){
 
-                if(($wallet -> getUsdt()) < $pakage_user_price ){
-                    $this->addFlash(
-                        'warning',
-                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
-                    return $this->redirectToRoute('app_pakege_new', ['unique_code_get' => $unique_code_get], Response::HTTP_SEE_OTHER);
-                }
-            }
-            elseif($form_referral_select2 == 1){
-                if($wallet_cometcoin_rate < $pakage_user_price ){
-                    $this->addFlash(
-                        'warning',
-                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
-                    return $this->redirectToRoute('app_pakege_new', ['unique_code_get' => $unique_code_get], Response::HTTP_SEE_OTHER);
-                }
-            }
-            elseif($form_referral_select2 == 2){
-                if($wallet_bitcoin_rate < $pakage_user_price ){
-                    $this->addFlash(
-                        'warning',
-                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
-                    return $this->redirectToRoute('app_pakege_new', ['unique_code_get' => $unique_code_get], Response::HTTP_SEE_OTHER);
-                }
-            }
-            elseif($form_referral_select2 == 3){
-                if($wallet_etherium_rate < $pakage_user_price ){
-                    $this->addFlash(
-                        'warning',
-                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
-                    return $this->redirectToRoute('app_pakege_new', ['unique_code_get' => $unique_code_get], Response::HTTP_SEE_OTHER);
-                }
+            // if($wallet -> getUsdt() < $pakage_user_price || $wallet_cometcoin_rate < $pakage_user_price || $wallet_bitcoin_rate < $pakage_user_price || $wallet_etherium_rate < $pakage_user_price ){
+            //         $this->addFlash(
+            //             'warning',
+            //             'У вас недостаточно средств для приобретения пакета, пожалуйста пополните кошелек или выберите другой пакет');
+            //         return $this->redirectToRoute('app_pakege_new', ['unique_code_get' => $unique_code_get], Response::HTTP_SEE_OTHER);
+            //     }
+            
+            if($this -> possibilityCheck($form_referral_select2, $wallet, $pakage_user_price, $token_rate) == false){
+                $this->addFlash(
+                'warning',
+                'У вас недостаточно средств для повышения уровня пакета, пожалуйста свой пополните кошелек или выберите меньшую сумму');
+            return $this->redirectToRoute('app_pakege_new', ['unique_code_get' => $unique_code_get], Response::HTTP_SEE_OTHER);
             }
             
             // if($form_referral_link != NULL){
@@ -284,48 +247,82 @@ class PakegeController extends AbstractController
             //     $this->addFlash(
             //         'danger',
             //         'Вы ошиблись при введении ссылки или ввели устаревшую ссылку, пожалуйста попробуйте еще раз');
-            //     return $this->redirectToRoute('app_pakege_new', [], Response::HTTP_SEE_OTHER);
+            //     return $this->redirectToRoute('app_pakege_new', ['unique_code_get' => $unique_code_get], Response::HTTP_SEE_OTHER);
             //     }
             // }
             // elseif($form_referral_link == NULL){
             //     $this->denyAccessUnlessGranted('ROLE_ADMIN'); 
             // }
-            
-            $pakege -> setReferralLink($user_referral_link); 
-            $pakege -> setUpdatedAt(new \DateTime());
-            $pakage_table = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $form_referral_select]);
             $token_table =  $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
             $personal_data_table = $entityManager->getRepository(PersonalData::class)->findOneBy(['user_id' => $user_id]);
             $client_code = $personal_data_table -> getClientCode();
-            $price_usdt = $pakage_table -> getPricePakage();
-            $price_token = $price_usdt * $token_table;
-            $user_table -> setPakageStatus(1);
-            $pakege -> setUserId($user_id);
-            $pakege -> setPrice($price_usdt);
-            $pakege -> setName($form_referral_select);
-            $pakege -> setUniqueCode($price_usdt);
-            $pakege -> setToken($price_token);
-            $pakege -> setClientCode($client_code);   
-            $pakegeRepository->add($pakege);
+            
+                $pakege -> setReferralLink($user_referral_link); 
+                $pakege -> setCreatedAt(new \DateTime());
+                $pakege -> setUpdatedAt(new \DateTime());
+                $pakage_table = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $form_referral_select]);
+                $price_usdt = $pakage_table -> getPricePakage();
+                $price_token = $price_usdt * $token_table;
+                $user_table -> setPakageStatus(1);
+                //dd($user_id);
+                $pakege -> setUserId($user_id);
+                $pakege -> setPrice($price_usdt);
+                $pakege -> setName($form_referral_select);
+                $pakege -> setUniqueCode($unique_code);
+                if($unique_code_get != 'not')
+                {
+                    $pakege -> setAction(2);//код пакета приобретенного по акции
+                }
+                else{
+                    $pakege -> setAction(0);//код пакета приобретенного по акции
+                }
+                $pakege -> setToken($price_token);
+                $pakege -> setClientCode($client_code);   
+                $pakegeRepository->add($pakege);
+            
+            if($unique_code_get != 'not'){
+                //подарочный пакет
+                $pakege_action -> setReferralLink($user_referral_link); 
+                $pakege_action -> setCreatedAt(new \DateTime());
+                $pakege_action -> setUpdatedAt(new \DateTime());
+                $pakage_table_action = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $name_pakage]);
+                $price_usdt_action = $pakage_table_action -> getPricePakage();
+                $price_token_action = $price_usdt * $token_table;
+                $user_table -> setPakageStatus(1);
+                $pakege_action -> setUserId($user_id);
+                $pakege_action -> setPrice($price_usdt_action);
+                $pakege_action -> setName($form_referral_select);
+                $pakege_action -> setUniqueCode($unique_code);
+                $pakege_action -> setToken($price_token_action);
+                $pakege_action -> setAction(3);//код подарочного пакета
+                $pakege_action -> setClientCode($client_code);   
+                $pakegeRepository->add($pakege_action);
+                $pakege_user -> setAction(1);//код пакета относительного которого покупался новый пакет по акции и подарен подарочный пакет
+                $entityManager->flush();
+            }
             if($form_referral_select2 == 0){
                 $current_usdt = $wallet -> getUsdt();
                 $new_balance_usdt = $current_usdt - $pakage_user_price;
                 $wallet -> setUsdt($new_balance_usdt);
+                $entityManager->flush();
             }
             elseif($form_referral_select2 == 1){
                 $current_cometpoin = $wallet -> getCometpoin();
                 $new_balance_cometpoin = $current_cometpoin - ($pakage_user_price * $token_rate);
                 $wallet -> setCometpoin($new_balance_cometpoin);
+                $entityManager->flush();
             }
             elseif($form_referral_select2 == 2){
                 $current_bitcoin = $wallet -> getBitcoin();
-                $new_balance_bitcoin = $current_bitcoin - ($pakage_user_price * 40000);
+                $new_balance_bitcoin = $current_bitcoin - ($pakage_user_price / 40000);
                 $wallet -> setBitcoin($new_balance_bitcoin);
+                $entityManager->flush();
             }
             elseif($form_referral_select2 == 3){
-                $current_Etherium = $wallet -> getEtherium();
-                $new_balance_etherium = $current_Etherium - ($pakage_user_price * $token_rate);
+                $current_etherium = $wallet -> getEtherium();
+                $new_balance_etherium = $current_etherium - ($pakage_user_price / 4000);
                 $wallet -> setEtherium($new_balance_etherium);
+                $entityManager->flush();
             }
             //$unique = $form->get('unique_code')->getData();
 
@@ -365,12 +362,17 @@ class PakegeController extends AbstractController
         return $this->renderForm('pakege/new.html.twig', [
             'pakege' => $pakege,
             'form' => $form,
-            'unique_code' => $collection[0],
             'user_referral_link' => $user_referral_link,
             'fast_consultation_form' => $fast_consultation_form,
             'choise' => $choise,
         ]);
     }
+
+
+
+
+
+
 
     #[Route('/{id}/show', name: 'app_pakege_show', methods: ['GET'])]
     public function show(Pakege $pakege,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
@@ -401,6 +403,12 @@ class PakegeController extends AbstractController
         ]);
     }
 
+
+
+
+
+
+
     #[Route('/show/multi', name: 'app_pakege_show_multiPakage', methods: ['GET', 'POST'])]
     public function showMultiPakage(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
@@ -411,18 +419,18 @@ class PakegeController extends AbstractController
         $user_id = $user -> getId();
         $entityManager = $doctrine->getManager();
         
-        $user_all_inform = $entityManager->getRepository(User::class)->findOneByIdJoinedToPakege($user_id);
-        if($user_all_inform == false){
-            $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        }
+        //$user_all_inform = $entityManager->getRepository(User::class)->findOneByIdJoinedToPakege($user_id);
+        // if($user_all_inform == false){
+        //     $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        // }
         // if($user_id != $pakage_user -> getUserId()){
         //     $this->denyAccessUnlessGranted('ROLE_ADMIN');
         // }
-        $pakages = $user_all_inform -> getPakege();
-        $array_pakages = [];
-        foreach($pakages as $pakage){
-            $array_pakages[] = $pakage;
-        }
+        // $pakages = $user_all_inform -> getPakege();
+        // $array_pakages = [];
+        // foreach($pakages as $pakage){
+        //     $array_pakages[] = $pakage;
+        // }
         
         $client_code = $user -> getPesonalCode();
         $secret_code = $user -> getSecretCode();
@@ -430,7 +438,8 @@ class PakegeController extends AbstractController
         $setting_opyions = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
         $multi_pakage_day = $setting_opyions -> getMultiPakageDay();
         $name_multi_pakage = $setting_opyions -> getNameMultiPakage();
-        $pakages = $entityManager->getRepository(Pakege::class)->findByPakageActionField($name_multi_pakage, $user_id, $multi_pakage_day);//получение пакетов соответсвующих акции
+        $action = 0;
+        $pakages = $entityManager->getRepository(Pakege::class)->findByPakageActionField($name_multi_pakage, $user_id, $multi_pakage_day,$action);//получение пакетов соответсвующих акции
         $action_pakage = [];
        // dd($pakages);
 
@@ -482,14 +491,55 @@ class PakegeController extends AbstractController
         ]);
     }
 
+    
+    #[Route('/{id}/edit/routingpakage', name: 'app_pakege_edit_routing', methods: ['GET', 'POST'])]
+    public function editRoutingPakage(EntityManagerInterface $entityManager, int $id)
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        $user = $this -> getUser();
+        $user_id = $user -> getId();
+        $client_code = $user -> getPesonalCode();
+        $pakage = $entityManager->getRepository(Pakege::class)->findByExampleIdField($user_id);
+    
+        if($pakage == false){    
+            $this->denyAccessUnlessGranted('ROLE_ADMIN'); 
+        }
+        elseif(count($pakage) == 1){
+            return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
+        }
+        elseif(count($pakage) > 1){
+            return $this->redirectToRoute('app_pakege_index', ['client_code' => $client_code], Response::HTTP_SEE_OTHER);
+        }
+    }
+
+
+
+
     #[Route('/{id}/edit', name: 'app_pakege_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
     {
+        //dd('hghghghg');
         $user = $this->getUser();
         $wallet = $user -> getWallet();
         $user_id = $user -> getId();
-        //получение переменных занчений настройки линии
+        //получение пакетов пользователя
         $pakage_comet = $entityManager->getRepository(Pakege::class)->findOneBy(['id' => $id]);
+        if($pakage_comet == false){
+            $this->addFlash(
+                'danger',
+                'У вас нет прав доступа');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+        if($pakage_comet -> getActivation() == NULL){
+            $this->addFlash(
+                'danger',
+                'Пакет не активирован.Вы не можете повысить пакет прежде чем его активируйте!');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+        if($user_id != $pakage_comet -> getUserId()){
+            $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        }
         $network_code = $pakage_comet -> getReferralNetworksId();
         $setting_opyions = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
         $update_day = $setting_opyions -> getUpdateDay();
@@ -498,100 +548,52 @@ class PakegeController extends AbstractController
         $payments_direct_fast = $setting_opyions -> getPaymentsDirectFast();
         $payments_singleline = $setting_opyions -> getPaymentsSingleline();
        // dd($update_day);
-        if($user_id != $pakage_comet -> getUserId()){
-            $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        }
+        
         //проверка срока активации пакета
-        //article.created_at|date('m-d')
-        if($pakage_comet -> getUpdatedAt() != NULL){
-            $datetime = $pakage_comet -> getCreatedAt();
-            $timestamp = $datetime->getTimestamp();
-            date_modify($datetime, $update_day.'day');
-            if(time() > $timestamp){
-                $this->addFlash(
-                    'warning',
-                    'Вы не можете повысить уровень пакета, срок предусмотренный для повышения пакета истек');
-                return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
-            }    
-        }
-        else{
-            $datetime = $pakage_comet -> getCreatedAt();
-            $timestamp = $datetime->getTimestamp();
-            date_modify($datetime, $update_day.'day');
-            if(time() > $timestamp){
-                $this->addFlash(
-                    'warning',
-                    'Вы не можете повысить уровень пакета, срок предусмотренный для повышения пакета истек');
-                return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
-            }    
-        }
-
-        //проверка срока быстрого старта и получения двойного бонуса Директ 20%
         if($pakage_comet -> getUpdatedAt() != NULL){
             $datetime = $pakage_comet -> getUpdatedAt();
-            $timestamp = $datetime->getTimestamp();
-            date_modify($datetime, $fast_start.'day');
-            if(time() > $timestamp){
-                $k_direct = $payments_direct_fast;
-            }
-            else{
-                $k_direct = $payments_direct;
-            }    
         }
         else{
             $datetime = $pakage_comet -> getCreatedAt();
-            $timestamp = $datetime->getTimestamp();
-            date_modify($datetime, $fast_start.'day');
-            //dd(time() - $this->timestamp = $datetime->getTimestamp());
-            if(time() > $timestamp){
-                $k_direct = $payments_direct_fast;
-            }
-            else{
-                $k_direct = $payments_direct;
-            }      
+        }
+            
+        date_modify($datetime, $update_day.'day');    
+        $timestamp = $datetime->getTimestamp();
+        //dd(time());
+        if($timestamp < time()){
+             $this->addFlash(
+                'warning',
+                'Вы не можете повысить уровень пакета, срок 30 календарных дней, предусмотренный для повышения пакета истек.');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }    
+       
+        //проверка срока быстрого старта и получения двойного бонуса Директ 20%
+        if($pakage_comet -> getUpdatedAt() != NULL){
+            $datetime_direct = $pakage_comet -> getUpdatedAt();
+        }
+        else{
+            $datetime_direct = $pakage_comet -> getCreatedAt();
         }
 
+        $fast_start_timestamp = $fast_start -> getTimestamp();
+        $timestamp_direct = $datetime_direct -> getTimestamp();
+        
+        if($fast_start_timestamp < $timestamp_direct){
+            $k_direct = $payments_direct_fast;
+        }
+        else{
+            $k_direct = $payments_direct;
+        }    
+        
+        //dd($k_direct);
 
         $form = $this->createForm(BoostPakageType::class, $pakege);
         $form->handleRequest($request);
         $entityManager = $doctrine->getManager();
-        
-        if($pakage_comet-> getName() == 'Starter'){
-            $choise  = [
-                'Basic' => 'Basic',
-                'Networker' => 'Networker',
-                'Business' => 'Business',
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($pakage_comet-> getName() == 'Basic'){
-            $choise  = [
-                'Networker' => 'Networker',
-                'Business' => 'Business',
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($pakage_comet-> getName() == 'Networker'){
-            $choise  = [
-                'Business' => 'Business',
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($pakage_comet-> getName() == 'Business'){
-            $choise  = [
-                'Trader' => 'Trader',
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($pakage_comet-> getName() == 'Trader'){
-            $choise  = [
-                'VIP' => 'VIP',
-            ]; 
-        }
-        elseif($pakage_comet-> getName() == 'VIP'){
+        $choise_param_edit = $pakage_comet-> getName();
+//dd($choise_param_edit);
+        $choise = $this -> choiseParamEdit($choise_param_edit);
+        if($choise == false){
             $this->addFlash(
                 'warning',
                 'У вас самый высокий уровень пакета, вы не можете повысить пакет');
@@ -610,102 +612,18 @@ class PakegeController extends AbstractController
             $wallet_cometcoin_rate =  $wallet_cometpoin / $token_rate;//перевеод токенов в юсдт по курсу токена
             $pakage_user_price = $pakage_user -> getPricePakage();//стоимость выбранного пакета 
             $pakage_current_price = $pakage_comet-> getPrice();//стоимость текущего пакета
-            $pakage_cost_difference = $pakage_user_price - $pakage_current_price;//разниуа стоимости пакетов
+            $pakage_cost_difference = $pakage_user_price - $pakage_current_price;//разница стоимости пакетов
             $token = $token_rate * $pakage_user_price;
-            if($form_referral_select == 1){
-                //юсдт
-                if(($wallet -> getUsdt()) < $pakage_cost_difference ){
-                    $this->addFlash(
-                        'warning',
-                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
-                    return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
-                }
-                else{
-                    $new_balanse_wallet = $wallet -> getUsdt() - $pakage_cost_difference;//новый баланс кошелька
-                    $wallet -> setUsdt($new_balanse_wallet);
-                    $wallet -> setUpdatedAt(new \DateTimeImmutable());
-                    $referral_network_user = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['pakege_id' => $id]);//объект владельца пакета
-                    $referral_link_refovod = $referral_network_user -> getMyTeam();
-                    //dd($referral_network_user);
-                    //получаем объект Рефовода и получаем текщие значения начислений бонусов
-                    $user_refovod = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link_refovod]);
-                   // dd($user_refovod );
-                    $user_refovod_curren_cash = $user_refovod -> getCash(); 
-                    $user_refovod_curren_reward = $user_refovod -> getReward();
-                    $user_refovod_curren_direct = $user_refovod -> getDirect();
-                    $user_refovod_direct_bonus = ($pakage_cost_difference * $k_direct) / 100;
-                    $user_refovod_cash_bonus = ($pakage_cost_difference * $payments_singleline) / 100;
-                    $user_refovod_reward_bonus = $user_refovod_cash_bonus + $user_refovod_direct_bonus;
-                    $user_refovod_direct_bonus_new = $user_refovod_curren_direct + $user_refovod_direct_bonus;
-                    $user_refovod_cash_bonus_new = $user_refovod_curren_cash + $user_refovod_cash_bonus;
-                    $user_refovod_reward_bonus_new = $user_refovod_curren_reward + $user_refovod_cash_bonus + $user_refovod_reward_bonus;
-                    //получаем значения владельца пакета с текщим балансом и значениями отчисления в сеть на момент предыдущей активации пакета
-                    $current_balance = $referral_network_user -> getBalance();//текущий баланс стоимости пакета пользователя в линии
-                    $current_balance_direct = $referral_network_user -> getPaymentsNetwork();//текущий значение отчислений в сеть на момент последней активации пакета по программе Директ
-                    $current_balance_cash = $referral_network_user -> getPaymentsCash();//текущий значение отчислений в сеть на момент последней активации пакета по программе CashBack
-                    $balace_line_new = $current_balance + $pakage_cost_difference;//новый баланс стоимости пакета участника в линии
-                    $new_balance_direct = $current_balance_direct + $user_refovod_direct_bonus;//обновленная сумма отчисления в линию по программе Директ на момент активации пакета
-                    $new_balance_cash = $current_balance_cash + $user_refovod_cash_bonus;//обновленная сумма отчисления в линию по программе CashBack на момент активации пакета
-                    $referral_network_user -> setBalance($balace_line_new);//запись нового баланса владельуц пакета
-                    $referral_network_user -> setPakage($pakage_user_price);//запись нового значения стоимости нового пакета
-                    $referral_network_user->setUpdatedAt(new \DateTime());
-                    //запсиь новых начислений Рефоводу
-                    $user_refovod -> setCash($user_refovod_cash_bonus_new); 
-                    $user_refovod -> setReward($user_refovod_reward_bonus_new);
-                    $user_refovod -> setDirect($user_refovod_direct_bonus_new);
-                    $user_refovod->setUpdatedAt(new \DateTime());
-                    //запись обновленных значений отчислений в сеть 
-                    $referral_network_user -> setPaymentsCash($new_balance_cash);//запись оьновленный значений отчислений в сеть по программе КешБек
-                    $referral_network_user -> setPaymentsNetwork($new_balance_direct);//запись оьновленный значений отчислений в сеть по программе Директ
-                }
+//dd($pakage_cost_difference);
+            if($this -> possibilityCheck($form_referral_select, $wallet, $pakage_cost_difference,$token_rate) == false){
+                $this->addFlash(
+                'warning',
+                'У вас недостаточно средств для повышения уровня пакета, пожалуйста свой пополните кошелек или выберите меньшую сумму');
+            return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
             }
-            elseif($form_referral_select == 2){
-                //внутренний токен
-                if($wallet_cometcoin_rate < $pakage_cost_difference){
-                    $this->addFlash(
-                        'warning',
-                        'У вас недостаточно средств для приобретения пакета, пополните кошелек');
-                    return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
-                }
-                else{
-                    $new_balanse_wallet = $wallet_cometcoin_rate - $pakage_cost_difference;//новый баланс кошелька
-                    $wallet -> setCometpoin($new_balanse_wallet);
-                    $wallet -> setUpdatedAt(new \DateTimeImmutable());
-                    $referral_network_user = $entityManager -> getRepository(ReferralNetwork::class)->findOneBy(['pakege_id' => $id]);//объект владельца пакета
-                    $referral_link_refovod = $referral_network_user -> getMyTeam();
-                    //dd($referral_network_user);
-                    //получаем объект Рефовода и получаем текщие значения начислений бонусов
-                    $user_refovod = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link_refovod]);
-                    $user_refovod_curren_cash = $user_refovod -> getCash(); 
-                    $user_refovod_curren_reward = $user_refovod -> getReward();
-                    $user_refovod_curren_direct = $user_refovod -> getDirect();
-                    $user_refovod_direct_bonus = ($pakage_cost_difference * $k_direct) / 100;
-                    $user_refovod_cash_bonus = ($pakage_cost_difference * $payments_singleline) / 100;
-                    $user_refovod_reward_bonus = $user_refovod_cash_bonus + $user_refovod_direct_bonus;
-                    $user_refovod_direct_bonus_new = $user_refovod_curren_direct + $user_refovod_direct_bonus;
-                    $user_refovod_cash_bonus_new = $user_refovod_curren_cash + $user_refovod_cash_bonus;
-                    $user_refovod_reward_bonus_new = $user_refovod_curren_reward + $user_refovod_cash_bonus + $user_refovod_reward_bonus;
-                    //получаем значения владельца пакета с текщим балансом и значениями отчисления в сеть на момент предыдущей активации пакета
-                    $current_balance = $referral_network_user -> getBalance();//текущий баланс стоимости пакета пользователя в линии
-                    $current_balance_direct = $referral_network_user -> getPaymentsNetwork();//текущий значение отчислений в сеть на момент последней активации пакета по программе Директ
-                    $current_balance_cash = $referral_network_user -> getPaymentsCash();//текущий значение отчислений в сеть на момент последней активации пакета по программе CashBack
-                    $balace_line_new = $current_balance + $pakage_cost_difference;//новый баланс стоимости пакета участника в линии
-                    $new_balance_direct = $current_balance_direct + $user_refovod_direct_bonus;//обновленная сумма отчисления в линию по программе Директ на момент активации пакета
-                    $new_balance_cash = $current_balance_cash + $user_refovod_cash_bonus;//обновленная сумма отчисления в линию по программе CashBack на момент активации пакета
-                    $referral_network_user -> setBalance($balace_line_new);//запись нового баланса владельуц пакета
-                    $referral_network_user -> setPakage($pakage_user_price);//запись нового значения стоимости нового пакета
-                    $referral_network_user->setUpdatedAt(new \DateTime());
-                    //запсиь новых начислений Рефоводу
-                    $user_refovod -> setCash($user_refovod_cash_bonus_new); 
-                    $user_refovod -> setReward($user_refovod_direct_bonus_new);
-                    $user_refovod -> setDirect($user_refovod_reward_bonus_new);
-                    $user_refovod->setUpdatedAt(new \DateTime());
-                    //запись обновленных значений отчислений в сеть 
-                    $referral_network_user -> setPaymentsCash($new_balance_cash);//запись оьновленный значений отчислений в сеть по программе КешБек
-                    $referral_network_user -> setPaymentsNetwork($new_balance_direct);//запись оьновленный значений отчислений в сеть по программе Директ
-                }
-            }
-
+            //начисления за повышения пакета 
+            $array_bonus_refovod = $this -> chargeForPromotion($entityManager,$doctrine,$form_referral_select,$wallet,$pakage_cost_difference,$k_direct,$payments_singleline,$pakage_user_price,$wallet_cometcoin_rate,$id,$token_rate);
+            
             //==================получаем и записываем  все начисления и погашеня сети ==============================================
             $listReferralNetwork = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['network_code' => $network_code]);//обект родительской сети
             //получение текущих значений 
@@ -715,6 +633,8 @@ class PakegeController extends AbstractController
             $listReferralNetwork_current_balance  = $listReferralNetwork -> getCurrentBalance();//текущая общая сумма оставшихся не погашенных пакетов в сети на момент активации последнего пакета
 
             //новые значения
+            $user_refovod_direct_bonus = $array_bonus_refovod[0];
+            $user_refovod_cash_bonus = $array_bonus_refovod[1];
             $listReferralNetwork_new_direct = $user_refovod_direct_bonus + $listReferralNetwork_current_direct;
             $listReferralNetwork_new_cash = $user_refovod_cash_bonus + $listReferralNetwork_current_cash;
             $listReferralNetwork_new_balance = $pakage_cost_difference + $listReferralNetwork_current_balance;
@@ -724,7 +644,7 @@ class PakegeController extends AbstractController
             $listReferralNetwork -> setPaymentsDirect($listReferralNetwork_new_direct);// обновленная общая сумма начислений попрограмме Директ на момент активации последнего пакета в сети
             $listReferralNetwork -> setPaymentsCash($listReferralNetwork_new_cash);//обновленная общая сумма начислений по программе КешБек на момент активации последнего пакета в сети
             $listReferralNetwork -> setCurrentBalance($listReferralNetwork_new_balance);//новая  общая сумма оставшихся не погашенных пакетов в сети на момент активации последнего пакета
-            $listReferralNetwork -> setUpdatedAt(new \DateTimeImmutable());
+            $listReferralNetwork -> setUpdatedAt(new \DateTime());
             //=========== =========================================================== ==============================================
 
             $pakage_comet -> setPrice($pakage_user_price);
@@ -735,7 +655,7 @@ class PakegeController extends AbstractController
             
             $this->addFlash(
                 'success',
-                'Вы успешно приобрели новый пакет, на электронную почту отправлено подтверждение операции');
+                'Вы успешно повысили уровень пакета, на электронную почту отправлено подтверждение операции');
             return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -758,6 +678,9 @@ class PakegeController extends AbstractController
             'choise' => $choise,
         ]);
     }
+
+
+
 
 
     #[Route('/{id}/edit/admin', name: 'app_pakege_edit_admin', methods: ['GET', 'POST'])]
@@ -909,7 +832,7 @@ class PakegeController extends AbstractController
     }
 
 
-    public function random_string ($str_length)
+    private function random_string ($str_length)
     {
     $str_characters = array (0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
 
@@ -936,5 +859,220 @@ class PakegeController extends AbstractController
 
     // Возвращаем результат
     return $string;
+    }
+
+
+    private function chargeForPromotion(EntityManagerInterface $entityManager,$doctrine,$form_referral_select,$wallet,$pakage_cost_difference,$k_direct,$payments_singleline,$pakage_user_price,$wallet_cometcoin_rate,$id,$token_rate){
+        $entityManager = $doctrine->getManager();
+        $referral_network_user = $entityManager -> getRepository(ReferralNetwork::class)->findOneBy(['pakege_id' => $id]);//объект владельца пакета
+        $referral_link_refovod = $referral_network_user -> getMyTeam();
+        //dd($referral_network_user);
+        //получаем объект Рефовода и получаем текщие значения начислений бонусов
+        $user_refovod = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link_refovod]);
+        $user_refovod_curren_cash = $user_refovod -> getCash(); 
+        $user_refovod_curren_reward = $user_refovod -> getReward();
+        $user_refovod_curren_direct = $user_refovod -> getDirect();
+        $user_refovod_direct_bonus = ($pakage_cost_difference * $k_direct) / 100;
+        $user_refovod_cash_bonus = ($pakage_cost_difference * $payments_singleline) / 100;
+        $user_refovod_reward_bonus = $user_refovod_cash_bonus + $user_refovod_direct_bonus;
+        $user_refovod_direct_bonus_new = $user_refovod_curren_direct + $user_refovod_direct_bonus;
+        $user_refovod_cash_bonus_new = $user_refovod_curren_cash + $user_refovod_cash_bonus;
+        $user_refovod_reward_bonus_new = $user_refovod_curren_reward + $user_refovod_cash_bonus + $user_refovod_reward_bonus;
+        //получаем значения владельца пакета с текщим балансом и значениями отчисления в сеть на момент предыдущей активации пакета
+        $current_balance = $referral_network_user -> getBalance();//текущий баланс стоимости пакета пользователя в линии
+        $current_balance_direct = $referral_network_user -> getPaymentsNetwork();//текущий значение отчислений в сеть на момент последней активации пакета по программе Директ
+        $current_balance_cash = $referral_network_user -> getPaymentsCash();//текущий значение отчислений в сеть на момент последней активации пакета по программе CashBack
+        $balace_line_new = $current_balance + $pakage_cost_difference;//новый баланс стоимости пакета участника в линии
+        $new_balance_direct = $current_balance_direct + $user_refovod_direct_bonus;//обновленная сумма отчисления в линию по программе Директ на момент активации пакета
+        $new_balance_cash = $current_balance_cash + $user_refovod_cash_bonus;//обновленная сумма отчисления в линию по программе CashBack на момент активации пакета
+        $referral_network_user -> setBalance($balace_line_new);//запись нового баланса владельуц пакета
+        $referral_network_user -> setPakage($pakage_user_price);//запись нового значения стоимости нового пакета
+        $referral_network_user->setUpdatedAt(new \DateTime());
+        //запсиь новых начислений Рефоводу
+        $user_refovod -> setCash($user_refovod_cash_bonus_new); 
+        $user_refovod -> setReward($user_refovod_reward_bonus_new);
+        $user_refovod -> setDirect($user_refovod_direct_bonus_new);
+        $user_refovod->setUpdatedAt(new \DateTime());
+        //запись обновленных значений отчислений в сеть 
+        $referral_network_user -> setPaymentsCash($new_balance_cash);//запись оьновленный значений отчислений в сеть по программе КешБек
+        $referral_network_user -> setPaymentsNetwork($new_balance_direct);//запись оьновленный значений отчислений в сеть по программе Директ
+
+        if($form_referral_select == 0){
+                
+            $new_balanse_wallet = $wallet -> getUsdt() - $pakage_cost_difference;//новый баланс кошелька
+            $wallet -> setUsdt($new_balanse_wallet);
+            $wallet -> setUpdatedAt(new \DateTime());
+            $entityManager->flush();
+        }
+        elseif($form_referral_select == 1){
+            //внутренний токен
+            $new_balanse_wallet = ($wallet_cometcoin_rate - $pakage_cost_difference) * $token_rate;//новый баланс кошелька
+            $wallet -> setCometpoin($new_balanse_wallet);
+            $wallet -> setUpdatedAt(new \DateTime());
+            $entityManager->flush();
+            // $referral_network_user = $entityManager -> getRepository(ReferralNetwork::class)->findOneBy(['pakege_id' => $id]);//объект владельца пакета
+            // $referral_link_refovod = $referral_network_user -> getMyTeam();
+            // //dd($referral_network_user);
+            // //получаем объект Рефовода и получаем текщие значения начислений бонусов
+            // $user_refovod = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link_refovod]);
+            // $user_refovod_curren_cash = $user_refovod -> getCash(); 
+            // $user_refovod_curren_reward = $user_refovod -> getReward();
+            // $user_refovod_curren_direct = $user_refovod -> getDirect();
+            // $user_refovod_direct_bonus = ($pakage_cost_difference * $k_direct) / 100;
+            // $user_refovod_cash_bonus = ($pakage_cost_difference * $payments_singleline) / 100;
+            // $user_refovod_reward_bonus = $user_refovod_cash_bonus + $user_refovod_direct_bonus;
+            // $user_refovod_direct_bonus_new = $user_refovod_curren_direct + $user_refovod_direct_bonus;
+            // $user_refovod_cash_bonus_new = $user_refovod_curren_cash + $user_refovod_cash_bonus;
+            // $user_refovod_reward_bonus_new = $user_refovod_curren_reward + $user_refovod_cash_bonus + $user_refovod_reward_bonus;
+            // //получаем значения владельца пакета с текщим балансом и значениями отчисления в сеть на момент предыдущей активации пакета
+            // $current_balance = $referral_network_user -> getBalance();//текущий баланс стоимости пакета пользователя в линии
+            // $current_balance_direct = $referral_network_user -> getPaymentsNetwork();//текущий значение отчислений в сеть на момент последней активации пакета по программе Директ
+            // $current_balance_cash = $referral_network_user -> getPaymentsCash();//текущий значение отчислений в сеть на момент последней активации пакета по программе CashBack
+            // $balace_line_new = $current_balance + $pakage_cost_difference;//новый баланс стоимости пакета участника в линии
+            // $new_balance_direct = $current_balance_direct + $user_refovod_direct_bonus;//обновленная сумма отчисления в линию по программе Директ на момент активации пакета
+            // $new_balance_cash = $current_balance_cash + $user_refovod_cash_bonus;//обновленная сумма отчисления в линию по программе CashBack на момент активации пакета
+            // $referral_network_user -> setBalance($balace_line_new);//запись нового баланса владельцу пакета
+            // $referral_network_user -> setPakage($pakage_user_price);//запись нового значения стоимости нового пакета
+            // $referral_network_user->setUpdatedAt(new \DateTime());
+            // //запсиь новых начислений Рефоводу
+            // $user_refovod -> setCash($user_refovod_cash_bonus_new); 
+            // $user_refovod -> setReward($user_refovod_direct_bonus_new);
+            // $user_refovod -> setDirect($user_refovod_reward_bonus_new);
+            // $user_refovod->setUpdatedAt(new \DateTime());
+            // //запись обновленных значений отчислений в сеть 
+            // $referral_network_user -> setPaymentsCash($new_balance_cash);//запись оьновленный значений отчислений в сеть по программе КешБек
+            // $referral_network_user -> setPaymentsNetwork($new_balance_direct);//запись оьновленный значений отчислений в сеть по программе Директ
+        
+        }
+        elseif($form_referral_select == 2){
+            //bitcoin
+            $bitcoin_curret = $wallet -> getBitcoin();
+            $new_balanse_wallet = $bitcoin_curret - ($pakage_cost_difference / 40000);//новый баланс кошелька
+            $wallet -> setBitcoin($new_balanse_wallet);
+            $wallet -> setUpdatedAt(new \DateTime());
+            $entityManager->flush();
+        }
+        elseif($form_referral_select == 3){
+            //etherium
+            $etherium_curret = $wallet -> getEtherium();
+            $new_balanse_wallet = $etherium_curret - ($pakage_cost_difference / 4000);//новый баланс кошелька
+            $wallet -> setEtherium($new_balanse_wallet);
+            $wallet -> setUpdatedAt(new \DateTime());
+            $entityManager->flush();
+    }
+
+    return $array_bonus_refovod = [$user_refovod_direct_bonus, $user_refovod_cash_bonus ];
+    }
+    
+
+    private function choiseParamEdit($choise_param_edit){
+        if($choise_param_edit == 'Starter'){
+            $choise  = [
+                'Basic' => 'Basic',
+                'Networker' => 'Networker',
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($choise_param_edit == 'Basic'){
+            $choise  = [
+                'Networker' => 'Networker',
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($choise_param_edit == 'Networker'){
+            $choise  = [
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($choise_param_edit == 'Business'){
+            $choise  = [
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($choise_param_edit == 'Trader'){
+            $choise  = [
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($choise_param_edit == 'VIP'){
+            $choise = false;
+        }
+        return $choise;
+    }
+
+    private function choiseNew($name_pakage){
+        if($name_pakage == NULL){
+            $choise  = [
+                'Starter'=> 'Starter',
+                'Basic' => 'Basic',
+                'Networker' => 'Networker',
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($name_pakage == 'Basic'){
+            $choise  = [
+                'Basic' => 'Basic',
+                'Networker' => 'Networker',
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($name_pakage == 'Networker'){
+            $choise  = [
+                'Networker' => 'Networker',
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($name_pakage == 'Business'){
+            $choise  = [
+                'Business' => 'Business',
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        elseif($name_pakage == 'Trader'){
+            $choise  = [
+                'Trader' => 'Trader',
+                'VIP' => 'VIP',
+            ]; 
+        }
+        return $choise;
+    }
+
+    private function possibilityCheck($form_referral_select, $wallet, $pakage_cost_difference,$token_rate){
+        //dd($form_referral_select);
+        if($form_referral_select == 0){
+            $control_summ = $wallet -> getUsdt();
+            
+        }
+        elseif($form_referral_select == 1){
+            $control_summ = $wallet -> getCometpoin() / $token_rate;
+        }
+        elseif($form_referral_select == 2){
+            $control_summ = $wallet -> getBitcoin() * 40000;
+        }
+        elseif($form_referral_select == 3){
+            $control_summ = $wallet -> getEtherium() * 4000;
+        }
+        //dd($control_summ);
+        if($control_summ < $pakage_cost_difference){
+            
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }

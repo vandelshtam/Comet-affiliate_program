@@ -24,7 +24,8 @@ class TablePakageController extends AbstractController
     public function index(TablePakageRepository $tablePakageRepository,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
     {
         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
-
+        $ffff = $tablePakageRepository->findAll();
+//dd($ffff[0] );
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);

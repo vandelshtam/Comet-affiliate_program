@@ -30,8 +30,9 @@ var chart_position = bb.generate({
         data: {
           columns: [
             ["Blue USDT", {{ wallet.usdt }}],
-            ["Orange Cometpoin", {{ wallet.cometpoin }}/{{ token_rate }}],
-            //["green", 0], 
+            ["Orange CoMetaCoin", {{ wallet.cometpoin }}/{{ token_rate }}],
+            ["Green Etherium", {{ wallet.etherium }} * 4000],
+            ["Red Bitcoin", {{ wallet.bitcoin }} * 40000],  
           ],
           type: "donut",
           onclick: function (d, i) {
