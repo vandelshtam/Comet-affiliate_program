@@ -2,13 +2,15 @@
 
 namespace App\Controller;
 
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\HttpFoundation\Response;
+use App\Entity\SavingMail;
 use App\Security\EmailVerifier;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\SavingMailRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
@@ -23,40 +25,54 @@ class MailerController extends AbstractController
     }
 
     #[Route('/email')]
-    public function sendEmail(MailerInterface $mailer)
+    public function sendEmail(MailerInterface $mailer,SavingMailRepository $savingMailRepository)
     {
         $user = $this -> getUser();
         $email_user = $user -> getEmail();
-        $email = (new Email())
+        $user_id = $user -> getId();
+        $saving_mail = new SavingMail();
+        $email = (new TemplatedEmail())
             ->from('Commet-AT@example.com')
             ->to($email_user)
             ->subject('Time for Symfony Mailer!')
             ->text('Благодарим Вас за вступление в нашу сеть и приобретение пакета! Перейти на сайт ,<a href="http://164.92.159.123">ссылка на сайт</a>')
-            ->html('<h1>Здравствуйте, мы благодарим вас за участие в нашей сети и приоретение пакета участника реферальной сети!</h1>
-            <p>Теперь Вам необходимо активировать свой пакет участника </p> <a href="http://164.92.159.123">ссылка на сайт</a>');
+            ->htmlTemplate('emails/pakage_new.html.twig')
+            ->context([
+                 'date' => new \DateTime(),
+            ]);
+            $saving_mail -> setCategory('new_pakege');
+            $saving_mail -> setUserId($user_id);
+            $saving_mail -> setCreatedAt((new \DateTime()));
+            $saving_mail -> setUpdatedAt((new \DateTime()));
+
             try {
                 $mailer->send($email);
                 $this->addFlash(
                 'info',
-                'Вам отправлено электронное письмо!');     
+                'Вам отправлено электронное письмо с подтверждением вступления в CoMetaClub!'); 
+                $saving_mail -> setStatus('success');
+                $saving_mail -> setText('Благодарим Вас за вступление в нашу сеть и приобретение пакета!');
+                $savingMailRepository -> add($saving_mail);
             } catch (TransportExceptionInterface $e) {
                 $this->addFlash(
                     'danger',
-                    'Не удалось отправить заявку, пожалуйста попробуйте еще раз'); 
+                    'Произошел не предвиденный сбой почтового клиента, электронное письмо с подтверждением вступления в CoMetaClub не отправлено. Приносим извинения, мы обязательно отправим вам письмо с подтверждение в ближайшее время'); 
+                $saving_mail -> setStatus('error');
+                $saving_mail -> setText('Произошел не предвиденный сбой почтового клиента, электронное письмо с подтверждением вступления в CoMetaClub не отправлено. Приносим извинения, мы обязательно отправим вам письмо с подтверждение в ближайшее время');
+                $savingMailRepository -> add($saving_mail);    
             }             
 
     }
 
-    public function sendFastConsultationEmail(MailerInterface $mailer,$fast_consultation,$textSendMail,$email_client)
+    public function sendFastConsultationEmail(MailerInterface $mailer,$fast_consultation,$email_client, $savingMailRepository)
     {
-        
+        $user = $this -> getUser();
+        $user_id = $user -> getId();
+        $saving_mail = new SavingMail();
         $email = (new TemplatedEmail())
             ->from($email_client)
             ->to('Commet-AT@example.com')
             ->subject('Time for Symfony Mailer!')
-            //->text([$fast_consultation->getQuestion(), $fast_consultation->getPhone()])
-            //->phone($fast_consultation->getPhone())
-            //->html($textSendMail)
             ->htmlTemplate('emails/fast_consultation.html.twig')
             ->context([
                 'username' => $fast_consultation->getName(),
@@ -64,78 +80,66 @@ class MailerController extends AbstractController
                 'question' => $fast_consultation->getQuestion(),
                 'phone' => $fast_consultation->getPhone(),
                 'post_mail' => $fast_consultation->getEmail(),
-            ])
-            ;
-            //dd($email);
+            ]);
+            $saving_mail -> setCategory('technical_support');
+            $saving_mail -> setUserId($user_id);
+            $saving_mail -> setToMail('Commet-AT@example.com');
+            $saving_mail -> setFromMail($email_client);
+            $saving_mail -> setText($fast_consultation->getQuestion());
+            $saving_mail -> setCreatedAt((new \DateTime()));
+            $saving_mail -> setUpdatedAt((new \DateTime()));
             try {
                 $mailer->send($email);
                 $this->addFlash(
                 'success',
-                'Вы успешно отправлили заявку, скоро мы свяжемся с вами!');     
+                'Вы успешно отправили  свой вопрос, скоро мы свяжемся с вами!'); 
+                $saving_mail -> setStatus('success');
+                $savingMailRepository -> add($saving_mail);    
             } catch (TransportExceptionInterface $e) {
                 $this->addFlash(
                     'success',
-                    'Не удалось отправить заявку, пожалуйста попробуйте еще раз'); 
+                    'Произошел не предвиденный сбой почтового клиента, не удалось отправить ссылку, чуть позже попробуйте еще раз.');
+                $saving_mail -> setStatus('error');
+                $savingMailRepository -> add($saving_mail);     
             }             
     }
 
-    public function sendReferralToEmail($mailer,$email_to_client,$email_user,$referral_link)
-    {//dd($email_user);
-        $email = (new Email())
-        
+    public function sendReferralToEmail(MailerInterface $mailer,$email_to_client,$email_user,$referral_link,$personal_data_username,$savingMailRepository,)
+    {
+        $user = $this -> getUser();
+        $email_user = $user -> getEmail();
+        $user_id = $user -> getId();
+        $saving_mail = new SavingMail();
+        $email = (new TemplatedEmail())
             ->from($email_user)
             ->to($email_to_client)
             ->subject('Time for Symfony Mailer!')
-            ->text('Vld')
-            ->html('<div class="card">
-                        <div class="card-header" style="background: #5eabeb; color: white;">
-                        <h3>Это сообщения от участника системы Single Line</h3>
-                        </div>
-                        <div class="card-body">
-                            <h4 class="card-title">Здравствуйте, я приглашаю вас вступить в Singl Line в мою команду!</h4>
-                            <p class="card-text fw-bolder">Реферальная ссылка для регистрации</p><span>' .$referral_link.'</span>
-                            <p class="card-text">Eсли вы не зарегистрированы, то можете перейти на страницу регистрации. Если вы уже зарегистрированы в системе, то можете скопировать ссылку и вставить ее в поле при покупке пакета.</p>
-                            <a href="http://164.92.159.123/register/$referral_link" class="btn btn-primary rounded-0" style="background: #5eabeb; hight: 100px; color: white; underline: none;">Перейти к регистрации</a>
-                        </div>
-                    </div>');
+            ->htmlTemplate('emails/initiation.html.twig')
+            ->context([
+                'username' => $personal_data_username,
+                'date' => new \DateTime(),
+                'referral_link' => $referral_link,
+            ]);
+            $saving_mail -> setCategory('referral_link');
+            $saving_mail -> setUserId($user_id);
+            $saving_mail -> setToMail($email_to_client);
+            $saving_mail -> setFromMail($email_user);
+            $saving_mail -> setText('http://164.92.159.123/register/'.$referral_link);
+            $saving_mail -> setCreatedAt((new \DateTime()));
+            $saving_mail -> setUpdatedAt((new \DateTime()));
             try {
                 $mailer->send($email);
                 $this->addFlash(
                 'success',
-                'Вы успешно отправлили реферальную ссылку!');     
+                'Вы успешно отправлили реферальную ссылку новому кандидату!');
+                $saving_mail -> setStatus('success');
+                $savingMailRepository -> add($saving_mail);     
             } catch (TransportExceptionInterface $e) {
                 $this->addFlash(
                     'success',
-                    'Не удалось отправить ссылку попробуйте еще раз'); 
+                    'Произошел не предвиденный сбой почтового клиента, не удалось отправить ссылку, чуть позже попробуйте еще раз.');
+                $saving_mail -> setStatus('error');
+                $savingMailRepository -> add($saving_mail);         
             }             
-    }
-
-    public function textEmalPakege(){
-        $textEmailPakege = 
-            '<h1>Здравствуйте, мы благодарим вас за участие в нашей сети и приоретение пакета участника реферальной сети!</h1>
-            <p>Теперь Вам необходимо активировать свой пакет участника </p> <a href="http://164.92.159.123">ссылка на сайт</a>';
-        return $textEmailPakege;
-    }
-
-    public function textFastConsultationMail($fast_consultation){
-        $textFastConsultation = 
-            '<h1>Здравствуйте, я '.$fast_consultation->getName().' пожалуйста ответьте на мой вопрос!</h1>
-            <p>Прошу связаться со мной по номеру телефона '.$fast_consultation->getPhone().'</p>
-            <p>или по электронной почте '.$fast_consultation->getEmail().'</p>';
-        return $textFastConsultation;
-    }
-    // public function textReferralToEmailMail($referral_link){
-    //     $textReferralEmail = 
-    //         '<h1>Здравствуйте, я приглашаю вас вступить в Singl Line в мою команду!</h1>
-    //         <p>реферальная ссылка для регистрации </p>
-    //         <p>ссылка на сайт <a href="http://164.92.159.123/register">ссылка на сайт</a></p>';
-    //     return $textReferralEmail;
-    // }
-
-    public function textReferralToEmailMail(){
-        $textReferralEmail = 
-        '<h1>Здравствуйте, мы благодарим вас за участие в нашей сети и приоретение пакета участника реферальной сети!</h1>
-        <p>Теперь Вам необходимо активировать свой пакет участника </p> <a href="http://164.92.159.123">ссылка на сайт</a>';
-        return $textReferralEmail;
     }
 }

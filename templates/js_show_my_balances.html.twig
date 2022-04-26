@@ -1,0 +1,28 @@
+{% block javascripts3 %}
+ 
+<script>
+var chart_position = bb.generate({
+        data: {
+          columns: [
+            ["Blue Direct {{ summ_direct * token_rate }} CoMetaCoin", {{ summ_direct * token_rate }}],
+            ["Orange CashBack {{ summ_cash * token_rate }} CoMetaCoin", {{ summ_cash * token_rate }}],
+            //["green", 3],
+          ],
+          type: "donut",
+          onclick: function (d, i) {
+            console.log("onclick", d, i);
+          },
+          onover: function (d, i) {
+            console.log("onover", d, i);
+          },
+          onout: function (d, i) {
+            console.log("onout", d, i);
+          },
+        },
+        donut: {
+          title: "Всего {{ (summ_direct * token_rate) +  (summ_cash * token_rate)}}",
+        },
+        bindto: "#donut-chart-my-position",
+      });
+</script>
+{% endblock %}

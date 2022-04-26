@@ -43,6 +43,16 @@
                 <div class="timer__item timer__seconds">00</div>
             </div>
         </div>
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        {% if user.PersonalDataId == 0 %}
+      <div class="alert alert-warning rounded-0" role="alert">
+      Важная информация:
+          <ul>
+              <li>Вы обязательно должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">перейти к заполнению</a></code></li>
+          </ul>
+      </div>
+      {% endif %}
+      {% endif %}
         <div class="shadow mb-3 bg-white">
                 <div class="row ">    
                     <div class="col-sm-3 text-center rounded-0">

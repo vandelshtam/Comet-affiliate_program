@@ -3,7 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <h1>{{ controller_name }}</h1>
+    <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success rounded-0" role="alert">
@@ -32,7 +32,7 @@
                     </div>
                 {% endfor %}            
     {% endfor %}
-    <a  class="btn btn-secondary mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a>
+    <a  class="btn btn-primary mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a>
     <table class="table">
         <thead>
             <tr>
@@ -53,9 +53,9 @@
                 <td>{{ list_referral_network.paymentscash }} USDT</td>
                 <td>{{ list_referral_network.ownerName }}</td>
                 <td>
-                    <a  class="btn btn-secondary mb-3" href="{{ path('app_list_referral_networks_show_list', {'id': list_referral_network.id}) }}">Посмотреть подробности</a>
+                    <a  class="btn btn-primary mb-3" href="{{ path('app_list_referral_networks_show_list', {'id': list_referral_network.id}) }}">Посмотреть подробности</a>
                     
-                    <a  class="btn btn-secondary mb-3" href="{{ path('app_referral_network_index') }}">Открыть список участников</a>
+                    <a  class="btn btn-primary mb-3" href="{{ path('app_referral_network_index') }}">Открыть список участников</a>
                 </td>
             </tr>
         {% else %}

@@ -1,78 +1,80 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pakege{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Подробности пакета</h1>
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success rounded-0" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">  
+    <div class="container-xxl col-sm-4 bg-white shadow p-3 mb-1 mt-3 rounded-0">
+       <h1 class="d-flex justify-content-center  mb-5 mt-3" style="color: rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['success', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info rounded-0" role="alert">
+                    <div class="alert alert-success rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}            
-    {% endfor %}
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ pakege.id }}</td>
-            </tr>
-            <tr>
-                <th>Название</th>
-                <td>{{ pakege.name }}</td>
-            </tr>
-            <tr>
-                <th>User_id</th>
-                <td>{{ pakege.userId }}</td>
-            </tr>
-            <tr>
-                <th>Стоимость USDT</th>
-                <td>{{ pakege.price }}</td>
-            </tr>
-            <tr>
-                <th>Идентификационный номер реферальной сети</th>
-                <td>{{ pakege.referralNetworksId }}</td>
-            </tr>
-            <tr>
-                <th>Уникальный код клиента</th>
-                <td>{{ pakege.clientCode }}</td>
-            </tr>
-        </tbody>
-    </table>
-    {% if is_granted('ROLE_ADMIN') %}  
-    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_index_admin') }}">Назад</a>
-    {% else %}
-    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">Назад</a>
-    {% endif %}
-    {% if pakege.activation == NULL %}
-        <a class="btn btn-danger rounded-0 mb-1" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать пакет</a>
-    {% endif %}
-    {% if is_granted('ROLE_ADMIN') %}   
-    <a  class="btn btn-warning rounded-0 mb-1" href="{{ path('app_pakege_edit_admin', {'id': pakege.id}) }}">Редактировать</a>
+        {% endfor %}
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>Id</th>
+                    <td>{{ pakege.id }}</td>
+                </tr>
+                <tr>
+                    <th>Название</th>
+                    <td>{{ pakege.name }}</td>
+                </tr>
+                <tr>
+                    <th>User_id</th>
+                    <td>{{ pakege.userId }}</td>
+                </tr>
+                <tr>
+                    <th>Стоимость USDT</th>
+                    <td>{{ pakege.price }}</td>
+                </tr>
+                <tr>
+                    <th>Идентификационный номер реферальной сети</th>
+                    <td>{{ pakege.referralNetworksId }}</td>
+                </tr>
+                <tr>
+                    <th>Уникальный код клиента</th>
+                    <td>{{ pakege.clientCode }}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% if is_granted('ROLE_ADMIN') %}  
+        <a  class="btn btn-primary rounded-0 mb-1" href="{{ path('app_pakege_index_admin') }}">Назад</a>
+        {% else %}
+        <a  class="btn btn-primary rounded-0 mb-1" href="{{ path('app_personal_area') }}">Назад</a>
+        {% endif %}
+        {% if pakege.activation == NULL %}
+            <a class="btn btn-danger rounded-0 mb-1" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать пакет</a>
+        {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}   
+        <a  class="btn btn-warning rounded-0 mb-1" href="{{ path('app_pakege_edit_admin', {'id': pakege.id}) }}">Редактировать</a>
 
-    {{ include('pakege/_delete_form.html.twig') }}
-    {% endif %}
+        {{ include('pakege/_delete_form.html.twig') }}
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 {{ form_start(form) }}
-    {{ form_row(form.cometpoin) }}<div id="emailHelp" class="form-text mb-3">В поле автоматически подгружена вся доступная сумма для конвертации. Вы можете изменить и ввести свою сумму  Cometpoin для конвертации. </div> 
+    {{ form_row(form.cometpoin) }}<div id="emailHelp" class="form-text mb-3">В поле автоматически подгружена вся доступная сумма на кошельке для конвертации. Вы можете изменить и ввести свою сумму  Cometpoin для конвертации. </div> 
     {{ form_row(form.usdt) }}<div id="emailHelp" class="form-text mb-3">Выберите во что конвертировать </div> 
     {# <select class="form-select mb-3" aria-label="Default select example" name="coin">
       <option selected name="selected">Open this select menu</option>
@@ -10,5 +10,5 @@
     <div class="hidden">
       {{ form_row(form.user) }}
     </div>
-    <button class="btn btn-info rounded-0 mb-3">{{ button_label|default('Подтвердить') }}</button>
+    <button class="btn btn-primary rounded-0 mb-3">{{ button_label|default('Подтвердить') }}</button>
 {{ form_end(form) }}

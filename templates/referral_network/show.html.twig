@@ -1,345 +1,342 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ReferralNetwork{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl col-sm-12 mt-3">
-    <h1 class="d-flex justify-content-center text-white mb-1 mt-3" style="background: #5eabeb;">Информация об участнике сети</h1>
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success rounded-0" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl col-sm-12 mt-3">
+        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['success', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info rounded-0" role="alert">
+                    <div class="alert alert-success rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
+        {% endfor %}
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-warning rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        <div class="col-sm-12 mb-3 mt-3 bg-white">
+                <div class=" text-secondary shadow p-3 mb-1  rounded-0">
+                    <div class="row">
+                        <div class="col-sm-6 mb-3 pb-3">
+                            {% if  referral_network.reward == NULL %}  
+                            <h5 class="text-center text-secondary">У вас пока нет начислений CoMetaCoin</h5>
+                            {% else %}   
+                            <h5 class="text-center text-secondary">Структура начислений CoMetaCoin</h5>   
+                            {% endif %}
+                            <div id="donut-chart-my-position"></div>   
+                        </div>
+                        <div class="col-sm-6 mb-3 pb-3">
+                            <h5 class="text-center text-secondary">Уровень начислений CoMetaCoin</h5>
+                            <div id="chart_position_cash_back"></div> 
+                        </div>
                     </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
+                    <div class="row">
+                                
                     </div>
-                {% endfor %}            
-    {% endfor %}
-    {# <div class="col-xs-12 text-secondary text-center shadow p-3 mb-1 bg-light rounded-0">
-      <h5 class="text-secondary">Структура ваших начислений дохода в сети в USDT</h5>
-    </div> #}
-    <div class="col-md-12 text-center mt-3 mb-3">
-        <img src="{{ asset('asset/img/icone-comet-6.png') }}" class="img-fluid rounded-start" alt="..." style="max-width: 100px;">
-    </div>
-    <div class="row justify-content-center">
-        <div class="col-sm-12 mb-1">
-            <div class="card text-center shadow p-3 mb-1 bg-light rounded-0">
-            <h5 class="text-secondary">Структура ваших начислений дохода в сети в USDT</h5>
-            {% if  referral_network.reward == NULL %}
-                <div class="card-body text-info">
-                    <h3>У вас пока нет начислений в сети</h3>
                 </div>
-            {% else %}
-                <div class="card-body">
-                    <div id="donut-chart-my-position"></div>
-                </div>
-            {% endif %}
-            </div>
         </div>
-    </div>
-    <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-warning rounded-0">
-                <div class="card-body d-flex  justify-content-between">    
-                    <span><h6 class="card-title">Отстаток начсиленных доходов в сети доступных для перевода на кошелек</h6></span>
-                    {% if  referral_network.rewardWallet == NULL %}     
-                    <span><h6 class="card-title text-dark">0.00 USDT</h6></span>
-                    {% else %}
-                    <span><h6 class="card-title text-dark">{{ available_balance }} USDT</h6></span>
-                    {% endif %} 
-                    <a class="btn  btn-info rounded-0 btn-sm mb-1" href="{{ path('app_wallet_exchange_wallet_comet', {'id': wallet_id}) }}">Вывести на кошелек</a>    
+    
+        {# <div class="row shadow p-3 justify-content-center">
+            <div class="col-sm-12 mb-1">
+                <div class="card text-center  mb-1 bg-white rounded-0">
+                <h5 class="text-secondary">Структура ваших начислений дохода в сети в USDT</h5>
+                {% if  referral_network.reward == NULL %}
+                    <div class="card-body text-info">
+                        <h3>У вас пока нет начислений в сети</h3>
+                    </div>
+                {% else %}
+                    <div class="card-body">
+                        <div id="donut-chart-my-position"></div>
+                    </div>
+                {% endif %}
                 </div>
             </div>
-    </div>
+        </div> #}
+        {# <div class=" mb-1">
+                <div class="card text-secondary shadow p-3 mb-1 bg-warning rounded-0">
+                    <div class="card-body d-flex  justify-content-between">    
+                        <span><h6 class="card-title">Отстаток начсиленных доходов в сети доступных для перевода на кошелек</h6></span>
+                        {% if  referral_network.rewardWallet == NULL %}     
+                        <span><h6 class="card-title text-dark">0.00 USDT</h6></span>
+                        {% else %}
+                        <span><h6 class="card-title text-dark">{{ available_balance }} USDT</h6></span>
+                        {% endif %} 
+                        <a class="btn  btn-info rounded-0 btn-sm mb-1" href="{{ path('app_wallet_exchange_wallet_comet', {'id': wallet_id}) }}">Вывести на кошелек</a>    
+                    </div>
+                </div>
+        </div> #}
 
-    <div class="row justify-content-center">
-        <div class="col-sm-4 mb-1">
-            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
-                <div class="card-body">    
+        <div class="row justify-content-center" style="background: rgb(223, 230, 245);">
+            <div class="col-sm-4 mb-1">
+                <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
+                    <div class="card-body">    
+                        <img src="{{ asset('asset/img/network-3.png') }}" class="card-img-top" alt="" style="max-width: 102px;">
+                        <h5 class="card-title">Сеть с левой стороны</h5>
+                        {# <p class="card-text">Баланс сети слева {{ data.summ_left }} USDT</p> #}
+                        <p class="text-warning shadow p-3 mb-1  rounded-0 fw-bolder" style="background: rgb(72, 109, 169);">Количество участников слева : {{ data.count_left }}</p>
+                        {# <a href="#" class="btn btn-primary">Перейти куда-нибудь</a> #}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 mb-1">
+                <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
+                    <div class="card-body">
+                    <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="" style="max-width: 100px;">
+                        <h5 class="card-title">Мой баланс</h5>
+                        {# <p class="card-text">Мой баланс всех начислений</p> #}
+                        {% if data.my_summ == NULL %}  
+                        <p class="text-warning shadow p-3 mb-1  rounded-0 fw-bolder" style="background: rgb(72, 109, 169);">0.00 CoMetaCoin</p>
+                        {% else %}
+                        <p class="text-warning shadow p-3 mb-1  rounded-0 fw-bolder" style="background: rgb(72, 109, 169);">{{ data.my_summ * token_rate }} CoMetaCoin</p>
+                        {% endif %}
+                        {# <a href="#" class="btn btn-primary">Перейти куда-нибудь</a> #}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 mb-1">
+                <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
+                    <div class="card-body">
                     <img src="{{ asset('asset/img/network-3.png') }}" class="card-img-top" alt="" style="max-width: 102px;">
-                    <h5 class="card-title">Сеть с левой стороны</h5>
-                    {# <p class="card-text">Баланс сети слева {{ data.summ_left }} USDT</p> #}
-                    <p class="text-warning shadow p-3 mb-1  rounded-0 fw-bolder" style="background: #5eabeb;">Количество участников слева : {{ data.count_left }}</p>
-                    {# <a href="#" class="btn btn-primary">Перейти куда-нибудь</a> #}
+                        <h5 class="card-title">Сеть с правой стороны</h5>
+                        {# <p class="card-text">Баланс сети справа {{ data.summ_right }} USDT</p> #}
+                        <p class="text-warning shadow p-3 mb-1 rounded-0 fw-bolder" style="background: rgb(72, 109, 169);">Количество участников справа : {{ data['count_right'] }}</p>
+                        {# <a href="#" class="btn btn-primary">Перейти куда-нибудь</a> #}
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-4 mb-1">
-            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
-                <div class="card-body">
-                <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="" style="max-width: 100px;">
-                    <h5 class="card-title">Мой баланс</h5>
-                    {# <p class="card-text">Мой баланс всех начислений</p> #}
-                    {% if data.my_summ == NULL %}  
-                    <p class="text-warning shadow p-3 mb-1  rounded-0 fw-bolder" style="background: #5eabeb;">0.00 USDT</p>
-                    {% else %}
-                    <p class="text-warning shadow p-3 mb-1  rounded-0 fw-bolder" style="background: #5eabeb;">{{ data.my_summ }} USDT</p>
-                    {% endif %}
-                    {# <a href="#" class="btn btn-primary">Перейти куда-нибудь</a> #}
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4 mb-1">
-            <div class="card text-secondary text-center shadow p-3 mb-1 bg-white rounded-0">
-                <div class="card-body">
-                <img src="{{ asset('asset/img/network-3.png') }}" class="card-img-top" alt="" style="max-width: 102px;">
-                    <h5 class="card-title">Сеть с правой стороны</h5>
-                    {# <p class="card-text">Баланс сети справа {{ data.summ_right }} USDT</p> #}
-                    <p class="text-warning shadow p-3 mb-1 rounded-0 fw-bolder" style="background: #5eabeb;">Количество участников справа : {{ data['count_right'] }}</p>
-                    {# <a href="#" class="btn btn-primary">Перейти куда-нибудь</a> #}
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-12">
-    <div class="row shadow p-3 mb-1">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="">
-                                <div class="card-body">
-                                    <h5 class="card-title fw-bold text-secondary">Личная реферральная ссылка</h5>
-                                    <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput">
-                                    <h5 class="card-title fw-bold text-secondary"></h5>
-                                    <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
-                                </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="">
-                                <div class="card-body row">
-                                    <button  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0" onclick="myFunction()">Скопировать ссылку</button>
-                                    {# <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> #}
-                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
-                                    <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="nav-link fw-bold fst-italic fs-5 mb-1">Отправить по почте</a>
-                                </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-8">
-                                <div class="">
-                                <div class="card-body">
-                                    <h5 class="card-title fw-bold text-secondary">Личная реферральная ссылка</h5>
-                                    <input class="rounded-0 border-0 bg-light text-info" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput">
-                                    <h5 class="card-title fw-bold text-secondary"></h5>
-                                    <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
-                                </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="">
-                                <div class="card-body row">
-                                    <button  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" onclick="myFunction()">Скопировать ссылку</button>
-                                    {# <a href="{{ path('app_wallet_exchange_usdt', {'id': wallet.id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> #}
-                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
-                                    <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="nav-link fw-bold fst-italic fs-5 mb-1">Отправить по почте</a>
-                                </div>
-                                </div>
+        <div class="col-sm-12 mb-3">
+            <div class="card text-secondary shadow p-3 mb-1  rounded-0">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-secondary">Доступный остаток CoMetaCoin для перевода на кошелек</h5>
+                                {% if  referral_network.rewardWallet == NULL %}     
+                                <span><h6 class="card-title fst-italic fw-bold" style="color: rgb(72, 109, 169); font-size: 25px;">0.00</h6></span>
+                                {% else %}
+                                <span><h6 class="card-title fst-italic fw-bold" style="color: rgb(72, 109, 169); font-size: 25px;">{{ available_balance * token_rate }}</h6></span>
+                                {% endif %} 
+                                <p class="card-text fw-lighter fst-italic">Внимание! Совокупно перевести на кошелек из линии можно не более 70% от общей суммы начислений доходов. </p>   
                             </div>
                         </div>
                     </div>
-    <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1  rounded-0">
+                    <div class="col-sm-4">
+                        <div class="">
+                            <div class="card-body row">
+                                <a href="{{ path('app_wallet_exchange_comet', {'id': wallet_id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Перевести на кошелек</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
                 <div class="row">
-                            <div class="col-sm-8">
-                                <div class="">
-                                <div class="card-body">
-                                    <h5 class="card-title fw-bold text-secondary">USDT</h5>
-                                    <h5 class="card-title fw-bold text-secondary"></h5>
-                                    <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
-                                </div>
-                                </div>
+                    <div class="col-sm-8">
+                        <div class="">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-secondary">Баланс моей команды CoMetaCoin </h5>
+                                <h5 class="card-title fst-italic fw-bold" style="color: rgb(72, 109, 169); font-size: 25px;">{{ my_team_summ }}</h5>
+                                <p class="card-text fw-lighter fst-italic">баланс моей команды - это совокупная стоимость пакетов всех участников которых пригласил лично я.</p>   
                             </div>
-                            <div class="col-sm-4">
-                                <div class="">
-                                <div class="card-body row">
-                                    <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Пополнить</a>
-                                    {# <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a> #}
-                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
-                                    {# <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Вывести</a> #}
-                                </div>
-                                </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="">
+                            <div class="card-body row">
+                                <a href="{{ path('app_referral_network_myteam',{'my_team': referral_network.memberCode}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Посмотреть мою команду</a>
                             </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
-                            <div class="col-sm-8">
-                                <div class="">
-                                <div class="card-body">
-                                    <h5 class="card-title fw-bold text-secondary">USDT</h5>
-                                    <h5 class="card-title fw-bold text-secondary"></h5>
-                                    <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
-                                </div>
-                                </div>
+                    <div class="col-sm-8">
+                        <div class="">
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-secondary">Моя личная реферральная ссылка</h5>
+                                <h5 class="card-title fw-bold text-secondary"></h5>
+                                <input class="form-control fst-italic rounded-0 border-0 bg-white text-wrap" type="text" value="164.92.159.123{{ path('app_register') }}/{{ referral_network.memberCode }}" id="myInput" style="color: rgb(72, 109, 169);">
+                                <p class="card-text fw-lighter fst-italic">Вы можете отправить свою реферральную ссылку для приглашения нового партнера по почте, или скопировать ее о отправить другим удобным для вас способом.</p>   
                             </div>
-                            <div class="col-sm-4">
-                                <div class="">
-                                <div class="card-body row">
-                                    <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Пополнить</a>
-                                    {# <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Обменять</a>
-                                    {# <a href="{{ path('app_wallet_edit', {'id': wallet.id}) }}" class="btn btn-secondary">Купить эфириум</a> #}
-                                    {# <a href="" class="nav-link fw-bold fst-italic fs-5 mb-1">Вывести</a>  #}
-                                </div>
-                                </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="">
+                            <div class="card-body row">
+                                <button  class="nav-link text-start bg-white fw-bold fst-italic fs-5 mb-1 border-0" onclick="myFunction()">Скопировать ссылку</button>
+                                <a data-fancybox data-src="#hidden-content-referral" href="javascript:;" class="nav-link fw-bold fst-italic fs-5 mb-1">Отправить по почте</a>
                             </div>
-                </div>
-            </div>
-    </div>
-    {# <div class="col-sm-4 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
-                <div class="card-body row justify-content-between">    
-                    <h6 class="card-title">Моя команда - количество участников</h6>
-                    <h6 class="card-title text-info mt-1">{{ my_team_count }}</h6>   
-                    <a class="btn  btn-info rounded-0 btn-sm mb-4 mt-1" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Открыть</a> 
-                   
-                </div>
-            </div>
-    </div>
-    {% if referral_network.cash < (referral_network.pakage * k_cash_back) %}
-    <div class="col-sm-4 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
-                <div class="card-body row  justify-content-between">    
-                    <span><h6 class="card-title">Мой пакет</h6></span>
-                    <span><h6 class="card-title text-info">{{ referral_network.pakage }} USDT</h6></span>
-                    <a class="btn  btn-info rounded-0 btn-sm mb-1 mt-1" href="{{ path('app_pakege_show', {'id': referral_network.pakegeId}) }}">Подробности</a>
-                    <a class="btn  btn-info rounded-0 btn-sm" href="{{ path('app_pakege_edit', {'id': referral_network.pakegeId}) }}">Повысить</a>          
-                </div>
-            </div>
-    </div>
-    {% else %}
-    <div class="col-sm-12 mb-1">
-            <div class="card text-white shadow p-3 mb-1 bg-danger rounded-0">
-                <div class="card-body row justify-content-between">    
-                    <span><h6 class="card-title">Мой пакет Внимание! вы достигли предела выплат cashback, необходимо повысить пакет (нажмите чтобы повысить)</h6></span>
-                    <span><h6 class="card-title text-info">{{ referral_network.pakage }} USDT</h6></span>
-                    <a class="btn  btn-info rounded-0 btn-sm mb-1" href="{{ path('app_pakege_show', {'id': referral_network.pakegeId}) }}">Подробности</a>
-                    <a class="btn  btn-info rounded-0 btn-sm " href="{{ path('app_pakege_edit', {'id': referral_network.pakegeId}) }}">Повысить</a>    
-                </div>
-            </div>
-    </div>
-    {% endif %} #}
-   </div>
-    <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Моя команда - баланс</h6></span>
-                    <span><h6 class="card-title text-info">{{ my_team_summ }} USDT</h6></span>    
-                </div>
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Моя сторона в сети</h6></span>
-                    <span><h6 class="card-title text-info">{{ referral_network.userStatus }}</h6></span>    
-                </div>
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Мои начисления по программе Cashback</h6></span>
-                    {% if  referral_network.cash == NULL %}
-                    <span><h6 class="card-title text-info">0.00 USDT</h6></span>
-                    {% else %}
-                    <span><h6 class="card-title text-info">{{ referral_network.cash }} USDT</h6></span>
-                    {% endif %}         
-                </div>
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Мои начисления по программе Direct</h6></span>
-                    {% if  referral_network.direct == NULL %}
-                    <span><h6 class="card-title text-info">0.00 USDT</h6></span>
-                    {% else %}
-                    <span><h6 class="card-title text-info">{{ referral_network.direct }} USDT</h6></span>
-                    {% endif %}        
-                </div>
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Всего переведено доходов на кошелек с момента активации пакета</h6></span>
-                    {% if  referral_network.withdrawalToWallet == NULL %}
-                    <span><h6 class="card-title text-info">0.00 USDT</h6></span>    
-                    {% else %}
-                    <span><h6 class="card-title text-info">{{ referral_network.withdrawalToWallet }} USDT</h6></span>
-                    {% endif %}    
-                </div>
-            </div>
-    </div>
-    {# <div class="col-sm-12 mb-1">
-            
-    </div>
-    <div class="col-sm-12 mb-1">
-            
-    </div>
-    <div class="col-sm-12 mb-1">
-            
-    </div> #}
-     
-    {% if is_granted('ROLE_ADMIN') %}
-    <div class="col-sm-12 mb-1">
-            <div class="card text-secondary shadow p-3 mb-1 bg-white rounded-0">
-                <div class="card-body">
-                <table class="table">
-                    <tbody>    
-                        <h5 class="card-title mb-3">Для Администратора - информация о сети на момент активации пакета данного пользователя</h5>
-                        <tr class="shadow p-3 mb-1 bg-light rounded-0">
-                            <th>Выплата в компанию (проект) в момент активации пакета данного участника</th>
-                            <td>{{ referral_network.currentNetworkProfit }} USDT</td>
-                        </tr>
-                        <tr class="shadow p-3 mb-1 bg-light rounded-0">
-                            <th>Выплата в сеть по программе Direct в момент активации пакета данного пользователя</th>
-                            <td>{{ referral_network.paymentsNetwork }} USDT</td>
-                        </tr>
-                        <tr class="shadow p-3 mb-1 bg-light rounded-0">
-                            <th>Выплата в сеть по программе Cash back в момент активации пакета данного пользователя</th>
-                            <td>{{ referral_network.cash }} USDT</td>
-                        </tr>    
-                    </tbody>
-                </table>
-                </div>
-            </div>
-    </div>
-    
-    <div class="col-sm-12 mb-1">
-            <div class="card text-center shadow p-3 mb-1 bg-light rounded-0">
-                <div class="card-body">
-                    {% if is_granted('ROLE_ADMIN') %}  
-                    <a  class="btn btn-secondary mb-1" href="{{ path('app_referral_network_index') }}">К списку всех участников</a>
-                    {% else %}
-                    <a  class="btn btn-secondary mb-1" href="{{ path('app_personal_area') }}">В личный кабинет</a>
-                    {% endif %}
-                    <a  class="btn btn-secondary mb-1" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Посмотреть команду</a>
-                    <a  class="btn btn-secondary mb-1" href="{{ path('app_personal_area') }}">Повысить пакет</a>
-                    
-                    <a class="btn btn-warning mb-1" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">Редактировать</a>
-
-                    {{ include('referral_network/_delete_form.html.twig') }}
-                </div>
+                        </div>
+                    </div>
+                </div>    
             </div>
         </div>
-    {% endif %}
-
-<div id="hidden-content-referral">
-    {{ form_start(referral_link_to_email_form) }}
-    <div class="form_box-inner">
-        <div class="form_box-left">
-            
-            {{ form_row(referral_link_to_email_form.email_to_client) }}
-            <div class="hidden">
-            {{ form_row(referral_link_to_email_form.referral_link) }}
-            {{ form_row(referral_link_to_email_form.user_id) }}
-            </div>
-            <input type="submit" value="Отправить">
+        <div class="col-sm-12">
+        
+        <div class="col-sm-12 mb-1">
+                <div class="card text-secondary shadow p-3 mb-1  rounded-0">
+                    <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold text-secondary">Моя сторона в линии</h5>
+                                        {# <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>    #}
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="">
+                                    <div class="card-body row">
+                                        <h6 class="nav-link fw-bold fst-italic fs-5 mb-1" style="color: rgb(72, 109, 169);">{{ referral_network.userStatus }}</h6></span>    
+                                    </div>
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold text-secondary">Мои начисления по программе cashBack в CoMetaCoin</h5>
+                                        <h5 class="card-title fw-bold text-secondary"></h5>
+                                        <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>   
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="">
+                                    <div class="card-body row">
+                                        {% if  referral_network.cash == NULL %}
+                                        <h6 class="nav-link fw-bold fst-italic fs-5 mb-1" style="color: rgb(72, 109, 169);">0.00</h6></span>
+                                        {% else %}
+                                        <h6 class="nav-link fw-bold fst-italic fs-5 mb-1" style="color: rgb(72, 109, 169);">{{ referral_network.cash * token_rate}}</h6></span>
+                                        {% endif %}    
+                                    </div>
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold text-secondary">Мои начисления по программе Direct в CoMetaCoin</h5>
+                                        {# <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>    #}
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="">
+                                    <div class="card-body row">
+                                         {% if  referral_network.direct == NULL %}
+                                        <h6 class="nav-link fw-bold fst-italic fs-5 mb-1" style="color: rgb(72, 109, 169);">0.00</h6></span>
+                                        {% else %}
+                                        <h6 class="nav-link fw-bold fst-italic fs-5 mb-1" style="color: rgb(72, 109, 169);">{{ referral_network.direct * token_rate }}</h6></span>
+                                        {% endif %}    
+                                    </div>
+                                    </div>
+                                </div>
+                    </div>
+                    <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold text-secondary">Всего переведено CoMetaCoin из линии на кошелек</h5>
+                                        {# <p class="card-text fw-lighter fst-italic">При выводе стедств с кошелька взимается комиссия от 2% до 5% в зависимости от размера суммы </p>    #}
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="">
+                                    <div class="card-body row">
+                                        {% if  referral_network.withdrawalToWallet == NULL %}
+                                        <h6 class="nav-link fw-bold fst-italic fs-5 mb-1" style="color: rgb(72, 109, 169);">0.00</h6></span>    
+                                        {% else %}
+                                        <h6 class="nav-link fw-bold fst-italic fs-5 mb-1" style="color: rgb(72, 109, 169);">{{ referral_network.withdrawalToWallet * token_rate }}</h6></span>
+                                        {% endif %}    
+                                    </div>
+                                    </div>
+                                </div>
+                    </div>
+                </div>
         </div>
     </div>
-    {{ form_end(referral_link_to_email_form) }}
-</div>    
-    
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="col-sm-12 mb-1">
+                <div class="card text-secondary shadow p-3 mb-1 bg-white rounded-0">
+                    <div class="card-body">
+                    <table class="table">
+                        <tbody>    
+                            <h5 class="card-title mb-3">Для Администратора - информация о сети на момент активации пакета данного пользователя</h5>
+                            <tr class="shadow p-3 mb-1 bg-light rounded-0">
+                                <th>Выплата в компанию (проект) в момент активации пакета данного участника</th>
+                                <td>{{ referral_network.currentNetworkProfit }} USDT</td>
+                            </tr>
+                            <tr class="shadow p-3 mb-1 bg-light rounded-0">
+                                <th>Выплата в сеть по программе Direct в момент активации пакета данного пользователя</th>
+                                <td>{{ referral_network.paymentsNetwork }} USDT</td>
+                            </tr>
+                            <tr class="shadow p-3 mb-1 bg-light rounded-0">
+                                <th>Выплата в сеть по программе Cash back в момент активации пакета данного пользователя</th>
+                                <td>{{ referral_network.cash }} USDT</td>
+                            </tr>    
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+        </div>
+        
+        <div class="col-sm-12 mb-1">
+                <div class="card text-center shadow p-3 mb-1 bg-light rounded-0">
+                    <div class="card-body">
+                        {% if is_granted('ROLE_ADMIN') %}  
+                        <a  class="btn btn-secondary mb-1" href="{{ path('app_referral_network_index') }}">К списку всех участников</a>
+                        {% else %}
+                        <a  class="btn btn-secondary mb-1" href="{{ path('app_personal_area') }}">В личный кабинет</a>
+                        {% endif %}
+                        <a  class="btn btn-secondary mb-1" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Посмотреть команду</a>
+                        <a  class="btn btn-secondary mb-1" href="{{ path('app_personal_area') }}">Повысить пакет</a>
+                        
+                        <a class="btn btn-warning mb-1" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">Редактировать</a>
 
+                        {{ include('referral_network/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    <div id="hidden-content-referral">
+        {{ form_start(referral_link_to_email_form) }}
+        <div class="form_box-inner">
+            <div class="form_box-left">
+                
+                {{ form_row(referral_link_to_email_form.email_to_client) }}
+                <div class="hidden">
+                {{ form_row(referral_link_to_email_form.referral_link) }}
+                {{ form_row(referral_link_to_email_form.user_id) }}
+                </div>
+                <input class="btn rounded-0 mb-1 text-white" type="submit" value="Отправить" style="background:  rgb(72, 109, 169);">
+            </div>
+        </div>
+        {{ form_end(referral_link_to_email_form) }}
+    </div>    
+    </div>
 </div>
 
 <script>
@@ -390,4 +387,7 @@ $('.copy_link').click(function(){alert('Cсылка успешно скопир�
 {% endblock %}
 {% block javascripts2 %}
             {{ include('js_show_my_position.html.twig') }}
+{% endblock %}
+{% block javascripts4 %}
+            {{ include('js_show_my_cashback.html.twig') }}
 {% endblock %}

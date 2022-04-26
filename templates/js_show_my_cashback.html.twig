@@ -1,0 +1,31 @@
+{% block javascripts4 %}
+ 
+<script>
+var chart_position_cash_back = bb.generate({
+        data: {
+          columns: [
+            [" ", 0],
+            //["Blue limit 60000 ", 0],
+            ["Orange  CashBack {{ referral_network.reward * token_rate }} CoMetaCoin", {{ referral_network.reward * token_rate }}],
+            //["Blue limit 60000 ", 1200],
+            ["Green Limit {{ limit_cashback * token_rate }} CoMetaCoin", {{ (limit_cashback * token_rate) - (referral_network.reward * token_rate)}}],
+            //["green cash 60000", 60000 - 1200],
+          ],
+          type: "donut",
+          onclick: function (d, i) {
+            console.log("onclick", d, i);
+          },
+          onover: function (d, i) {
+            console.log("onover", d, i);
+          },
+          onout: function (d, i) {
+            console.log("onout", d, i);
+          },
+        },
+        donut: {
+          title: "Всего {{ referral_network.reward * token_rate }}",
+        },
+        bindto: "#chart_position_cash_back",
+      });
+</script>
+{% endblock %}

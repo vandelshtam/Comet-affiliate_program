@@ -1,38 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Wallet{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <h1>Create new Wallet</h1>
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success rounded-0" role="alert">
-                    {{ message }}
-                </div>
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">  
+    <div class="container-xxl col-sm-8 bg-white shadow p-3 mb-3 mt-3 rounded-0">
+        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+            
+            {% for label, messages in app.flashes(['success', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-success rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
             {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-info rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}            
-    {% endfor %}
-    {{ include('wallet/_form.html.twig') }}
+            {% for label, messages in app.flashes(['info', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-info rounded-0" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['danger', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger rounded-0" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+            {% endfor %}
+            {% for label, messages in app.flashes(['warning', 'notice']) %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger rounded-0" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}            
+            {% endfor %}
+            {{ include('wallet/_form.html.twig') }}
 
-    <a class="btn btn-info rounded-0 mb-1"  href="{{ path('app_wallet_index_admin') }}">Назад</a>
+            <a class="btn btn-primary rounded-0 mb-1"  href="{{ path('app_wallet_index_admin') }}">Назад</a>
+    </div>
+</div>
 {% endblock %}

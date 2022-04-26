@@ -40,10 +40,11 @@ security:
 
     access_control:
          - { path: ^/pakege, roles: ROLE_USER }
-         - { path: ^/list/referral/networks, roles: ROLE_USER }
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
-        #- { path: '/show', roles: [ROLE_ADMIN] }
+         - { path: ^/referral/network, roles: ROLE_USER }
+         - { path: ^/list/referral/networks, roles: ROLE_ADMIN }
+         - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/edit, roles: ROLE_USER }
+        #- { path: '/delete', roles: ROLE_ADMIN }
 
 when@test:
     security:

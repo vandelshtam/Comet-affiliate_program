@@ -3,88 +3,90 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container">
-    <h1>Страница персоанльных данных</h1>
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success rounded-0" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
+<div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl bg-white shadow">
+    <h1 class="d-flex justify-content-center  mb-5 mt-3" style="color: rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['success', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info rounded-0" role="alert">
+                    <div class="alert alert-success rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}            
-    {% endfor %}
-    {# <div class="alert alert-warning" role="alert">
-    Важная информация:
-        <ul>
-            <li>Вы обязательно должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new') }}">перейти к заполнению</a></code></li>
-        </ul>
-    </div> #}
-    {% if is_granted('ROLE_ADMIN') %}
-    {# <a class="btn btn-success" href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">Добавить</a> #}
-    <a class="btn btn-info rounded-0 mb-1 mt-1" href="{{ path('app_admin') }}">Назад</a>
-    {% endif %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>имя</th>
-                <th>Фамилия</th>
-                <th>Телефон</th>
-                <th>Государство</th>
-                <th>регион/область/провинция</th>
-                <th>Город</th>
-                <th>Улица</th>
-                <th>Номер дома</th>
-                <th>Номер корпуса/блока</th>
-                <th>Квартира</th>
-                <th>Ваши действия</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for personal_datum in personal_datas %}
-            <tr>
-                <td>{{ personal_datum.id }}</td>
-                <td>{{ personal_datum.name }}</td>
-                <td>{{ personal_datum.surname }}</td>
-                <td>{{ personal_datum.phone }}</td>
-                <td>{{ personal_datum.state }}</td>
-                <td>{{ personal_datum.region }}</td>
-                <td>{{ personal_datum.city }}</td>
-                <td>{{ personal_datum.street }}</td>
-                <td>{{ personal_datum.house }}</td>
-                <td>{{ personal_datum.block }}</td>
-                <td>{{ personal_datum.apartment }}</td>
-                <td>
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_data_show', {'personal_user_id': personal_datum.id}) }}">Показать</a>
-                    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_personal_data_edit', {'id': personal_datum.id}) }}">Редактировать</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="12">no records found</td>
-            </tr>
         {% endfor %}
-        </tbody>
-    </table>
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        {# <div class="alert alert-warning" role="alert">
+        Важная информация:
+            <ul>
+                <li>Вы обязательно должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new') }}">перейти к заполнению</a></code></li>
+            </ul>
+        </div> #}
+        {% if is_granted('ROLE_ADMIN') %}
+        {# <a class="btn btn-success" href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">Добавить</a> #}
+        <a class="btn btn-primary rounded-0 mb-1 mt-1" href="{{ path('app_admin') }}">Назад</a>
+        {% endif %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>имя</th>
+                    <th>Фамилия</th>
+                    <th>Телефон</th>
+                    <th>Государство</th>
+                    <th>регион/область/провинция</th>
+                    <th>Город</th>
+                    <th>Улица</th>
+                    <th>Номер дома</th>
+                    <th>Номер корпуса/блока</th>
+                    <th>Квартира</th>
+                    <th>Ваши действия</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for personal_datum in personal_datas %}
+                <tr>
+                    <td>{{ personal_datum.id }}</td>
+                    <td>{{ personal_datum.name }}</td>
+                    <td>{{ personal_datum.surname }}</td>
+                    <td>{{ personal_datum.phone }}</td>
+                    <td>{{ personal_datum.state }}</td>
+                    <td>{{ personal_datum.region }}</td>
+                    <td>{{ personal_datum.city }}</td>
+                    <td>{{ personal_datum.street }}</td>
+                    <td>{{ personal_datum.house }}</td>
+                    <td>{{ personal_datum.block }}</td>
+                    <td>{{ personal_datum.apartment }}</td>
+                    <td>
+                        <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_personal_data_show', {'personal_user_id': personal_datum.id}) }}">Показать</a>
+                        <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_personal_data_edit', {'id': personal_datum.id}) }}">Редактировать</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="12">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

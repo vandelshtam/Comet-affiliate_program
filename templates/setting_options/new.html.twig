@@ -1,11 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New SettingOptions{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <h1>Create new SettingOptions</h1>
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">    
+    <div class="container-xxl bg-white col-sm-4  shadow p-3 mb-3 mt-3 rounded-0">
+        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
 
     {{ include('setting_options/_form.html.twig') }}
 
-    <a href="{{ path('app_setting_options_index') }}">back to list</a>
+    <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_setting_options_index') }}">Назад</a>
+    </div>
+</div>
 {% endblock %}

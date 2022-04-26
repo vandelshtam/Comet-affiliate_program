@@ -19,28 +19,28 @@
                 <div class="form_box-left">
                 {% for label, messages in app.flashes(['success', 'notice']) %}
                         {% for message in messages %}
-                            <div class="alert alert-success" role="alert">
+                            <div class="alert alert-success rounded-0" role="alert">
                                 {{ message }}
                             </div>
                         {% endfor %}
                 {% endfor %}
                 {% for label, messages in app.flashes(['info', 'notice']) %}
                             {% for message in messages %}
-                                <div class="alert alert-info" role="alert">
+                                <div class="alert alert-info rounded-0" role="alert">
                                     {{ message }}
                                 </div>
                             {% endfor %}
                 {% endfor %}
                 {% for label, messages in app.flashes(['danger', 'notice']) %}
                             {% for message in messages %}
-                                <div class="alert alert-danger" role="alert">
+                                <div class="alert alert-danger rounded-0" role="alert">
                                     {{ message }}
                                 </div>
                             {% endfor %}
                 {% endfor %}
                 {% for label, messages in app.flashes(['warning', 'notice']) %}
                     {% for message in messages %}
-                        <div class="alert alert-danger" role="alert">
+                        <div class="alert alert-warning rounded-0" role="alert">
                             {{ message }}
                         </div>
                     {% endfor %}            
@@ -64,7 +64,7 @@
                         </div>
                         {% endif %}
                         <label class="form-check-label" for="exampleCheck1">{{ form_row(registrationForm.agreeTerms) }}</label>
-                        <a data-fancybox data-src="#agree_terms" href="javascript:;" class="btn rounded-0 mb-2 btn-sm" style="background: #5eabeb;">
+                        <a data-fancybox data-src="#agree-terms" href="javascript:;" class="btn rounded-0 mb-2 btn-sm" style="background: #5eabeb;">
                             Прочитать условия
                         </a>
                         <div id="emailHelp" class="form-text mb-3">Согласие с условиями обязательный параметр для пегистрации.</div>
@@ -73,7 +73,7 @@
                             {{ form_row(registrationForm.personal_data_id, {'value': 0 }) }}
                         </div> 
                         
-                    <button type="submit" class="btn btn-info rounded-0 mb-1 text-light" >Зарегистрироваться</button>
+                    <button type="submit" class="btn btn-primary rounded-0 mb-1 text-light" >Зарегистрироваться</button>
                 </div>
             </div>
         {{ form_end(registrationForm) }}

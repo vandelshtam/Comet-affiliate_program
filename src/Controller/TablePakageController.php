@@ -7,6 +7,7 @@ use App\Form\TablePakageType;
 use App\Entity\FastConsultation;
 use App\Form\FastConsultationType;
 use App\Controller\MailerController;
+use App\Repository\SavingMailRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\TablePakageRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,7 +22,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class TablePakageController extends AbstractController
 {
     #[Route('/', name: 'app_table_pakage_index', methods: ['GET'])]
-    public function index(TablePakageRepository $tablePakageRepository,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function index(TablePakageRepository $tablePakageRepository,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $ffff = $tablePakageRepository->findAll();
@@ -31,8 +32,7 @@ class TablePakageController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -45,7 +45,7 @@ class TablePakageController extends AbstractController
     }
 
     #[Route('/new/admin', name: 'app_table_pakage_new_admin', methods: ['GET', 'POST'])]
-    public function new(TablePakageRepository $tablePakageRepository,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function new(TablePakageRepository $tablePakageRepository,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -64,8 +64,7 @@ class TablePakageController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client, $savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -73,30 +72,33 @@ class TablePakageController extends AbstractController
             'table_pakage' => $tablePakage,
             'form' => $form,
             'fast_consultation_form' => $fast_consultation_form,
+            'title' => 'New Pakages Table',
+            'controller_name' => 'Страница создания нового пакетного плана',
         ]);
     }
 
     #[Route('/{id}', name: 'app_table_pakage_show', methods: ['GET'])]
-    public function show(TablePakage $tablePakage,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function show(TablePakage $tablePakage,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('table_pakage/show.html.twig', [
             'table_pakage' => $tablePakage,
             'fast_consultation_form' => $fast_consultation_form->createView(),
+            'title' => 'Pakages show',
+            'controller_name' => 'Подробности пакета',
         ]);
     }
 
     #[Route('/{id}/edit/admin', name: 'app_table_pakage_edit_admin', methods: ['GET', 'POST'])]
-    public function edit(Request $request, TablePakage $tablePakage, TablePakageRepository $tablePakageRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function edit(Request $request, TablePakage $tablePakage, TablePakageRepository $tablePakageRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -114,8 +116,7 @@ class TablePakageController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -123,6 +124,8 @@ class TablePakageController extends AbstractController
             'table_pakage' => $tablePakage,
             'form' => $form,
             'fast_consultation_form' => $fast_consultation_form,
+            'title' => 'Table Pakages edit',
+            'controller_name' => 'Редактирование пакетного плана',
         ]);
     }
 

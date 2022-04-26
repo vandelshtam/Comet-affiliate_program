@@ -13,6 +13,7 @@ use App\Form\EditPersonalDataType;
 use App\Form\FastConsultationType;
 use App\Controller\MailerController;
 use App\Repository\WalletRepository;
+use App\Repository\SavingMailRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\PersonalDataRepository;
@@ -27,7 +28,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class PersonalDataController extends AbstractController
 {
     #[Route('/admin', name: 'app_personal_data_index', methods: ['GET'])]
-    public function index(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine,EntityManagerInterface $entityManager, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function index(Request $request, PersonalDataRepository $personalDataRepository,ManagerRegistry $doctrine,EntityManagerInterface $entityManager, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -37,8 +38,7 @@ class PersonalDataController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -46,11 +46,13 @@ class PersonalDataController extends AbstractController
             'personal_datas' => $personalDataRepository->findAll(),
             'title' => 'Personal data',
             'fast_consultation_form' => $fast_consultation_form -> createView(),
+            'controller_name' => 'Все персональные данные',
+            'title' => 'Personal data all',
         ]);
     }
 
     #[Route('/{user_id}/new', name: 'app_personal_data_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PersonalDataRepository $personalDataRepository, WalletRepository $walletRepository,ManagerRegistry $doctrine,EntityManagerInterface $entityManager, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $user_id): Response
+    public function new(Request $request, PersonalDataRepository $personalDataRepository, WalletRepository $walletRepository,ManagerRegistry $doctrine,EntityManagerInterface $entityManager, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $user_id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
@@ -102,8 +104,7 @@ class PersonalDataController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client, $savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -120,7 +121,7 @@ class PersonalDataController extends AbstractController
 
     
     #[Route('/{personal_user_id}/show', name: 'app_personal_data_show', methods: ['GET', 'POST'])]
-    public function show(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,int $personal_user_id): Response
+    public function show(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository,int $personal_user_id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
@@ -149,9 +150,7 @@ class PersonalDataController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            //dd($fast_consultation->getName());
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -159,11 +158,13 @@ class PersonalDataController extends AbstractController
             'personal_datum' => $personalDatum,
             'user' => $user,
             'fast_consultation_form' => $fast_consultation_form,
+            'controller_name' => 'Страница персональных данных',
+            'title' => 'Personal data show',
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_personal_data_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, PersonalData $personalDatum, PersonalDataRepository $personalDataRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
+    public function edit(Request $request, PersonalData $personalDatum, PersonalDataRepository $personalDataRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -203,8 +204,7 @@ class PersonalDataController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -214,6 +214,8 @@ class PersonalDataController extends AbstractController
             'new_user_make' => false,
             'user_id' => $user->getId(),
             'fast_consultation_form' => $fast_consultation_form,
+            'controller_name' => 'Страница редактирование персональных данных',
+            'title' => 'Personal data edit',
         ]);
     }
 

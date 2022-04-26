@@ -3,8 +3,9 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">{{ controller_name }}</h1>
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">    
+    <div class="container-xxl bg-white col-sm-4  shadow p-3 mb-3 mt-3 rounded-0">
+        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success rounded-0" role="alert">
@@ -33,34 +34,7 @@
                     </div>
                 {% endfor %}            
     {% endfor %}
-    {# <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ pakege.id }}</td>
-            </tr>
-            <tr>
-                <th>Название</th>
-                <td>{{ pakege.name }}</td>
-            </tr>
-            <tr>
-                <th>User_id</th>
-                <td>{{ pakege.userId }}</td>
-            </tr>
-            <tr>
-                <th>Стоимость USDT</th>
-                <td>{{ pakege.price }}</td>
-            </tr>
-            <tr>
-                <th>Идентификационный номер реферальной сети</th>
-                <td>{{ pakege.referralNetworksId }}</td>
-            </tr>
-            <tr>
-                <th>Уникальный код клиента</th>
-                <td>{{ pakege.clientCode }}</td>
-            </tr>
-        </tbody>
-    </table> #}
+    
 {# <p class="card-text fw-lighter fst-italic alert alert-warning rounded-0">Внимание! В настоящее время действует акция "Двойной бонус Direct". Приобретая пакет во время дейтвия акции вы будете получать бонус попрограмме "Direct" в размере  </p> #}
                     <div class="row  mb-1">
                         <div class="row">    
@@ -86,9 +60,9 @@
                         </div>
                     </div>
     {% if is_granted('ROLE_ADMIN') %}  
-    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_index_admin') }}">Назад</a>
+    <a  class="btn btn-primary rounded-0 mb-3" href="{{ path('app_pakege_index_admin') }}">Назад</a>
     {% else %}
-    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">Назад</a>
+    <a  class="btn btn-primary rounded-0 mb-3" href="{{ path('app_personal_area') }}">Назад</a>
     {% endif %}
     {# {% if pakege.activation == NULL %} #}
         {# <a class="btn btn-danger rounded-0 mb-1" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать пакет</a> #}
@@ -100,7 +74,7 @@
     {% endif %}
 </div>
 
-{% if time_control > 0 %}
+{% if time_control > 0 and pakeges != NULL %}
 <div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
     <div class="">
         <div class="card-body">
@@ -141,7 +115,7 @@
                         </div>
                     </div>
                 {% endfor%}
-
+    </div>
 </div>
 {% endif %}
 {% endblock %}

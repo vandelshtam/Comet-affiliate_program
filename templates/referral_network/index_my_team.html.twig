@@ -1,320 +1,155 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ReferralNetwork index{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl col-sm-12  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Моя команда</h1>
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success rounded-0" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-info rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}            
-    {% endfor %}
-    {% if is_granted('ROLE_ADMIN') %}  
-    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в  кабинет админа</a> 
-    {# <a class="btn btn-success mb-3" href="{{ path('app_referral_network_new') }}">Добавить</a>    #}
-    {% else %}
-    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
-    {% endif %}
-    {# <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Имя пользователя</th>
-                <th>id пользователя</th>
-                <th>Статус пользователя</th>
-                <th>id записи персональных данных</th>
-                {% if is_granted('ROLE_ADMIN') %}
-                <th>Начисление участнику по программе Direct</th>
-                <th>Начисление пользователю по программе Cash back</th>
-                <th>Стоимость пакета участника</th>
-                <th>Общее количество начислений наград</th>
-                <th>Личная реферальная ссылка для приглашения нового участника</th>
-                {% endif %} 
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for referral_network in referral_networks %}
-            <tr>
-                <td>{{ referral_network.id }}</td>
-                <td>{{ referral_network.name }}</td>
-                <td>{{ referral_network.userId }}</td>
-                <td>{{ referral_network.userStatus }}</td>
-                <td>{{ referral_network.personalDataId }}</td>
-                {% if is_granted('ROLE_ADMIN') %}
-                <td>{{ referral_network.direct }}</td>
-                <td>{{ referral_network.cash }}</td>
-                <td>{{ referral_network.pakage }}</td>
-                <td>{{ referral_network.reward }}</td>
-                <td>{{ referral_network.memberCode }}</td>
-                {% endif %} 
-                <td>
-                    <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">Подробности</a>
-                    {# <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}
-                {# </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">нет записей</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>  #}
+<div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
+  <div class="container-xxl col-sm-12 bg-white shadow p-3 mb-1 mt-3 rounded-0">
+      <h1 class="d-flex justify-content-center mb-5 mt-0 pb-3 pt-3" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+      {% for label, messages in app.flashes(['success', 'notice']) %}
+              {% for message in messages %}
+                  <div class="alert alert-success rounded-0" role="alert">
+                      {{ message }}
+                  </div>
+              {% endfor %}
+      {% endfor %}
+      {% for label, messages in app.flashes(['info', 'notice']) %}
+                  {% for message in messages %}
+                      <div class="alert alert-info rounded-0" role="alert">
+                          {{ message }}
+                      </div>
+                  {% endfor %}
+      {% endfor %}
+      {% for label, messages in app.flashes(['danger', 'notice']) %}
+                  {% for message in messages %}
+                      <div class="alert alert-danger rounded-0" role="alert">
+                          {{ message }}
+                      </div>
+                  {% endfor %}
+      {% endfor %}
+      {% for label, messages in app.flashes(['warning', 'notice']) %}
+                  {% for message in messages %}
+                      <div class="alert alert-danger rounded-0" role="alert">
+                          {{ message }}
+                      </div>
+                  {% endfor %}            
+      {% endfor %}
+      {% if is_granted('ROLE_ADMIN') %}  
+      <a  class="btn btn-primary rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в  кабинет админа</a> 
+      {# <a class="btn btn-success mb-3" href="{{ path('app_referral_network_new') }}">Добавить</a>    #}
+      {% else %}
+      <a  class="btn btn-primary rounded-0 mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
+      {% endif %}
+     
 
-    {# <a href="{{ path('app_referral_network_new') }}">Create new</a> #}
 
-<div class="col-sm-12 mb-1">
-            <div class=" text-secondary rounded-0">
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Моя команда - количество участников</h6></span>
-                    <span><h6 class="card-title text-dark">{{ my_team_count }}</h6></span>    
-                </div>
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Моя команда - баланс</h6></span>
-                    <span><h6 class="card-title">{{ my_team_summ }} USDT</h6></span>    
-                </div>
-                
-                
-            </div>
-    </div>
-
-<div class="container">
-
-    <div class="slider">
-      <div class="slider__container">
-        <div class="slider__wrapper">
-          <div class="slider__items">
-          {% for referral_network in referral_networks %}
-            <div class="slider__item">
-              <!-- Начало контента 1 слайда -->
-              <div class="slider__item-container">
-                <div class="slider__item-content">
-                  <div class="slider__content_header">
-                     <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
-                      {# height="250" loading="lazy"> #}
-                    <span class="slider__content_section">Стоимость пакета {{ referral_network.pakage }} USDT</span>
-                  </div>
-                  <h2 class="slider__content_title">{{ referral_network.name }}</h2>
-                  <div class="slider__content_footer">
-                    <div class="slider__content_avatar">
-                      <img class="slider__content_photo" src="/examples/images/photo-2.jpg" alt="">
-                    </div>
-                    <span class="slider__content_author">Место в линии</span>
-                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
-                      <path fill="currentColor"
-                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
-                      </path>
-                    </svg>
-                    <span class="slider__content_views">{{ referral_network.userStatus }}</span>
-                  </div>
-                </div>
+  <div class="col-sm-12 mb-1 bg-white">
+          <div class=" text-secondary rounded-0">
+              <div class="card-body d-flex justify-content-between">    
+                  <span><h6 class="card-title fst-italic fw-bold text-secondary" style="font-size: 20px;">Моя команда - количество участников</h6></span>
+                  <span><h6 class="card-title fst-italic fw-bold" style="color:  rgb(72, 109, 169); font-size: 25px;">{{ my_team_count }}</h6></span>    
               </div>
-              <!-- Конец контента 1 слайда -->
-            </div>
-          {% endfor %}  
-            {# <div class="slider__item">
-              <!-- Начало контента 2 слайда -->
-              <div class="slider__item-container">
-                <div class="slider__item-content">
-                  <div class="slider__content_header">
-                    <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
-                      height="250" loading="lazy">
-                    <span class="slider__content_section">Подборка</span>
-                  </div>
-                  <h2 class="slider__content_title">15 самых полезных свойств черники</h2>
-                  <div class="slider__content_footer">
-                    <div class="slider__content_avatar">
-                      <img class="slider__content_photo" src="/examples/images/photo-4.jpg" alt="">
-                    </div>
-                    <span class="slider__content_author">Тамара</span>
-                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
-                      <path fill="currentColor"
-                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
-                      </path>
-                    </svg>
-                    <span class="slider__content_views">757</span>
-                  </div>
-                </div>
-              </div>
-              <!-- Конец контента 2 слайда -->
-            </div>
-            <div class="slider__item">
-              <!-- Начало контента 3 слайда -->
-              <div class="slider__item-container">
-                <div class="slider__item-content">
-                  <div class="slider__content_header">
-                     <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
-                      height="250" loading="lazy">
-                    <span class="slider__content_section">Подборка</span>
-                  </div>
-                  <h2 class="slider__content_title">Лучшие фермерские рынки Майами</h2>
-                  <div class="slider__content_footer">
-                    <div class="slider__content_avatar">
-                      <img class="slider__content_photo" src="/examples/images/photo-3.jpg" alt="">
-                    </div>
-                    <span class="slider__content_author">Иван</span>
-                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path fill="currentColor"
-                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
-                      </path>
-                    </svg>
-                    <span class="slider__content_views">320</span>
-                  </div>
-                </div>
-              </div>
-              <!-- Конец контента 3 слайда -->
-            </div>
-            <div class="slider__item">
-              <!-- Начало контента 4 слайда -->
-              <div class="slider__item-container">
-                <div class="slider__item-content">
-                  <div class="slider__content_header">
-                    <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
-                      height="250" loading="lazy">
-                    <span class="slider__content_section">Подборка</span>
-                  </div>
-                  <h2 class="slider__content_title">Почему утята такие милые?</h2>
-                  <div class="slider__content_footer">
-                    <div class="slider__content_avatar">
-                      <img class="slider__content_photo" src="/examples/images/photo-4.jpg" alt="">
-                    </div>
-                    <span class="slider__content_author">Тамара</span>
-                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
-                      <path fill="currentColor"
-                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
-                      </path>
-                    </svg>
-                    <span class="slider__content_views">1855</span>
-                  </div>
-                </div>
-              </div>
-              <!-- Конец контента 4 слайда -->
-            </div> #}
-            {# <div class="slider__item">
-              <!-- Начало контента 5 слайда -->
-              <div class="slider__item-container">
-                <div class="slider__item-content">
-                  <div class="slider__content_header">
-                    <img class="slider__content_img" src="/examples/images/slider/5-350x250.jpg" alt="..." width="350"
-                      height="250" loading="lazy">
-                    <span class="slider__content_section">Подборка</span>
-                  </div>
-                  <h2 class="slider__content_title">Вкусный лимонад в жаркий день</h2>
-                  <div class="slider__content_footer">
-                    <div class="slider__content_avatar">
-                      <img class="slider__content_photo" src="/examples/images/photo-2.jpg" alt="">
-                    </div>
-                    <span class="slider__content_author">Ирина</span>
-                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
-                      <path fill="currentColor"
-                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
-                      </path>
-                    </svg>
-                    <span class="slider__content_views">2799</span>
-                  </div>
-                </div>
-              </div>
-              <!-- Конец контента 5 слайда -->
-            </div>
-            <div class="slider__item">
-              <!-- Начало контента 6 слайда -->
-              <div class="slider__item-container">
-                <div class="slider__item-content">
-                  <div class="slider__content_header">
-                    <img class="slider__content_img" src="/examples/images/slider/6-350x250.jpg" alt="..." width="350"
-                      height="250" loading="lazy">
-                    <span class="slider__content_section">Совет эксперта</span>
-                  </div>
-                  <h2 class="slider__content_title">10 заповедей счастливой женщины</h2>
-                  <div class="slider__content_footer">
-                    <div class="slider__content_avatar">
-                      <img class="slider__content_photo" src="/examples/images/photo-4.jpg" alt="">
-                    </div>
-                    <span class="slider__content_author">Тамара</span>
-                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
-                      <path fill="currentColor"
-                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
-                      </path>
-                    </svg>
-                    <span class="slider__content_views">1855</span>
-                  </div>
-                </div>
-              </div>
-              <!-- Конец контента 6 слайда -->
-            </div>
-            <div class="slider__item">
-              <!-- Начало контента 7 слайда -->
-              <div class="slider__item-container">
-                <div class="slider__item-content">
-                  <div class="slider__content_header">
-                    <img class="slider__content_img" src="/examples/images/slider/7-350x250.jpg" alt="..." width="350"
-                      height="250" loading="lazy">
-                    <span class="slider__content_section">Совет эксперта</span>
-                  </div>
-                  <h2 class="slider__content_title">Влияние кофе на организм человека</h2>
-                  <div class="slider__content_footer">
-                    <div class="slider__content_avatar">
-                      <img class="slider__content_photo" src="/examples/images/photo-1.jpg" alt="">
-                    </div>
-                    <span class="slider__content_author">Арнольд</span>
-                    <svg class="slider__content_icon" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
-                      <path fill="currentColor"
-                        d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
-                      </path>
-                    </svg>
-                    <span class="slider__content_views">2107</span>
-                  </div>
-                </div>
-              </div>
-              <!-- Конец контента 7 слайда -->
-            </div> #}
+              <div class="card-body d-flex justify-content-between">    
+                  <span><h6 class="card-title fst-italic fw-bold" style="font-size: 20px;">Моя команда - баланс</h6></span>
+                  <span><h6 class="card-title fst-italic fw-bold" style="color:  rgb(72, 109, 169); font-size: 25px;">{{ my_team_summ }} USDT</h6></span>    
+              </div>    
           </div>
+  </div>
+ {# {% for referral_network in referral_networks %}  
+<div class="slider__item-container row" style="max-width: 100px;">
+                  <div class="slider__item-content">
+                    <div class="slider__content_header">
+                      <img src="{{ asset('asset/img/icone-avatar-3.png') }}" class="card-img-top" alt="">
+                        {# height="250" loading="lazy"> #}
+                      {# <span class="slider__content_section" style="background: rgb(72, 109, 169);">Стоимость пакета {{ referral_network.pakage }} USDT</span>
+                    </div>
+                    <h2 class="slider__content_title text-white" style="background: rgb(72, 109, 169);">{{ referral_network.name }}</h2>
+                    <div class="slider__content_footer" style="background: rgb(72, 109, 169);">
+                      <div class="slider__content_avatar">
+                        <img class="slider__content_photo" src="/examples/images/photo-2.jpg" alt="">
+                      </div>
+                      <span class="slider__content_author text-white">Место в линии</span>
+                      <svg class="slider__content_icon text-white" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+                        <path fill="currentColor"
+                          d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                        </path>
+                      </svg>
+                      <span class="slider__content_views text-white">{{ referral_network.userStatus }}</span>
+                    </div>
+                  </div>
+                </div>
+{% endfor %}  #}
+{% if my_team_count <= 2 %}
+ 
+<div class="justify-content-center row p-3 mb-1 bg-white mb-3 ">
+{% for referral_network in referral_networks %}
+    <div class="card col-sm2" style="width: 12rem;">
+            <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
+            <div class="card-body">
+                <h5 class="card-title">Username {{ referral_network.name }}</h5>
+                <p class="card-text fst-italic mb-1">Стоимость пакета {{ referral_network.pakage }} USDT</p> 
+                <p class="card-text fst-italic mt-1 mb-1">Место в линии: {{ referral_network.userStatus }}</p> 
+            </div>
+    </div> 
+{% endfor %}               
+</div>
+
+{% else %}
+  <div class="container mb-3 pb-3">
+      <div class="slider">
+        <div class="slider__container">
+          <div class="slider__wrapper">
+            <div class="slider__items">
+            {% for referral_network in referral_networks %}
+              <div class="slider__item">
+                <!-- Начало контента 1 слайда -->
+                <div class="slider__item-container">
+                  <div class="slider__item-content">
+                    <div class="slider__content_header">
+                      <img src="{{ asset('asset/img/icone-avatar-3.png') }}" class="card-img-top" alt="">
+                        {# height="250" loading="lazy"> #}
+                      <span class="slider__content_section" style="background: rgb(72, 109, 169);">Стоимость пакета {{ referral_network.pakage }} USDT</span>
+                    </div>
+                    <h2 class="slider__content_title text-white" style="background: rgb(72, 109, 169);">{{ referral_network.name }}</h2>
+                    <div class="slider__content_footer" style="background: rgb(72, 109, 169);">
+                      <div class="slider__content_avatar">
+                        <img class="slider__content_photo" src="/examples/images/photo-2.jpg" alt="">
+                      </div>
+                      <span class="slider__content_author text-white">Место в линии</span>
+                      <svg class="slider__content_icon text-white" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20">
+                        <path fill="currentColor"
+                          d="M10 5C6.947 5 4.16 6.747 2.12 9.61a.726.726 0 0 0 0 .799C4.16 13.253 6.947 15 10 15s5.84-1.747 7.88-4.61a.726.726 0 0 0 0-.799C15.84 6.747 13.053 5 10 5zm.213 8.513c-2.023.13-3.71-1.617-3.585-3.755.106-1.747 1.473-3.178 3.141-3.29 2.024-.13 3.71 1.618 3.585 3.755-.106 1.766-1.455 3.178-3.141 3.29zm-.089-1.617c-1.1.074-1.988-.874-1.934-2.026.053-.948.78-1.71 1.686-1.766 1.1-.074 1.988.874 1.934 2.026-.053.93-.798 1.71-1.686 1.766z">
+                        </path>
+                      </svg>
+                      <span class="slider__content_views text-white">{{ referral_network.userStatus }}</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Конец контента 1 слайда -->
+              </div>
+            {% endfor %}     
+            </div>
+          </div>
+          <a href="#" class="slider__control" data-slide="prev"></a>
+          <a href="#" class="slider__control" data-slide="next"></a>
+          <ol class="slider__indicators">
+          {% for i in range(1, my_team_count) %}
+            <li data-slide-to="{{ i }}"></li>
+            {# <li data-slide-to="1"></li>
+            <li data-slide-to="2"></li>
+            <li data-slide-to="3"></li>
+            <li data-slide-to="4"></li>
+            <li data-slide-to="5"></li>
+            <li data-slide-to="6"></li> #}
+          {% endfor %}
+          </ol>
         </div>
-        <a href="#" class="slider__control" data-slide="prev"></a>
-        <a href="#" class="slider__control" data-slide="next"></a>
-        <ol class="slider__indicators">
-        {% for i in range(1, my_team_count) %}
-          <li data-slide-to="{{ i }}"></li>
-          {# <li data-slide-to="1"></li>
-          <li data-slide-to="2"></li>
-          <li data-slide-to="3"></li>
-          <li data-slide-to="4"></li>
-          <li data-slide-to="5"></li>
-          <li data-slide-to="6"></li> #}
-        {% endfor %}
-        </ol>
       </div>
     </div>
   </div>
-
-</div>
-
-
   </div>
+  {% endif %}
+</div>
 
 
 

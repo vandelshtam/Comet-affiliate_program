@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit email{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 
 {% block body %}
@@ -9,44 +9,46 @@
     {{ form_errors(form) }}
 </div>
 {% endif %}
-<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Страница редактирования электронной почты</h1>
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-danger" role="alert">
-                {{ message }}
-            </div>
+<div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl col-sm-4 bg-white shadow p-3 mb-3 mt-3 rounded-0">
+        <h1 class="d-flex justify-content-center  mb-5 mt-3" style="color: rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-info" role="alert">
-                {{ message }}
-            </div>
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-info" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    {{ form_start(form) }}
-    <div class="form_box-inner">   
-        <div class="form_box-left">    
-            {{ form_row(form.email) }}<div id="emailHelp" class="form-text mb-3">Это поле автоматически заполнилось текущей почтой, замените его на новое, или введите новую почту если поле не заполнено</div>
-        <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Контрольный ввод новой электронной почты</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_email">
-            <div id="emailHelp" class="form-text">Введите новую электронную почту</div>
+        {{ form_start(form) }}
+        <div class="form_box-inner">   
+            <div class="form_box-left">    
+                {{ form_row(form.email) }}<div id="emailHelp" class="form-text mb-3">Это поле автоматически заполнилось текущей почтой, замените его на новое, или введите новую почту если поле не заполнено</div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Контрольный ввод новой электронной почты</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="new_email">
+                <div id="emailHelp" class="form-text">Введите новую электронную почту</div>
+            </div>
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Повтор новой электронной почты</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="confirm_email">
+                <div id="emailHelp" class="form-text">Пожалуйста повторите новую электронную почту еще раз</div>
+            </div>  
+            <button class="btn btn-warning rounded-0 mb-1">{{ button_label|default('Сохранить') }}</button>
+            <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
+            </div>
+            <div class="hidden">
+            {# {{ form_row(form.username) }} #}
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Повтор новой электронной почты</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="confirm_email">
-            <div id="emailHelp" class="form-text">Пожалуйста повторите новую электронную почту еще раз</div>
-        </div>  
-        <button class="btn btn-warning rounded-0 mb-1">{{ button_label|default('Сохранить') }}</button>
-        <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
-        </div>
-        <div class="hidden">
-        {# {{ form_row(form.username) }} #}
-        </div>
-    </div>
 
-    {{ form_end(form) }}
+        {{ form_end(form) }}
+    </div>
 </div>
 {% endblock %}

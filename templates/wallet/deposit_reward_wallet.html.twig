@@ -1,44 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Wallet{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl">
-    <h1>Пополнение кошелька из заработка в сети</h1>
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success rounded-0" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl container-xxl bg-white shadow col-sm-4  mt-3">
+        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+    
+        <h3 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">Пополнение кошелька из заработка в сети</h3>
+        {% for label, messages in app.flashes(['success', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info rounded-0" role="alert">
+                    <div class="alert alert-success rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}            
-    {% endfor %}
-    <div class="card-body">
-        <h5 class="card-title">Доступно для перевода из сети на кошелек</h5>
-        <p class="card-text">{{ reward_wallet }} Cometpoin</p>
-    </div>
-    {{ include('wallet/_form_deposit_from_singlline.html.twig') }}
+        {% endfor %}
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        <div class="card-body">
+            <p class="card-title fst-italic fw-bold text-secondary ft-4">Начислено CoMetaCoin за весь период</p>
+            <p class="card-text fst-italic fw-bold  ft-4" style="color:  rgb(72, 109, 169);">{{ reward_all }} Cometpoin</p>
+            <p class="card-title fst-italic fw-bold text-secondary ft-4">Остаток CoMetaCoin доступный для перевода</p>
+            <p class="card-text fst-italic fw-bold  ft-4" style="color:  rgb(72, 109, 169);">{{ reward_wallet }} Cometpoin</p>
+            <p class="card-title fst-italic fw-bold text-secondary ft-4">Выведено за всеь период</p>
+            <p class="card-text fst-italic fw-bold  ft-4" style="color:  rgb(72, 109, 169);">{{ withdrawal_wallet }} Cometpoin</p>
+            <p class="card-title fst-italic fw-bold text-secondary ft-4">Доступно для перевода из сети на кошелек - 70%</p>
+            <p class="card-text fst-italic fw-bold  ft-4" style="color:  rgb(72, 109, 169);">{{ available_balance }} Cometpoin</p>
+        </div>
+        {{ include('wallet/_form_deposit_from_singlline.html.twig') }}
 
-    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_wallet_index') }}">Назад</a>
+        <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_wallet_user') }}">Назад</a>
+    </div>
 </div>
 {% endblock %}

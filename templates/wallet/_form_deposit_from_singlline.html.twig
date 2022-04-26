@@ -1,7 +1,7 @@
 {{ form_start(form) }}
-    {{ form_row(form.cometpoin) }}<div id="emailHelp" class="form-text">Введите сумму Cometpoin для пополнения кошелька из заработка в сети </div> 
+    {{ form_row(form.cometpoin) }}<div id="emailHelp" class="form-text mb-3">Введите сумму Cometpoin для пополнения кошелька из заработка в сети </div> 
     <div class="hidden">
       {{ form_row(form.user) }}
     </div>
-    <button class="btn btn-info rounded-0 mb-3">{{ button_label|default('Подтвердить') }}</button>
+    <button class="btn btn-primary rounded-0 mb-3">{{ button_label|default('Подтвердить') }}</button>
 {{ form_end(form) }}

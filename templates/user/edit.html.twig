@@ -1,28 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit User{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl col-sm-4  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Страница редактирования регистрационных сведений</h1>
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-danger" role="alert">
-                {{ message }}
-            </div>
+<div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl col-sm-4 bg-white shadow p-3 mb-3 mt-3 rounded-0">
+        <h1 class="d-flex justify-content-center  mb-5 mt-3" style="color: rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
-        {% for message in messages %}
-            <div class="alert alert-info" role="alert">
-                {{ message }}
-            </div>
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-info" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-    {{ include('user/_form.html.twig', {'button_label': 'Обновить'}) }}
+        {{ include('user/_form.html.twig', {'button_label': 'Обновить'}) }}
 
-    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
-    <br><br>
-    {{ include('user/_delete_form.html.twig') }}
+        <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
+        <br><br>
+        {{ include('user/_delete_form.html.twig') }}
+    </div>
 </div>
 {% endblock %}

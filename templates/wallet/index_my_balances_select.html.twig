@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl col-sm-12  mb-1 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+            {% for message in messages %}
+                <div class="alert alert-success rounded-0" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['info', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-info rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['danger', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+    {% endfor %}
+    {% for label, messages in app.flashes(['warning', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-danger rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}            
+    {% endfor %}
+    <h5 class="text-secondary text-center mb-3 fw-bold ft-2 fst-italic">Пожалуйста выберите свое сетевое место с которого будуте переводить CoMetaCoin на кошелек</h5>
+    {% if is_granted('ROLE_ADMIN') %}  
+    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в  кабинет админа</a> 
+    {% else %}
+    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
+    {% endif %}
+    {% for referral_network in referral_networks %}
+    <div class="row shadow bg-white p-3  mb-3">
+        <div class="row">    
+            <div class="col-sm-8">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-secondary">Имя в сети: {{ referral_network.name }}</h5>
+                        <h6 class="card-title fw-bold text-secondary">Место в линии: {{ referral_network.userStatus }}</h6>
+                        <p class="card-text fw-bold text-secondary fst-italic fst-italic">Общее начисление: {{ referral_network.reward  * token_rate }} CoMetaCoin</p> 
+                        <p class="card-text fw-lighter fst-italic">Вывести можно не более 70% от размера всех начислений дохода</p>      
+                    </div>
+                </div>
+            </div>
+                <div class="col-sm-4">
+                <div class="">
+                <div class="card-body row">
+                    <a  class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_wallet_exchange_wallet_comet',{'network' : referral_network.id }) }}">Выбрать для перевода на кошелек</a>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% for referral_network_no in referral_networks_no %}
+    <div class="row shadow bg-white p-3  mb-3">
+        <div class="row">    
+            <div class="col-sm-8">
+                <div class="">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-secondary">Имя в сети: {{ referral_network_no.name }}</h5>
+                        <h6 class="card-title fw-bold text-secondary">Место в линии: {{ referral_network_no.userStatus }}</h6>
+                        <p class="card-text fw-bold text-secondary fst-italic fst-italic">Общее начисление: {{ referral_network_no.reward  * token_rate }} CoMetaCoin</p> 
+                        <p class="card-text fw-lighter fst-italic">Вывод невозможен, достигнут лимит  70% от размера всех начислений дохода</p>      
+                    </div>
+                </div>
+            </div>
+                <div class="col-sm-4">
+                <div class="">
+                <div class="card-body row">
+                    <a class="nav-link text-warning fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="">Достигнут лимит вывода</a>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class=" col-sm-12  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">{{ controller_name }}</h1>
+    <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success rounded-0" role="alert">
@@ -28,12 +28,12 @@
     {% endfor %}
     {% for label, messages in app.flashes(['warning', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
+                    <div class="alert alert-warning rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}            
     {% endfor %}
-    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в кабинет  администратора</a>
+    <a  class="btn btn-primary rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в кабинет  администратора</a>
     <table class="table">
         <thead>
             <tr>
@@ -72,9 +72,9 @@
                 {% endif %}
                 <td>{{ list_referral_network.ownerName }}</td>
                 <td>
-                    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_list_referral_networks_show', {'id': list_referral_network.id}) }}">Посмотреть подробности</a>
+                    <a  class="btn btn-primary rounded-0 mb-1" href="{{ path('app_list_referral_networks_show', {'id': list_referral_network.id}) }}">Посмотреть подробности</a>
                     
-                    <a  class="btn btn-info rounded-0 mb-1" href="{{ path('app_referral_network_index') }}">Открыть список участников</a>
+                    <a  class="btn btn-primary rounded-0 mb-1" href="{{ path('app_referral_network_index') }}">Открыть список участников</a>
                 </td>
             </tr>
         {% else %}

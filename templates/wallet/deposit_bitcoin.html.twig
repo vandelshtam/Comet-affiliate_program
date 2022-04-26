@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">  
+    <div class="container-xxl col-sm-4 bg-white shadow p-3 mb-3 mt-3 rounded-0">
+        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['success', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-success rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        {{ include('wallet/_form_deposit_bitcoin.html.twig', {'button_label': 'Подтвердить'}) }}
+
+        <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_wallet_user') }}">Назад</a>
+        {% if is_granted('ROLE_ADMIN') %}
+        {{ include('wallet/_delete_form.html.twig') }}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

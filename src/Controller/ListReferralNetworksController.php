@@ -10,9 +10,10 @@ use App\Form\FastConsultationType;
 use App\Controller\MailerController;
 use App\Entity\ListReferralNetworks;
 use App\Form\ListReferralNetworksType;
+use App\Repository\SavingMailRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 
+use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
@@ -30,7 +31,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ListReferralNetworksController extends AbstractController
 {
     #[Route('/admin', name: 'app_list_referral_networks_index', methods: ['GET'])]
-    public function index(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function index(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -48,8 +49,7 @@ class ListReferralNetworksController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client, $savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -64,7 +64,7 @@ class ListReferralNetworksController extends AbstractController
     }
 
     #[Route('/list/admin', name: 'app_list_referral_networks_index_list', methods: ['GET'])]
-    public function indexList(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository,ReferralNetworkRepository $referralNetworkRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function indexList(Request $request, ListReferralNetworksRepository $listReferralNetworksRepository,ReferralNetworkRepository $referralNetworkRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -89,8 +89,7 @@ class ListReferralNetworksController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -104,7 +103,7 @@ class ListReferralNetworksController extends AbstractController
     }
 
     #[Route('/{id}/new/admin', name: 'app_list_referral_networks_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ListReferralNetworksRepository $listReferralNetworksRepository,int $id): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ListReferralNetworksRepository $listReferralNetworksRepository, SavingMailRepository $savingMailRepository,int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -151,8 +150,7 @@ class ListReferralNetworksController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -161,11 +159,13 @@ class ListReferralNetworksController extends AbstractController
             'form' => $form,
             'pakege_id' => $id,
             'fast_consultation_form' => $fast_consultation_form,
+            'controller_name' => 'Новая реферальная сеть',
+            'title' => 'New network referral list',
         ]);
     }
 
     #[Route('/{id}/admin', name: 'app_list_referral_networks_show', methods: ['GET'])]
-    public function show(Request $request,ListReferralNetworks $listReferralNetwork,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function show(Request $request,ListReferralNetworks $listReferralNetwork,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -182,11 +182,13 @@ class ListReferralNetworksController extends AbstractController
         return $this->render('list_referral_networks/show.html.twig', [
             'list_referral_network' => $listReferralNetwork,
             'fast_consultation_form' => $fast_consultation_form->createView(),
+            'controller_name' => 'Реферральная сеть',
+            'title' => 'network referral list show',
         ]);
     }
 
     #[Route('/{id}/list/admin', name: 'app_list_referral_networks_show_list', methods: ['GET'])]
-    public function showList(Request $request,ListReferralNetworks $listReferralNetwork,ReferralNetworkRepository $referralNetworkRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function showList(Request $request,ListReferralNetworks $listReferralNetwork,ReferralNetworkRepository $referralNetworkRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -195,8 +197,7 @@ class ListReferralNetworksController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -206,11 +207,13 @@ class ListReferralNetworksController extends AbstractController
             'list_referral_network' => $listReferralNetwork,
             'referral_network_all_count' => $referral_network_all_count,
             'fast_consultation_form' => $fast_consultation_form->createView(),
+            'controller_name' => 'Информация о реферральной сети',
+            'title' => 'All network referral list',
         ]);
     }
 
     #[Route('/{id}/edit/admin', name: 'app_list_referral_networks_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ListReferralNetworks $listReferralNetwork, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, int $id): Response
+    public function edit(Request $request, ListReferralNetworks $listReferralNetwork, ListReferralNetworksRepository $listReferralNetworksRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
     {
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -224,8 +227,7 @@ class ListReferralNetworksController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client, $savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -245,6 +247,8 @@ class ListReferralNetworksController extends AbstractController
             'form' => $form,
             'fast_consultation_form' => $fast_consultation_form,
             'pakege_id' => $pakege_id,
+            'controller_name' => 'Редактирование реферральной сети',
+            'title' => 'edit network referral list',
         ]);
     }
 
@@ -262,7 +266,7 @@ class ListReferralNetworksController extends AbstractController
 
 
     #[Route('/{id}/new/confirm/admin', name: 'app_list_referral_networks_new_confirm', methods: ['GET', 'POST'])]
-    public function newConfirm(Request $request,  ManagerRegistry $doctrine, ListReferralNetworksRepository $listReferralNetworksRepository, ReferralNetworkRepository $referralNetworkRepository, int $id): Response
+    public function newConfirm(Request $request,  ManagerRegistry $doctrine, ListReferralNetworksRepository $listReferralNetworksRepository, ReferralNetworkRepository $referralNetworkRepository,SavingMailRepository $savingMailRepository, int $id): Response
     {  
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');

@@ -36,7 +36,7 @@
     {% endfor %}
     {{ include('list_referral_networks/_form.html.twig', {'button_label': 'Обновить'}) }}
 {% endif %}
-    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_list_referral_networks_index') }}">Назад</a>
+    <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_list_referral_networks_index') }}">Назад</a>
 {% if is_granted('ROLE_ADMIN') %} 
     {{ include('list_referral_networks/_delete_form.html.twig') }}
 </div>

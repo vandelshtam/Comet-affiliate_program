@@ -37,7 +37,7 @@
             <a class="nav-link" href="{{ path('app_home') }}">
                 <img src="{{ asset('asset/img/icone-cometa-project.jpg') }}" alt="" class="logo" style="max-width: 50px;">
             </a>    
-            <a class="navbar-brand" href="{{ path('app_home') }}">CoMetaCoin</a>
+            <a class="navbar-brand" href="{{ path('app_home') }}">CoMeta Club</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -69,7 +69,7 @@
                 
                 <li class="nav-item ml-3">
                 {# <a class="btn btn-warning" href="#" tabindex="-1" aria-disabled="true">Быстрая консультация</a> #}
-                <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn text-light rounded-0 header_send ml-1" style="background:  rgb(72, 109, 169);">Поддержка</a> 
+                <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn text-light rounded-0 header_send ml-1" style="background:  rgb(72, 109, 169);">Быстрое обращение в поддержку</a> 
                 {% endif %}   
                 </li>
             </ul>
@@ -133,18 +133,18 @@
                         <li><a class="dropdown-item fw-bold" href="{{ path('app_referral_network_myplace') }}" style="color: rgb(72, 109, 169);">Мой баланс</a></li>
                         <li><a class="dropdown-item fw-bold" href="{{ path('app_wallet_user') }}" style="color: rgb(72, 109, 169);">Мой кошелек</a></li>
                         {# <li><a class="dropdown-item" href="#">История транзакций</a></li> #}
-                        {% if is_granted('ROLE_ADMIN') %}
+                        {# {% if is_granted('ROLE_ADMIN') %} #}
                         <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}" style="color: rgb(72, 109, 169);">Купить пакет</a></li>
                             {% if app.user.pakageStatus == 1 %}
                             <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_edit_routing', {'id': app.user.pakageId}) }}" style="color: rgb(72, 109, 169);">Повысить пакет</a></li>
                             {% endif %}
-                        {% else %}   
-                            {% if app.user.pakageStatus == 0 %}
-                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_new') }}" style="color: rgb(72, 109, 169);">Купить пакет</a></li>
+                        {# {% else %}    #}
+                            {# {% if app.user.pakageStatus == 0 %}
+                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}" style="color: rgb(72, 109, 169);">Купить пакет</a></li>
                             {% elseif app.user.pakageStatus == 1  %}
-                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_edit_routing', {'id': app.user.pakageId}) }}" style="color: rgb(72, 109, 169);">Повысить пакет</a></li>
-                            {% endif %}
-                        {% endif %} 
+                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_edit_routing', {'id': app.user.pakageId}) }}" style="color: rgb(72, 109, 169);">Повысить пакет</a></li> #}
+                            {# {% endif %} #}
+                        {# {% endif %}  #}
                         {# <li><a class="dropdown-item" href="{{ path('app_referral_network_index') }}">Участники реферальных сетей</a></li>
                         <li><a class="dropdown-item" href="{{ path('app_list_referral_networks_index') }}">Реферальные сети</a></li> #}
                         {# <li><a class="dropdown-item" href="#">Вывод</a></li> #}
@@ -161,7 +161,7 @@
                         <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">No login</a></li>
                         {% endif %} 
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">Поддержка (не активно)</a></li>
+                        {# <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">Поддержка (не активно)</a></li> #}
                         {% if is_granted('ROLE_ADMIN') %}   
                         <li><a class="dropdown-item fw-bold" href="{{ path('app_admin') }}" style="color: rgb(72, 109, 169);">Кабинет администратора</a></li>
                         {% endif %} 
@@ -198,6 +198,10 @@
             {{ include('js.html.twig') }}
     {% endblock %}
     {% block javascripts2 %}      
+    {% endblock %}
+    {% block javascripts3 %}      
+    {% endblock %}
+    {% block javascripts4 %}      
     {% endblock %}
     {% block javascripts_three %}      
     {% endblock %}

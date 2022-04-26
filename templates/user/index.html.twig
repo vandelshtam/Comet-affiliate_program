@@ -1,97 +1,99 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User index{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl  shadow p-3 mb-1 mt-3 rounded-0">
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
+<div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl bg-white shadow p-3 mb-1 mt-3 rounded-0">
+        {% for label, messages in app.flashes(['success', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-success" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}            
-    {% endfor %}
-    <h1 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">Страница всех пользователей</h1>
-    <div class="col-sm-4 mb-3 mt-3">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
-                <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Количество пользователей в сети</h6></span>
-                    <span><h6 class="card-title text-info">{{ count }}</h6></span>    
-                </div>
-            </div>
-    </div>
-    <a class="btn btn-info rounded-0 mb-5" href="{{ path('app_admin') }}">Назад</a>
-    <a class="btn btn-success rounded-0 mb-5" href="{{ path('app_register') }}">Добавить</a>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Email</th>
-                <th>Роли пользователей</th>
-                {# <th>Password</th> #}
-                {# <th>IsVerified</th> #}
-                {# <th>Personal_data_id</th> #}
-                <th>Username</th>
-                <th>Данные безопасности</th>
-                <th>Персональные данные</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-                {# <td>{{ user.password }}</td> #}
-                {# <td>{{ user.isVerified ? 'Yes' : 'No' }}</td> #}
-                {# <td>{{ user.personalDataId }}</td> #}
-                <td>{{ user.username }}</td>
-                <td>
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_user_show', {'id': user.id}) }}">Открыть</a>
-                    {# <br><br>
-                    <a class="btn btn-warning" href="{{ path('app_user_edit', {'id': user.id}) }}">Редактировать</a> #}
-                </td>
-                <td>
-                     {% if user.personalDataId == 0 %}
-                     <div>
-                        Нет данных, заполнить?
-                        <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">Заполнить</a>
-                     </div>
-                     {% else %}
-                     <div>
-                        {# <a class="btn btn-warning" href="{{ path('app_personal_data_edit', {'id': user.id}) }}">Редактировать</a> #}
-                        <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_data_show', {'personal_user_id': user.id}) }}">Открыть</a>
-                     </div>
-                     {% endif %}
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="8">no records found</td>
-            </tr>
         {% endfor %}
-        </tbody>
-    </table>
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        <h1 class="d-flex justify-content-center  mb-5 mt-3" style="color: rgb(72, 109, 169);">{{ controller_name }}</h1>
+        <div class="col-sm-4 mb-3 mt-3">
+                <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
+                    <div class="card-body d-flex justify-content-between">    
+                        <span><h6 class="card-title text-secondary fs- fw-bold fst-italic">Количество пользователей в сети</h6></span>
+                        <span><h6 class="card-title fs- fw-bold fst-italic" style="color: rgb(72, 109, 169);">{{ count }}</h6></span>    
+                    </div>
+                </div>
+        </div>
+        <a class="btn btn-primary tetxt-white rounded-0 mb-5" href="{{ path('app_admin') }}">Назад</a>
+        <a class="btn btn-success rounded-0 mb-5" href="{{ path('app_register') }}">Добавить</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Email</th>
+                    <th>Роли пользователей</th>
+                    {# <th>Password</th> #}
+                    {# <th>IsVerified</th> #}
+                    {# <th>Personal_data_id</th> #}
+                    <th>Username</th>
+                    <th>Данные безопасности</th>
+                    <th>Персональные данные</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+                    {# <td>{{ user.password }}</td> #}
+                    {# <td>{{ user.isVerified ? 'Yes' : 'No' }}</td> #}
+                    {# <td>{{ user.personalDataId }}</td> #}
+                    <td>{{ user.username }}</td>
+                    <td>
+                        <a class="btn btn-primary yexy-white rounded-0 mb-1" href="{{ path('app_user_show', {'id': user.id}) }}">Открыть</a>
+                        {# <br><br>
+                        <a class="btn btn-warning" href="{{ path('app_user_edit', {'id': user.id}) }}">Редактировать</a> #}
+                    </td>
+                    <td>
+                        {% if user.personalDataId == 0 %}
+                        <div>
+                            Нет данных, заполнить?
+                            <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">Заполнить</a>
+                        </div>
+                        {% else %}
+                        <div>
+                            {# <a class="btn btn-warning" href="{{ path('app_personal_data_edit', {'id': user.id}) }}">Редактировать</a> #}
+                            <a class="btn btn-primary yexy-white rounded-0 mb-1" href="{{ path('app_personal_data_show', {'personal_user_id': user.id}) }}">Открыть</a>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

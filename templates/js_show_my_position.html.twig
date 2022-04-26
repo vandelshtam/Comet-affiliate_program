@@ -1,11 +1,11 @@
-{% block javascripts %}
+{% block javascripts2 %}
  
 <script>
 var chart_position = bb.generate({
         data: {
           columns: [
-            ["Blue Direct", {{ referral_network.direct }}],
-            ["Orange CashBack", {{ referral_network.cash }}],
+            ["Blue Direct {{ referral_network.direct * token_rate }}", {{ referral_network.direct * token_rate }}],
+            ["Orange CashBack {{ referral_network.cash * token_rate }}", {{ referral_network.cash * token_rate }}],
             //["green", 3],
           ],
           type: "donut",
@@ -20,7 +20,7 @@ var chart_position = bb.generate({
           },
         },
         donut: {
-          title: "Всего {{ referral_network.reward }}",
+          title: "Всего {{ referral_network.reward * token_rate }}",
         },
         bindto: "#donut-chart-my-position",
       });

@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">  
+    <div class="container-xxl col-sm-4 bg-white shadow p-3 mb-1 mt-3 rounded-0">
+        <h1 class="d-flex justify-content-center  mb-5 mt-3" style="color: rgb(72, 109, 169);">{{ controller_name }}</h1>
+    {% for label, messages in app.flashes(['success', 'notice']) %}
+                {% for message in messages %}
+                    <div class="alert alert-success rounded-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        <form action="{{ path('app_wallet_exchange_wallet_comet', {'id': id}) }}" method="POST">
+            <label for="exampleDataList" class="form-label text-secondary">Выберите место в линии с баланса которого будете переводить CoMetaCoin</label>   
+            <select class="form-select mb-3 text-secondary" aria-label="Default select example" name="coin">
+                <option selected name="selected">Список ваших балансов в линии </option>
+                {% for referral_network in referral_networks %}
+                <option value="{{ referral_network.id }}"><span>Имя в линии : {{ referral_network.name }}; </span><span>Баланс места: {{ referral_network.reward * token_rate}} CoMetaCoin</span></option>
+            {% endfor %}
+            </select>
+            
+            {# <a class="btn btn-primary rounded-0 mb-1 mt-3" href="{{ path('app_wallet_show') }}">Назад</a> #}
+            <button type="submit" class="btn btn-primary rounded-0 ">Подтвердить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

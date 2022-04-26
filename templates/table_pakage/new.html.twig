@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New TablePakage{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="example-wrapper container-xxl container-xxl col-sm-6  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Создание нового пакета</h1>
+<div class="example-wrapper container-xxl container-xxl col-sm-6  shadow p-3 mb-3 mt-3 rounded-0">
+    <h1 class="d-flex justify-content-center bg-white mb-5" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
 
     {{ include('table_pakage/_form.html.twig') }}
 
-    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_table_pakage_index') }}">Назад</a>
+    <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_table_pakage_index') }}">Назад</a>
 </div>
 {% endblock %}

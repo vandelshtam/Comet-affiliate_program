@@ -124,7 +124,8 @@
   font-family: 'icomoon';
   /* position: absolute; */
   left: 0;
-  margin-right: 5px;
+  margin-right: 10px;
+  font-size: 25px;
   color: rgb(174, 201, 243);
 }
 .header_email::before{
@@ -140,7 +141,8 @@
   font-family: 'icomoon';
   /* position: absolute; */
   left: 0;
-  margin-right: 5px;
+  margin-right: 10px;
+  font-size: 25px;
   color: rgb(174, 201, 243);
 }
 .header_whatsapp::before{
@@ -148,7 +150,8 @@
   font-family: 'icomoon';
   /* position: absolute; */
   left: 0;
-  margin-right: 5px;
+  margin-right: 10px;
+  font-size: 25px;
   color: rgb(174, 201, 243);
 }
 .header_facebook::before{
@@ -157,6 +160,7 @@
   /* position: absolute; */
   left: 0;
   margin-right: 10px;
+  font-size: 25px;
   color: rgb(174, 201, 243);
 }
 .header_phone::before{
@@ -164,10 +168,9 @@
   font-family: 'icomoon';
   /* position: absolute; */
   left: 0;
-  height: 100px;
-  max-width: 100px;
   margin-right: 10px;
   margin-bottom: 0px;
+  font-size: 25px;
   color: rgb(174, 201, 243);
 }
 .header_briefcase::before{
@@ -389,6 +392,9 @@ div#consultation{
   #hidden-content-referral{
     display: none ;  
     width: 400px;
+}
+#agree-terms{
+  display: none ;  
 }
 
 

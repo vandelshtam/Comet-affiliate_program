@@ -1,38 +1,40 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit User{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container">
-    <h1>Страница редактирования роли пользователя</h1>
-     {{ form_start(form) }}
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Текущие роли пользователя</th>
-                {% for role in roles %}
-                <td>    
-                    {{ role }} , 
-                </td>
-                {% endfor %}
-        </tbody>
-    </table>
-   
-        {# {{ include('user/_form.html.twig', {'button_label': 'Обновить'}) }} #}
-        <select class="form-select" aria-label="Default select example" name="roles">
-            <option selected>Выберите роль пользователя</option>
-            <option value="{{ role_admin }}">{{ role_admin }}</option>
-            <option value="{{ role_super_admin }}">{{ role_super_admin }}</option>
-        </select>
-       <div class="hidden">
-        {{ form_row(form.role) }}
-        </div>
-        <a class="btn btn-primary rounded-0 mt-1 mb-1" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
-        {# {{ include('user/_delete_form.html.twig') }} #}
-        <button class="btn btn-warning rounded-0 mb-1 mt-1">{{ button_label|default('Сохранить') }}</button>
+<div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl bg-white shadow">
+        <h1 class="d-flex justify-content-center  mb-5 mt-3" style="color: rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {{ form_start(form) }}
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>Текущие роли пользователя</th>
+                    {% for role in roles %}
+                    <td>    
+                        {{ role }} , 
+                    </td>
+                    {% endfor %}
+            </tbody>
+        </table>
+    
+            {# {{ include('user/_form.html.twig', {'button_label': 'Обновить'}) }} #}
+            <select class="form-select" aria-label="Default select example" name="roles">
+                <option selected>Выберите роль пользователя</option>
+                <option value="{{ role_admin }}">{{ role_admin }}</option>
+                <option value="{{ role_super_admin }}">{{ role_super_admin }}</option>
+            </select>
+        <div class="hidden">
+            {{ form_row(form.role) }}
+            </div>
+            <a class="btn btn-primary rounded-0 mt-1 mb-1" href="{{ path('app_user_show', {'id': app.user.id}) }}">Назад</a>
+            {# {{ include('user/_delete_form.html.twig') }} #}
+            <button class="btn btn-warning rounded-0 mb-1 mt-1">{{ button_label|default('Сохранить') }}</button>
 
-    {{ form_end(form) }} 
+        {{ form_end(form) }} 
 
+    </div>
 </div>
 
 {% endblock %}

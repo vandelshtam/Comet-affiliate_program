@@ -1,110 +1,112 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}PersonalData{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-<div class="container-xxl col-sm-6 shadow p-3 mb-1 mt-3 bg-white rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">Страница персоанльных данных</h1>
-    {% for label, messages in app.flashes(['success', 'notice']) %}
-            {% for message in messages %}
-                <div class="alert alert-success rounded-0" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['info', 'notice']) %}
+<div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
+    <div class="container-xxl col-sm-6 shadow p-3 mb-1 mt-3 bg-white rounded-0">
+        <h1 class="d-flex justify-content-center  mb-5 mt-3" style="color: rgb(72, 109, 169);">{{ controller_name }}</h1>
+        {% for label, messages in app.flashes(['success', 'notice']) %}
                 {% for message in messages %}
-                    <div class="alert alert-info rounded-0" role="alert">
+                    <div class="alert alert-success rounded-0" role="alert">
                         {{ message }}
                     </div>
                 {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['danger', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-    {% endfor %}
-    {% for label, messages in app.flashes(['warning', 'notice']) %}
-                {% for message in messages %}
-                    <div class="alert alert-danger rounded-0" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}            
-    {% endfor %}
-    {% if personal_datum == NULL %}
-    <div class="alert alert-warning" role="alert">
-    Важная информация, вы еще не заполнили персональные данные:
-        <ul>
-            <li>Вы должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">перейти к заполнению</a></code></li>
-        </ul>
-    </div>
-    {% else %}  
-    <table class="table">
-        <tbody>
-            {# <tr>
-                <th>Id</th>
-                <td>{{ personal_datum.id }}</td>
-            </tr> #}
-            <tr>
-                <th>Имя</th>
-                <td>{{ personal_datum.name }}</td>
-            </tr>
-            <tr>
-                <th>Фамилия</th>
-                <td>{{ personal_datum.surname }}</td>
-            </tr>
-            <tr>
-                <th>Телефон</th>
-                <td>{{ personal_datum.phone }}</td>
-            </tr>
-            <tr>
-                <th>Государство</th>
-                <td>{{ personal_datum.state }}</td>
-            </tr>
-            <tr>
-                <th>Регион/область/провинция</th>
-                <td>{{ personal_datum.region }}</td>
-            </tr>
-            <tr>
-                <th>Город</th>
-                <td>{{ personal_datum.city }}</td>
-            </tr>
-            <tr>
-                <th>Индекс</th>
-                <td>{{ personal_datum.indexcity }}</td>
-            </tr>
-            <tr>
-                <th>Улица</th>
-                <td>{{ personal_datum.street }}</td>
-            </tr>
-            <tr>
-                <th>Дом</th>
-                <td>{{ personal_datum.house }}</td>
-            </tr>
-            <tr>
-                <th>Блок/корпус</th>
-                <td>{{ personal_datum.frame }}</td>
-            </tr>
-            <tr>
-                <th>Квартира</th>
-                <td>{{ personal_datum.apartment }}</td>
-            </tr>
-        </tbody>
-    </table>
-    {% if is_granted('ROLE_ADMIN') %}
-    <a type="submit" class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_data_index') }}">Назад</a>
-    {% else %}
-    <a type="submit" class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_area') }}">Назад</a>
-    {% endif %}
-    <a type="submit" class="btn btn-warning rounded-0 mb-3" href="{{ path('app_personal_data_edit', {'id': personal_datum.id}) }}">Редактировать</a>
-    <br><br>
-     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['info', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-info rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['danger', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+        {% endfor %}
+        {% for label, messages in app.flashes(['warning', 'notice']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger rounded-0" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}            
+        {% endfor %}
+        {% if personal_datum == NULL %}
+        <div class="alert alert-warning" role="alert">
+        Важная информация, вы еще не заполнили персональные данные:
+            <ul>
+                <li>Вы должны заполнить персональные данные и принять условия нашей платформы. Без этого вы не сможете совершать операции на нашей платформе. Спасибо за понимание! <code><a href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">перейти к заполнению</a></code></li>
+            </ul>
+        </div>
+        {% else %}  
+        <table class="table">
+            <tbody>
+                {# <tr>
+                    <th>Id</th>
+                    <td>{{ personal_datum.id }}</td>
+                </tr> #}
+                <tr>
+                    <th>Имя</th>
+                    <td>{{ personal_datum.name }}</td>
+                </tr>
+                <tr>
+                    <th>Фамилия</th>
+                    <td>{{ personal_datum.surname }}</td>
+                </tr>
+                <tr>
+                    <th>Телефон</th>
+                    <td>{{ personal_datum.phone }}</td>
+                </tr>
+                <tr>
+                    <th>Государство</th>
+                    <td>{{ personal_datum.state }}</td>
+                </tr>
+                <tr>
+                    <th>Регион/область/провинция</th>
+                    <td>{{ personal_datum.region }}</td>
+                </tr>
+                <tr>
+                    <th>Город</th>
+                    <td>{{ personal_datum.city }}</td>
+                </tr>
+                <tr>
+                    <th>Индекс</th>
+                    <td>{{ personal_datum.indexcity }}</td>
+                </tr>
+                <tr>
+                    <th>Улица</th>
+                    <td>{{ personal_datum.street }}</td>
+                </tr>
+                <tr>
+                    <th>Дом</th>
+                    <td>{{ personal_datum.house }}</td>
+                </tr>
+                <tr>
+                    <th>Блок/корпус</th>
+                    <td>{{ personal_datum.frame }}</td>
+                </tr>
+                <tr>
+                    <th>Квартира</th>
+                    <td>{{ personal_datum.apartment }}</td>
+                </tr>
+            </tbody>
+        </table>
         {% if is_granted('ROLE_ADMIN') %}
-        {{ include('personal_data/_delete_form.html.twig') }}
+        <a type="submit" class="btn btn-primary rounded-0 mb-3" href="{{ path('app_personal_data_index') }}">Назад</a>
+        {% else %}
+        <a type="submit" class="btn btn-primary rounded-0 mb-3" href="{{ path('app_personal_area') }}">Назад</a>
+        {% endif %}
+        <a type="submit" class="btn btn-warning rounded-0 mb-3" href="{{ path('app_personal_data_edit', {'id': personal_datum.id}) }}">Редактировать</a>
+        <br><br>
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            {% if is_granted('ROLE_ADMIN') %}
+            {{ include('personal_data/_delete_form.html.twig') }}
+            {% endif %}
         {% endif %}
     {% endif %}
-{% endif %}
+    </div>
 </div>
 {% endblock %}

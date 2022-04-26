@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SettingOptions index{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block body %}
 <div class=" col-sm-12  shadow p-3 mb-1 mt-3 rounded-0">
-    <h1 class="d-flex justify-content-center text-white mb-5" style="background: #5eabeb;">Настройка опций управления сетью</h1>
-    <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в кабинет Администратора</a>
+     <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+    <a  class="btn btn-primary rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в кабинет Администратора</a>
 {% for label, messages in app.flashes(['success', 'notice']) %}
                     {% for message in messages %}
                         <div class="alert alert-success" role="alert">
@@ -37,27 +37,49 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                {# <th>Id</th> #}
                 <th>Начисление по программе Сash back (singl line) %</th>
                 <th>Начисление по программе direct (за приглашенного участника) %</th>
-                <th>Лимит начислений Cash_back в линии %</th>
+                <th>Лимит начислений Cash_back в линии  в % от стоимости пакета участника</th>
                 <th>Предельная сумма когда наисляются выплаты Сash back tokens local</th>
                 <th>Предельный коэффициент выплат в сеть участникам %</th>
+
+                <th>Отчисления в систему %</th>
+                <th>Количество дней до старта проекта</th>
+                <th>Установленная дата быстрого старта по акции"Фаст Старт", в этот период начисляется повышенный директ в %</th>
+                <th>Количество дней для обновления пакета</th>
+                <th>Лимит вывода заработка из линии на кошелек в %</th>
+                <th>Размер поавшенного Директа по акции "фаст старт" в %</th>
+
+                <th>Установленная дата до которой действует акция "Три пакета по цене двух"</th>
+                <th>Название пакета начиная с уровня которого  действует акция "Три пакета по цене двух" %</th>
+
                 <th>actions</th>
             </tr>
         </thead>
         <tbody>
         {% for setting_option in setting_options %}
             <tr>
-                <td>{{ setting_option.id }}</td>
+                {# <td>{{ setting_option.id }}</td> #}
                 <td>{{ setting_option.paymentsSingleline }}</td>
                 <td>{{ setting_option.paymentsDirect }}</td>
                 <td>{{ setting_option.cashBack }}</td>
                 <td>{{ setting_option.allPricePakage }}</td>
                 <td>{{ setting_option.accrualLimit }}</td>
+
+                <td>{{ setting_option.systemRevenues }}</td>
+                <td>{{ setting_option.startDay }}</td>
+                <td>{{ setting_option.fastStart| date() }}</td>
+                <td>{{ setting_option.updateDay }}</td>
+                <td>{{ setting_option.limitWalletFromLine }}</td>
+                <td>{{ setting_option.paymentsDirectFast }}</td>
+
+                <td>{{ setting_option.multiPakageDay|date() }}</td>
+                <td>{{ setting_option.nameMultiPakage }}</td>
+                
                 <td>
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_setting_options_show', {'id': setting_option.id}) }}">Посмотреть</a>
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_setting_options_edit', {'id': setting_option.id}) }}">Редкатировать</a>
+                    <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_setting_options_show', {'id': setting_option.id}) }}">Посмотреть</a>
+                    <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_setting_options_edit', {'id': setting_option.id}) }}">Редкатировать</a>
                 </td>
             </tr>
         {% else %}
@@ -68,6 +90,6 @@
         </tbody>
     </table>
 
-    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_setting_options_new') }}">Создать новую опцию</a>
+    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_setting_options_new') }}">Создать новую опцию</a>
 </div>
 {% endblock %}

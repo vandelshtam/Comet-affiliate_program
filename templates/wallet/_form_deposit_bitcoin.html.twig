@@ -1,0 +1,7 @@
+{{ form_start(form) }}
+    {{ form_row(form.bitcoin) }}<div id="emailHelp" class="form-text mb-3">В форме отобразился текущий баланс кошелька Bitcoin. Введите сумму Bitcoin которую хотите внести  на кошелек </div> 
+    <div class="hidden">
+      {{ form_row(form.user) }}
+    </div>
+    <button class="btn btn-primary rounded-0 mb-1">{{ button_label|default('Подтвердить') }}</button>
+{{ form_end(form) }}

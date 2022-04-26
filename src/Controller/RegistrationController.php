@@ -10,6 +10,8 @@ use App\Form\FastConsultationType;
 use App\Form\RegistrationFormType;
 use Symfony\Component\Mime\Address;
 use App\Controller\MailerController;
+use Doctrine\ORM\Cache\TimestampRegion;
+use App\Repository\SavingMailRepository;
 use App\Security\LoginFormAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,7 +19,6 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
-use Doctrine\ORM\Cache\TimestampRegion;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,7 +36,7 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register/{referral?}', name: 'app_register')]
-    public function register(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager,FastConsultationController $fast_consultation_meil, MailerController $mailerController,MailerInterface $mailer, ?string $referral): Response
+    public function register(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, LoginFormAuthenticator $authenticator, EntityManagerInterface $entityManager,FastConsultationController $fast_consultation_meil, MailerController $mailerController,MailerInterface $mailer,SavingMailRepository $savingMailRepository, ?string $referral): Response
     {
         
         $user = new User();
@@ -60,6 +61,12 @@ class RegistrationController extends AbstractController
                         'Вы ошиблись при вводе реферальной ссылки или ввели устаревшую ссылку, пожалуйста поробуйте еще раз или обратитесь за новой ссылкой'); 
                     return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);       
                 }
+            }
+            else{
+                $this->addFlash(
+                    'danger',
+                    'Извините! Без реферральной ссылки зарегистрироваться нельзя, пожалуйста обратитесь за ссылкой.'); 
+                return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);       
             }
             
             
@@ -105,8 +112,7 @@ class RegistrationController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);
         }
 

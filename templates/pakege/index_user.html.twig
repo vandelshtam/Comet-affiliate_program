@@ -29,7 +29,7 @@
         {% endfor %}
         {% for label, messages in app.flashes(['warning', 'notice']) %}
                     {% for message in messages %}
-                        <div class="alert alert-danger rounded-0" role="alert">
+                        <div class="alert alert-warning rounded-0" role="alert">
                             {{ message }}
                         </div>
                     {% endfor %}            
@@ -53,9 +53,9 @@
         {% if is_granted('ROLE_ADMIN') %}
         <a class="btn btn-success rounded-0 mb-3" href="{{ path('app_pakege_new') }}">Добавить новый пакет</a>
         
-                <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">В кабинет администратора</a>       
+                <a class="btn btn-primary text-white rounded-0 mb-3" href="{{ path('app_admin') }}">В кабинет администратора</a>       
         {% else %}
-                <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">назад</a>
+                <a class="btn btn-primary text-white rounded-0 mb-3" href="{{ path('app_personal_area') }}">В личный кабинет</a>
                     
         {% endif %}
         {% for pakege in pakeges %}
@@ -85,7 +85,7 @@
                         {% if is_granted('ROLE_ADMIN') %}
                             <a class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
                         {% else %}
-                        <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть баланс</a>
+                        {# <a class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Открыть</a> #}
                         {# <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a> #}
                         {% endif %}
                         {% if pakege.activation == NULL %}
@@ -126,7 +126,7 @@
                         {% if is_granted('ROLE_ADMIN') %}
                             <a class="nav-link fw-bold fst-italic fs-5 mb-1 border-0 pl-0 text-start bg-white" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
                         {% else %}
-                        <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть баланс</a>
+                        {# <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть баланс</a> #}
                         {# <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a> #}
                         {% endif %}
                         {% if pakege.activation == NULL %}
@@ -140,7 +140,7 @@
             </div>
         </div>
         {% endfor %}
-    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">назад</a>        
+    <a class="btn btn-primary text-white rounded-0 mb-1" href="{{ path('app_personal_area') }}">назад</a>        
     </div>
 </div>    
 {% endblock %}

@@ -6,6 +6,8 @@ use App\Entity\User;
 use App\Entity\Pakege;
 use App\Entity\Wallet;
 use App\Entity\TokenRate;
+use App\Entity\SavingMail;
+use App\Entity\PersonalData;
 use App\Entity\SettingOptions;
 use App\Entity\ReferralNetwork;
 use App\Entity\FastConsultation;
@@ -14,6 +16,7 @@ use App\Form\ReferralToEmailType;
 use App\Form\FastConsultationType;
 use App\Controller\MailerController;
 use App\Entity\ListReferralNetworks;
+use App\Repository\SavingMailRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +31,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ReferralNetworkController extends AbstractController
 {
     #[Route('/admin', name: 'app_referral_network_index', methods: ['GET', 'POST'])]
-    public function index(ReferralNetworkRepository $referralNetworkRepository,Request $request,  MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine): Response
+    public function index(ReferralNetworkRepository $referralNetworkRepository,Request $request,  MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine,SavingMailRepository $savingMailRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -39,8 +42,7 @@ class ReferralNetworkController extends AbstractController
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
             dd($fast_consultation->getName());
-            $textSendMail = $mailerController -> textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client, $savingMailRepository); 
             return $this->redirectToRoute('app_referral_network_show', [], Response::HTTP_SEE_OTHER);
         }        
         return $this->renderForm('referral_network/index.html.twig', [
@@ -53,43 +55,53 @@ class ReferralNetworkController extends AbstractController
 
 
     #[Route('/', name: 'app_referral_network_index_user', methods: ['GET', 'POST'])]
-    public function indexUser(ReferralNetworkRepository $referralNetworkRepository,Request $request,  MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine): Response
+    public function indexUser(ReferralNetworkRepository $referralNetworkRepository,Request $request,  MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine,SavingMailRepository $savingMailRepository): Response
     {
-        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         
-
         $entityManager = $doctrine->getManager();
-        $referral_networks = $entityManager->getRepository(ReferralNetwork::class)->findByUserIdField($this->getUser()->getId()); 
+        $referral_networks = $entityManager->getRepository(ReferralNetwork::class)->findByUserIdField($this->getUser()->getId());
+        $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//курс токена
         if($referral_networks == false){
             $this->addFlash(
                 'warning',
                 'У вас нет прав доступа');
             return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
-        //if($referral_networks[] -> get)
+        $array_summ_cash = [];
+        foreach($referral_networks as $network){
+            $array_summ_cash[] = $network -> getCash();
+        }
+        $summ_cash = array_sum($array_summ_cash);
+
+        $array_summ_direct = [];
+        foreach($referral_networks as $network){
+            $array_summ_direct[] = $network -> getDirect();
+        }
+        $summ_direct = array_sum($array_summ_direct);
 
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            dd($fast_consultation->getName());
-            $textSendMail = $mailerController -> textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_referral_network_show', [], Response::HTTP_SEE_OTHER);
         }        
         return $this->renderForm('referral_network/index_my_balances.html.twig', [
-            'referral_networks' => $referralNetworkRepository->findAll(),
+            'referral_networks' => $referral_networks,
             'fast_consultation_form' => $fast_consultation_form,
             'controller_name' => 'Балансы моих пакетов',
             'title' => 'my balances',
+            'token_rate' => $token_rate,
+            'summ_direct' => $summ_direct,
+            'summ_cash' => $summ_cash,
         ]);
     }
 
 
     #[Route('/{my_team}/myteam', name: 'app_referral_network_myteam', methods: ['GET'])]
-    public function myTeam(Request $request, ReferralNetworkRepository $referralNetworkRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, string $my_team): Response
+    public function myTeam(Request $request, ReferralNetworkRepository $referralNetworkRepository,MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, SavingMailRepository $savingMailRepository, string $my_team): Response
     { 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -97,8 +109,8 @@ class ReferralNetworkController extends AbstractController
         if($entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]) == false){
             $this->addFlash(
                 'warning',
-                'У вас нет прав доступа');
-            return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
+                'У вас нет команды, вы никого не пригласили, или прав доступа');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
 
         $referral_network_user = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $this->getUser()->getId()]);
@@ -117,8 +129,7 @@ class ReferralNetworkController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -127,11 +138,13 @@ class ReferralNetworkController extends AbstractController
             'fast_consultation_form' => $fast_consultation_form -> createView(),
             'my_team_summ' => $my_team_summ,
             'my_team_count' => $my_team_count,
+            'controller_name' => 'Моя команда',
+            'title' => 'my team',
         ]);
     }
 
     #[Route('/{referral_link}/{id}/new', name: 'app_referral_network_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, string $referral_link, int $id): Response
+    public function new(Request $request, ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, string $referral_link, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -162,10 +175,14 @@ class ReferralNetworkController extends AbstractController
 
         $user = $this -> getUser();
         $username = $user -> getUsername();
+        $user_authentificate = $entityManager->getRepository(User::class)->findOneBy(['id' => $user -> getId()]);
+
         if ($form->isSubmitted() && $form->isValid()) {
             //проводим предварительное создание записи в таблицу строки нового участника реферальной сети 
             $referralNetwork -> setCreatedAt(new \DateTime());
             $referralNetworkRepository->add($referralNetwork);
+            $user_authentificate -> setPakageStatus(1);
+            $entityManager->flush();
             //запись нового участника в линию single_line
             $referral_network_id = $this -> newConfirm($request,$referralNetworkRepository, $doctrine,$member_code,$id,$referral_link);
             $this->addFlash(
@@ -179,8 +196,7 @@ class ReferralNetworkController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -190,6 +206,8 @@ class ReferralNetworkController extends AbstractController
             'username' => $username,
             'member_code' => $member_code,
             'fast_consultation_form' => $fast_consultation_form,
+            'controller_name' => 'Активация пакета',
+            'title' => 'activation pakage',
         ]);
     }
 
@@ -203,7 +221,7 @@ class ReferralNetworkController extends AbstractController
         if($referral_networks == false){
             $this->addFlash(
                 'danger',
-                'У вас нет прав доступа.');
+                'Вы еще не приобрели и не активировали ни одного пакета, или у вас нет прав доступа.');
             return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
         }
         
@@ -226,7 +244,7 @@ class ReferralNetworkController extends AbstractController
 
 
     #[Route('/{id}/show', name: 'app_referral_network_show', methods: ['GET', 'POST'])]
-    public function show(Request $request, ReferralNetwork $referralNetwork,ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine,  int $id,): Response
+    public function show(Request $request, ReferralNetwork $referralNetwork, ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine, SavingMailRepository $savingMailRepository, int $id,): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -234,7 +252,7 @@ class ReferralNetworkController extends AbstractController
         if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['id' => $id]) == false){
             $this->addFlash(
                 'danger',
-                'У вас нет прав доступа');
+                'Вы еще не приобрели и не активировали ни одного пакета, или у вас нет прав доступа');
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
         if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['id' => $id])->getUserId() != $this->getUser()->getId()){
@@ -249,14 +267,20 @@ class ReferralNetworkController extends AbstractController
         
         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
-        $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]);//получаем объект  участников моей команды (которых пригласил пользователь)
-        
+        $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField($referral_link);//получаем объект  участников моей команды (которых пригласил пользователь)
+        //dd($array_my_team);
         $user_status = $referral_network -> getUserStatus();
-        $my_team_count = count($array_my_team);
-        foreach($array_my_team as $array){
-            $array_my_team_summ_pakege[] = $array -> getPakage();
+        if($array_my_team != NULL){
+            $my_team_count = count($array_my_team);
+            foreach($array_my_team as $array){
+                $array_my_team_summ_pakege[] = $array -> getPakage();
+            }
+            $my_team_summ = array_sum($array_my_team_summ_pakege);
         }
-        $my_team_summ = array_sum($array_my_team_summ_pakege);
+        else{
+            $my_team_summ = 0;
+            $my_team_count = 0;
+        }
         
         $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);//объект владельца сети
         $user_id = $referral_network -> getUserId();
@@ -312,8 +336,7 @@ class ReferralNetworkController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController -> textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_referral_network_show', ['id' => $id], Response::HTTP_SEE_OTHER);
         }
 
@@ -325,13 +348,15 @@ class ReferralNetworkController extends AbstractController
         $available_amount = ($reward_all * $limit_wallet_from_line) / 100; //общая сумма доступная для вывода - контрольная с которой сравниваем выводимые средства
         $available_balance = $available_amount - $withdrawal_wallet;//доступный остаток для вывода в момент запроса
 
-           
+        $personal_data_id = $this->getUser()->getPersonalDataId();
+        $personal_data_username = $entityManager->getRepository(PersonalData::class)->findOneBy(['id' => $personal_data_id]) -> getName();
+        $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//курс токена
+         
         $referral_link_to_email_form = $this->createForm(ReferralToEmailType::class);
         $referral_link_to_email_form->handleRequest($request);
         if ($referral_link_to_email_form->isSubmitted() && $referral_link_to_email_form->isValid()) {
             $email_to_client = $referral_link_to_email_form -> get('email_to_client')->getData();
-            $textSendToReferralMail = $mailerController->textReferralToEmailMail($referral_link);
-            $mailerController -> sendReferralToEmail($mailer,$email_to_client,$email_user,$referral_link); 
+            $mailerController -> sendReferralToEmail($mailer,$email_to_client,$email_user,$referral_link,$personal_data_username,$savingMailRepository); 
             return $this->redirectToRoute('app_referral_network_show', ['id' => $id], Response::HTTP_SEE_OTHER);
         }
         return $this->renderForm('referral_network/show.html.twig', [
@@ -345,12 +370,15 @@ class ReferralNetworkController extends AbstractController
             'referral_link_to_email_form' => $referral_link_to_email_form,
             'wallet_id' => $wallet_id,
             'limit_cashback' => $limit_cash_back,
-            'available_balance' => $available_balance
+            'available_balance' => $available_balance,
+            'token_rate' => $token_rate,
+            'title' => 'my balance',
+            'controller_name' => 'Мой баланс',
         ]);
     }
 
     #[Route('/{id}/edit/admin', name: 'app_referral_network_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ReferralNetwork $referralNetwork, ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer,FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine,int $id): Response
+    public function edit(Request $request, ReferralNetwork $referralNetwork, ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer,FastConsultationController $fast_consultation_meil, MailerController $mailerController, ManagerRegistry $doctrine,SavingMailRepository $savingMailRepository,int $id): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $entityManager = $doctrine->getManager();
@@ -371,8 +399,7 @@ class ReferralNetworkController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -469,10 +496,11 @@ class ReferralNetworkController extends AbstractController
         //проверка срока быстрого старта и получения двойного бонуса Директ 20%
         if($pakage_comet -> getUpdatedAt() != NULL){
             $datetime = $pakage_comet -> getUpdatedAt();
+            //date_modify($datetime, $fast_start.'day');
             $timestamp = $datetime->getTimestamp();
-            date_modify($datetime, $fast_start.'day');
-            //dd(time() - $this->timestamp = $datetime->getTimestamp());
-            if(time() > $timestamp){
+            $timestamp_fast_start = $fast_start->getTimestamp();
+            //dd($timestamp_fast_start);
+            if(time() < $timestamp_fast_start){
                 $k_direct = $payments_direct_fast;
             }
             else{
@@ -482,10 +510,11 @@ class ReferralNetworkController extends AbstractController
         else{
             $datetime = $pakage_comet -> getCreatedAt();
             $timestamp = $datetime->getTimestamp();
+            $timestamp_fast_start = $fast_start->getTimestamp();
             //dd($timestamp);
             date_modify($datetime, $fast_start.'day');
             //dd(time() - $this->timestamp = $datetime->getTimestamp());
-            if(time() > $timestamp){
+            if(time() < $timestamp_fast_start){
                 $k_direct = $payments_direct_fast;
             }
             else{

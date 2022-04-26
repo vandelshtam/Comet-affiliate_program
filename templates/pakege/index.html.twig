@@ -3,7 +3,8 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block body %}
-    <h1 class="d-flex justify-content-center text-white mb-5 mt-3" style="background: #5eabeb;">{{ controller_name }}</h1>
+<div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">
+     <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
     {% for label, messages in app.flashes(['success', 'notice']) %}
             {% for message in messages %}
                 <div class="alert alert-success rounded-0" role="alert">
@@ -33,23 +34,23 @@
                 {% endfor %}            
     {% endfor %}
     <div class="col-sm-4 mb-3 mt-3">
-            <div class="card text-secondary shadow p-3 mb-1 bg-light rounded-0">
+            <div class="card text-secondary shadow p-3 mb-1 bg-white rounded-0">
                 <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Количество пакетов в сети</h6></span>
-                    <span><h6 class="card-title text-info">{{ count }}</h6></span>    
+                    <h6 class="card-title fst-italic fw-bold fs-5 text-secondary">Количество пакетов в сети</h6></span>
+                    <h6 class="card-title  text-end fst-italic fs-5 fw-bold" style="color: rgb(72, 109, 169);">{{ count }}</h6></span>    
                 </div>
                 <div class="card-body d-flex justify-content-between">    
-                    <span><h6 class="card-title">Общая стоимость всех приобретенных пакетов</h6></span>
-                    <span><h6 class="card-title text-info">{{ pakage_summ_usdt }} USDT</h6></span>    
+                    <h6 class="card-title fst-italic fw-bold fs-5 text-secondary">Общая стоимость всех приобретенных пакетов</h6></span>
+                    <h6 class="card-title text-end fst-italic fs-5 fw-bold" style="color: rgb(72, 109, 169);">{{ pakage_summ_usdt }} USDT</h6></span>    
                 </div>
             </div>
     </div>
     {% if is_granted('ROLE_ADMIN') %}
-    <a class="btn btn-success rounded-0 mb-3" href="{{ path('app_pakege_new') }}">Добавить новый пакет</a>
+    <a class="btn btn-success rounded-0 mb-3" href="{{ path('app_pakege_new',{'unique_code_get': 'not'}) }}">Добавить новый пакет</a>
     
-            <a class="btn btn-info rounded-0 mb-3" href="{{ path('app_admin') }}">В кабинет администратора</a>       
+            <a class="btn btn-primary rounded-0 mb-3" href="{{ path('app_admin') }}">В кабинет администратора</a>       
     {% else %}
-            <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_personal_area') }}">назад</a>
+            <a class="btn btn-primary rounded-0 mb-1 text-white" href="{{ path('app_personal_area') }}">назад</a>
                 
     {% endif %}
     
@@ -88,13 +89,13 @@
                 <td>{{ pakege.uniqueCode }}</td>
                 <td>
                  {% if is_granted('ROLE_ADMIN') %}
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
+                    <a class="nav-link card-title fst-italic fw-bold" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть</a>
                  {% else %}
-                    <a class="btn btn-info rounded-0 mb-1" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть баланс</a>
+                    <a class="nav-link card-title fst-italic fw-bold" href="{{ path('app_pakege_show', {'id': pakege.id}) }}">Посмотреть баланс</a>
                     {# <a href="{{ path('app_pakege_edit', {'id': pakege.id}) }}">edit</a> #}
                 {% endif %}
                     {% if pakege.activation == NULL %}
-                    <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
+                    <a class="nav-link text-danger card-title fst-italic fw-bold" href="{{ path('app_list_referral_networks_new', {'id': pakege.id}) }}">Активировать</a>
                      {% endif %}
                 </td>
             </tr>
@@ -105,6 +106,6 @@
         {% endfor %}
         </tbody>
     </table>
-
+</div>
     
 {% endblock %}
