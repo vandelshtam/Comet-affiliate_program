@@ -390,11 +390,11 @@ div#consultation{
   
   #hidden-content,
   #hidden-content-referral{
-    display: none !important;
+    display: none;
     width: 400px;
 }
 #agree-terms{
-  display: none !important;
+  display: none;
 }
 
 
