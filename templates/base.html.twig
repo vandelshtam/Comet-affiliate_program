@@ -184,13 +184,10 @@
         {{ include('footer.html.twig') }}
         {% endblock %}
         {% block fast_consultation %}
-            {# {% if form_errors(fast_consultation_form) %}
-                <div class="my-custom-class-for-errors">
-                    {{ form_errors(fast_consultation_form) }}
-                </div>
-            {% endif %} #}
             {{ include('fast_consultation.html.twig') }}
-    {% endblock %}
+        {% endblock %}
+        {% block agree_terms %}
+        {% endblock %}
     </body>
     
     
@@ -207,6 +204,5 @@
     {% endblock %}
     {% block javascripts_reverse_counter %}
     {% endblock %}
-    {% block agree_terms %}
-    {% endblock %}
+    
 </html>
