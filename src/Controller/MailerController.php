@@ -71,7 +71,7 @@ class MailerController extends AbstractController
         $saving_mail = new SavingMail();
         $email = (new TemplatedEmail())
             ->from($email_client)
-            ->to('Commet-AT@example.com')
+            ->to('helfopets@gmail.com')
             ->subject('Time for Symfony Mailer!')
             ->htmlTemplate('emails/fast_consultation.html.twig')
             ->context([

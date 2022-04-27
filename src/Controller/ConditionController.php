@@ -30,8 +30,8 @@ class ConditionController extends AbstractController
         }
 
         return $this->render('condition/index.html.twig', [
-            'controller_name' => 'О проекте',
-            'title' => 'about of project',
+            'controller_name' => 'Правила и акции',
+            'title' => 'condition',
             'fast_consultation_form' => $fast_consultation_form->createView(),
             'date_info' => new \DateTime('+20 days'),
             'date_ico' => date('2022-06'),
