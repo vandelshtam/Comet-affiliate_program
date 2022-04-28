@@ -47,14 +47,14 @@ class PersonalAreaController extends AbstractController
         elseif($pakege_user == NULL || $pakege_user == false){
             $pakege_id = 0;
         }
-        //dd($pakege_id);
+        
         if($referral_network != NULL){
             $my_team = $referral_network -> getMemberCode();
         }
         else{
             $my_team = 0;
         }
-        //dd($my_team);
+        
         if($this->getUser()->getWallet() == NULL){
             $personal_data = 0;
         }

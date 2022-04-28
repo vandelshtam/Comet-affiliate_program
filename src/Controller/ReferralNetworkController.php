@@ -268,7 +268,7 @@ class ReferralNetworkController extends AbstractController
         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findByLeftField(['left']);//получаем объект всех участников с левой стороны линии
         $referral_network_right = $entityManager->getRepository(ReferralNetwork::class)->findByRightField(['right']);//получаем объект участников участников с правой стороны 
         $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField($referral_link);//получаем объект  участников моей команды (которых пригласил пользователь)
-        //dd($array_my_team);
+        
         $user_status = $referral_network -> getUserStatus();
         if($array_my_team != NULL){
             $my_team_count = count($array_my_team);
@@ -290,7 +290,7 @@ class ReferralNetworkController extends AbstractController
         $pakage_price = $referral_network -> getPakage();
         $k_cash_back = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getCashBack()/100;//получаем коэффициент начисления cash_back
         $limit_cash_back = $k_cash_back * $pakage_price;
-        //dd($limit_cash_back);
+    
         //построение линии сингл-лайн в виде массива
         $single_line = array_merge($referral_network_left, $owner_array, $referral_network_right);//объеденяем в один массив в  соотвтетсвии с правилом построения линии сингл-лайн
         
@@ -340,7 +340,7 @@ class ReferralNetworkController extends AbstractController
             return $this->redirectToRoute('app_referral_network_show', ['id' => $id], Response::HTTP_SEE_OTHER);
         }
 
-        //рачет - лимит вывода из сети (линии) на кошелек
+        //раcчет - лимит вывода из сети (линии) на кошелек
         $setting_opyions = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
         $withdrawal_wallet = $referral_network -> getWithdrawalToWallet();//учет ввсех сумм с накоплением выведенных из  сингллайн на кошелек
         $limit_wallet_from_line = $setting_opyions -> getLimitWalletFromLine();//коеф лимита для  вывода из сети на кошелек
@@ -418,7 +418,6 @@ class ReferralNetworkController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$referralNetwork->getId(), $request->request->get('_token'))) {
             $referralNetworkRepository->remove($referralNetwork);
         }
-
         return $this->redirectToRoute('app_referral_network_index', [], Response::HTTP_SEE_OTHER);
     }
 
@@ -440,7 +439,7 @@ class ReferralNetworkController extends AbstractController
         }
         // dd($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code])-);
         // if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $member_code])->getUserId() != $this->getUser()->getId()){
-        //     $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        //  $this->denyAccessUnlessGranted('ROLE_ADMIN');
         // }
 
 
@@ -472,8 +471,6 @@ class ReferralNetworkController extends AbstractController
         $network_code = $listReferralNetwork -> getNetworkCode();
         // ==================================================================================================================
 
-
-
         //=============== первичная обработка информации и сохранение в таблицы ==============================================
         //изменения статуса пакета приглашенного участника сети на "активирован"
         $pakege_user -> setActivation('активирован');
@@ -499,7 +496,7 @@ class ReferralNetworkController extends AbstractController
             //date_modify($datetime, $fast_start.'day');
             $timestamp = $datetime->getTimestamp();
             $timestamp_fast_start = $fast_start->getTimestamp();
-            //dd($timestamp_fast_start);
+            
             if(time() < $timestamp_fast_start){
                 $k_direct = $payments_direct_fast;
             }
@@ -511,7 +508,7 @@ class ReferralNetworkController extends AbstractController
             $datetime = $pakage_comet -> getCreatedAt();
             $timestamp = $datetime->getTimestamp();
             $timestamp_fast_start = $fast_start->getTimestamp();
-            //dd($timestamp);
+            
             date_modify($datetime, $fast_start.'day');
             //dd(time() - $this->timestamp = $datetime->getTimestamp());
             if(time() < $timestamp_fast_start){
@@ -521,7 +518,7 @@ class ReferralNetworkController extends AbstractController
                 $k_direct = $payments_direct;
             }      
         }
-       // dd($k_direct);
+       
         //начисления рефовода
         $bonus = ($balance * $k_direct) / 100;//direct начисление за приглашенного участника
        
@@ -572,8 +569,6 @@ class ReferralNetworkController extends AbstractController
         $entityManager->flush();
         // ======================================================================================================================
 
-
-
         //===================выполнение формулы постоения  линии ================================================================ 
         $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();//количество участников в линии (в сети)
         $referral_network_left = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'left']);//получение всех объектов линии слевой стороны, пока в линии нет Владельца (Я)
@@ -586,7 +581,6 @@ class ReferralNetworkController extends AbstractController
             $referral_network -> setPaymentsNetwork($direct);//начисление в сеть по программе Директ в момент активации нового пакета
             $entityManager->flush();
         }
-
 
         //первое построение линии из трех участников реферальной сети. Когда происходит активация пакета 3-го участника в сети числится еще 2 участника, поэтому в условии установлена цифра 2 участника активных 
         if($list_network_all_count == 2){
@@ -609,8 +603,6 @@ class ReferralNetworkController extends AbstractController
             $entityManager->flush();
         }
         //======================================================================================================================
-
-
 
 
         //==================получаем и записываем  все начисления и погашеня сети ==============================================
@@ -649,8 +641,6 @@ class ReferralNetworkController extends AbstractController
         $listReferralNetwork -> setSystemRevenues($current_system_revenues_summ);//текущая общая сумма отчислений в доход системы (30%)
         $listReferralNetwork -> setUpdatedAt(new \DateTime());
         //=========== =========================================================== ==============================================
-
-
 
         // =====================================================================================================================
         //сохранение записей в базе данных
@@ -719,7 +709,6 @@ class ReferralNetworkController extends AbstractController
         }
         $all_pakages_summ = array_sum($pakages_summ) * $token_rate;//фактическая сумма стоимости приобретенных пакетов в сети переведенная в лакальный токен по курсу
 
-
         //====построение линии сингл-лайн и получение АйДи Рефовода и получение баланса с левой и с правой стороны ===============
         //получаем массив всех пользователей
         $single_line = array_merge($referral_network_left, $owner_array, $referral_network_right);//объеденяем в один массив в  соотвтетсвии с правилом построения линии сингл-лайн
@@ -758,7 +747,6 @@ class ReferralNetworkController extends AbstractController
         $summ_single_line_right_balance = array_sum($single_line_right_balance);//баланс пакетов в правой части линии относительно Рефовода
         //==========================================================================================================================
 
-        
         //============определяем с какой стороны линии сумма баланса больше и проводим начисления Кешбек ============================
         if($summ_single_line_left_balance == 0 || $summ_single_line_right_balance == 0){
             //проверка предельного баланса и сообщение в случае   достижения предела общего баланса сети
@@ -786,7 +774,7 @@ class ReferralNetworkController extends AbstractController
                 'Начисление  проведено по правилу когда с одной стороны 0');  
         }
         elseif($summ_single_line_left_balance == $summ_single_line_right_balance ){
-            //dd(',fkfyc 000');
+            
             //проверка и вывод информационного сообщение о достижении предела общей стоимости сети (купленных пакетов)
             if($price_pakage_all <= $all_pakages_summ){
                     $this->addFlash(
@@ -827,7 +815,6 @@ class ReferralNetworkController extends AbstractController
         }
         elseif($summ_single_line_left_balance != $summ_single_line_right_balance ){
             
-                    //dd('balance no 0');
                     $single_line_left = array_reverse($single_line_left);//переворачиваем массив в нормальный вид, чтобы перебор массива происходил от пользователей с более ранней датой входа в лини (которые в линии ближе к рефоводу)
                     //array_unshift($single_line_right, $referral_network_user);//добавляем рефовода который предоставил ссылку в массив с права 
                     $count_left = count($single_line_left);
@@ -851,7 +838,7 @@ class ReferralNetworkController extends AbstractController
                     $current_referral_user_pakage = $referral_network_referral -> getPakage();//стоимость текущего пакета
                     $current_referral_user_reward_wallet = $referral_network_referral -> getRewardWallet();//общие доступные для перевода на кошелек доходы
                     $current_referral_user_cash = $referral_network_referral -> getCash();//общие текущие начисления СингЛайн
-                    //dd($current_referral_user_pakage);
+                   
                     $singl_line_limit = $k_cash_back * $current_referral_user_pakage;
                     if($current_referral_user_cash < $singl_line_limit ){
                         if($summ_single_line_left_balance < $summ_single_line_right_balance){
@@ -886,7 +873,6 @@ class ReferralNetworkController extends AbstractController
                                 $user_referral_cashback = ($summ_single_line_right_balance * $k_payments_singl_line) + $current_referral_user_cash;//новый баланс КешБек бонуса рефовода (старый плюс новые начисления)
                                 $user_referral_reward = ($summ_single_line_right_balance * $k_payments_singl_line) + $current_referral_user_reward;//новый баланс Всех начислений  рефовода (старые плюс новые начисления)
                                 $new_user_referral_reward_wallet = $current_referral_user_reward_wallet + $user_referral_cashback_bonus;//новый баланс Всех начислений  рефовода доступные для вывода на кошелек
-                                //dd($k_cash_back);
                                 $referral_network_referral -> setCash($user_referral_cashback);//запись   single-line КешБек рефоводу
                                 $referral_network_referral -> setReward($user_referral_reward);//запись общего начисления поплнение общего количества начислений рефоводу  на момент автивации нового пакета
                                 $referral_network_referral -> setRewardWallet($new_user_referral_reward_wallet);//запись общего начисления поплнение общего количества начислений рефоводудоступных для вывода на кошелек
@@ -899,7 +885,7 @@ class ReferralNetworkController extends AbstractController
                     }
 
                     $accrual_limit = ($summ_ammoutn_all) - ($user_referral_cashback_bonus + $system_revenues);//Доля начислений в линию по КешБек - максимальная сумму начисления по программе КешБек в линию(лимит совокупных начислений)
-                    //dd($accrual_limit);
+                    
                     //=====получение общей суммы начислений в линии в виде cash-back которые по 1-му правилу должны начисляться участникам
                     //==========вычисляем и записываем награды участникам лини, сначала двигаясь относительно Рефовода  в сторону меньшего баланса линии, если лимит не превшен начинаем движение в противополжную от меньшего баланса сторону ===========
                     //array_unshift($single_line_right, $referral_network_user);//!!!!!!!добавляем рефовода который предоставил ссылку в массив с права , так как сначала масивы участников строились слева и спава от рефовода, самого рефовода
@@ -913,14 +899,10 @@ class ReferralNetworkController extends AbstractController
                         //условие начисления выплат по линии Сингл-Лайн если общее количество выплат меньше лимита суммы (сейчас 70% от суммы баланса с маньшей стороны) 
                         //то начисление производится в размере определенного коэффициентом (сейчас 10%), если общая сумма начислений к выплате превашает установленный лимит (70%) то включаем "Цикл начисления в линию"
                         //проверяем общее начисление и количество пользователей к начислению КешБэк в линии с помощью методов cashBackSummRight,cashBackSummLeft
-                        //if($summ_single_line_left_balance > $summ_single_line_right_balance){
-                            $cash_back_all_2 = $this -> cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline,$accrual_limit);
-                            $cash_back_all_1 = $this -> cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline,$accrual_limit);
-                       // }
-                        // else{
-                        //     $cash_back_all_1 = $this -> cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline,$accrual_limit);
-                        //     $cash_back_all_2 = $this -> cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline,$accrual_limit);
-                        // }
+                       
+                        $cash_back_all_2 = $this -> cashBackSummRight($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline,$accrual_limit);
+                        $cash_back_all_1 = $this -> cashBackSummLeft($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline,$accrual_limit);
+                      
                         $cash_back_all_1_summ = array_sum($cash_back_all_1); 
                         $cash_back_all_2_summ = array_sum($cash_back_all_2);
                         $cash_back_all_left_count = count($cash_back_all_1); //количество участников которые не превысили норму отчислений 300% в линию КешБек с левой стороны
@@ -931,7 +913,7 @@ class ReferralNetworkController extends AbstractController
 
                         //расчет начислений КешБек в линию, если общая сумма начисления не превышает лимит выплаты (70%) то начисляем по правилу №1
                         //если сумма выплат превышает лимит то начисление проводим по правилу "Цикла"
-                        //dd($cash_back_all_1);
+                        
                         if($accrual_limit >= $cash_back_all_summ){
                             //теперь проделываем операции по определению наград двигаясь в  обе стороны  от Рефовода по линии по правилу №1 и общую сумму начисления в сеть
                             $all_cash_right = $this -> reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back, $payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count);
@@ -976,7 +958,6 @@ class ReferralNetworkController extends AbstractController
                     //         $all_cash_left_summ = 0;
                     // }
 
-                    
                     //$payments_cash - общая сумма начислений КешБек в сеть на момент активации пакета
                     $referral_network -> setPaymentsNetwork($bonus);//direct начисление  за текущиую итерацию сети (на момент активации нового пакета)
                     $referral_network -> setPaymentsCash($payments_cash);//запись общего начисления  single-line КешБек на момент автивации нового пакета
@@ -997,7 +978,7 @@ class ReferralNetworkController extends AbstractController
 
                     //==============проводим погашение баланса пакетов пользователей в линии=============
                     //сформируем массивы баланса пакетов больше нуля с левой и с правой стороны
-                    //dd($array_single_line_left);
+                    
                         $single_line_left_balance_pakege = [];
                         for($i = 0; $i < count($array_single_line_left); $i++){
                             if($array_single_line_left[$i] -> getBalance() > 0){
@@ -1005,7 +986,7 @@ class ReferralNetworkController extends AbstractController
                                 $array_left_balance_pakege[] = $array_single_line_left[$i] -> getBalance();
                             }    
                         }
-                        //dd($array_left_balance_pakege);
+                       
                         $summ_left_balance_pakege = array_sum($array_left_balance_pakege);
                         $count_left_balance_pakege = count($array_left_balance_pakege);
                         
@@ -1063,13 +1044,11 @@ class ReferralNetworkController extends AbstractController
                                 $single_line_left_balance_pakege[$i] -> setBalance(0);
                                 $entityManager->flush();
                             }
-                        }
-                         
+                        }    
                     $referral_network -> setCurrentNetworkProfit($repayment_amount);// запись в таблицу начисления погашаемой суммы в систему!!!!!!!!!!!!!!!!!!!!!!!!!!
                     $referral_network -> setSystemRevenues($system_revenues);// запись в таблицу начисления  суммы дохода системы  (30%)
                     $entityManager->persist($referral_network);
-                    $entityManager->flush();    
-            
+                    $entityManager->flush();        
         }
         $entityManager->persist($referral_network);
         $entityManager->flush();
@@ -1712,7 +1691,6 @@ class ReferralNetworkController extends AbstractController
                 $single_line_left_balance_new =[];
                 $control_all_summ = 0;
                 //начисление начинаем со второго участника так как первый участник в массиве это последний учстник линии которому не начиляются бонусы
-//dd($single_line_left_l_reverse);
                 for($j = 1; $j< count($single_line_left_l_reverse); $j++){
                     
                     
@@ -1799,13 +1777,9 @@ class ReferralNetworkController extends AbstractController
                     $entityManager->flush();
                     }
                 }
-                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);  
-            
+                $summ_single_line_right_balance_new = array_sum($single_line_right_balance_new);      
        }
-       //dd($summ_single_line_right_balance_new);
        $summ_single_line_balance_new = $summ_single_line_right_balance_new + $summ_single_line_left_balance_new + $summ_single_line_organizer_new;//общая сумма начислений КешБек
        return $summ_single_line_balance_new;
    }
-
-
 }

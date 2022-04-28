@@ -25,8 +25,6 @@ class FastConsultationController extends AbstractController
 
     public function fastSendMeil(Request $request,MailerInterface $mailer, $fast_consultation, MailerController $mailerController, $entityManager, $email_client,$savingMailRepository)
     {
-        //$entityManager->persist($fast_consultation);
-        //$entityManager->flush();
         $mailerController->sendFastConsultationEmail($mailer,$fast_consultation,$email_client, $savingMailRepository);
     }
 }

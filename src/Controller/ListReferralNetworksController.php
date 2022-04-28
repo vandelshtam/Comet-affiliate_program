@@ -36,7 +36,6 @@ class ListReferralNetworksController extends AbstractController
         //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $entityManager = $doctrine->getManager();
-        //$pakages = $referralPakegeRepository->findAll();
         $pakages = $entityManager->getRepository(Pakege::class)->findAll();
         foreach($pakages as $pakage){
             $pakage_price_all[] = $pakage -> getPrice();
@@ -106,7 +105,6 @@ class ListReferralNetworksController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, ListReferralNetworksRepository $listReferralNetworksRepository, SavingMailRepository $savingMailRepository,int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $user = $this -> getUser();
         $user_id = $user -> getId();
@@ -282,13 +280,13 @@ class ListReferralNetworksController extends AbstractController
         $owner_name = $user_table -> getUsername();
         $pakege_id = $pakege -> getId();//id пакета основателя сети
         //$id переданный в агрументе id пакета пользователя пришедшего для записи в качестве члена сети, в данном случае совпадает с владельцем сети
-
         $balance = $pakege -> getPrice();
+
         //$current_wallet_usdt = $wallet_table -> getUsdt();
         $client_code = $pakege -> getClientCode();
         $unique_code = $pakege -> getUniqueCode();//уникальный код сети генерировался на этапе начального создания 
         $listReferralNetwork_id = $listReferralNetwork -> getId();// id реферальной сети
-
+        
         //$network_code - уникальный код реферальной сети
         $network_code = $pakege_id.'-'.$unique_code;//первая част до тире "id реферальной сети " - после тире "уникальный код сети" который одинаковый с уникальным кодом пакета unique_code
 

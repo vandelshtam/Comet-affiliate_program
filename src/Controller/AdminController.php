@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class AdminController extends AbstractController
 {
     #[Route('/admin', name: 'app_admin')]
-    public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController): Response
+    public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
         
         $fast_consultation = new FastConsultation();       
@@ -25,8 +25,7 @@ class AdminController extends AbstractController
         $fast_consultation_form->handleRequest($request);
         if ($fast_consultation_form->isSubmitted() && $fast_consultation_form->isValid()) {
             $email_client = $fast_consultation_form -> get('email')->getData(); 
-            $textSendMail = $mailerController->textFastConsultationMail($fast_consultation);
-            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$textSendMail,$email_client); 
+            $fast_consultation_meil -> fastSendMeil($request,$mailer,$fast_consultation,$mailerController,$entityManager,$email_client,$savingMailRepository); 
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
         return $this->render('admin/index.html.twig', [

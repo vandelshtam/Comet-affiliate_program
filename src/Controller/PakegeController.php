@@ -87,8 +87,7 @@ class PakegeController extends AbstractController
                 $pakages_noupdate[] = $pakage;
             }
         }
-        //$user_id = $this -> getUser() -> getId();
-        //dd($pakages_update);
+        
         if($pakages_table == false){
             $this->addFlash(
                 'warning',
@@ -104,7 +103,6 @@ class PakegeController extends AbstractController
         if($pakages_table[0] -> getUserId() != $this -> getUser() -> getId()){
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
         }
-        //dd($pakages_table);
         //$pakages = $pakegeRepository->findAll();
         $pakages_array_price = [0];
         
@@ -142,11 +140,9 @@ class PakegeController extends AbstractController
     }
 
     
-
     #[Route('/new/purchase/{unique_code_get?}', name: 'app_pakege_new', methods: ['GET', 'POST'])]
     public function new(Request $request, PakegeRepository $pakegeRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,ReferralNetworkRepository $referralNetworkRepository, SavingMailRepository $savingMailRepository, string $unique_code_get): Response
     {
-        //dd('GHhyy');
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -212,12 +208,10 @@ class PakegeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             //$form_referral_link = $form->get('referral_link')->getData();
-            
             //$form_pakage_name = $form->get('name')->getData();
             $form_referral_select = $request->get('select');
             $form_referral_select2 = $request->get('select2');
             
-            //dd($form_referral_select);
             $pakage_user = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $form_referral_select]); 
             $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
             $wallet_cometpoin = $wallet -> getCometpoin();
@@ -265,7 +259,7 @@ class PakegeController extends AbstractController
                 $price_usdt = $pakage_table -> getPricePakage();
                 $price_token = $price_usdt * $token_table;
                 $user_table -> setPakageStatus(1);
-                //dd($user_id);
+            
                 $pakege -> setUserId($user_id);
                 $pakege -> setPrice($price_usdt);
                 $pakege -> setName($form_referral_select);
@@ -328,10 +322,9 @@ class PakegeController extends AbstractController
                 $entityManager->flush();
             }
             //$unique = $form->get('unique_code')->getData();
-
             //$pakage_comet_id = $this -> newChoice ($request,$pakegeRepository,$doctrine,$unique,$wallet,$form_referral_select,$form_pakage_name,$pakage_user_price,$token_rate,$user_table);
-            
             //$user_table -> setPakageId($pakage_comet_id);
+
             $entityManager->flush();
             $mailerController->sendEmail($mailer,$savingMailRepository);
             $this->addFlash(
@@ -341,8 +334,6 @@ class PakegeController extends AbstractController
                 'info',
                 'Чтобы пакет начал работать вы должны активировать пакет!'); 
             $pakage_comet = $entityManager->getRepository(Pakege::class)->findByExampleClientField($client_code); 
-            //dd(count($pakage_comet));
-            
             return $this->redirectToRoute('app_pakege_index', ['client_code' => $client_code], Response::HTTP_SEE_OTHER);   
         }
 
@@ -367,15 +358,9 @@ class PakegeController extends AbstractController
     }
 
 
-
-
-
-
-
     #[Route('/{id}/show', name: 'app_pakege_show', methods: ['GET', 'POST'])]
     public function show(Pakege $pakege,Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, SavingMailRepository $savingMailRepository, int $id): Response
     {
-        //dd('HHHHHhhhhhhhh');
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $user = $this->getUser();
@@ -404,14 +389,9 @@ class PakegeController extends AbstractController
 
 
 
-
-
-
-
     #[Route('/show/multi', name: 'app_pakege_show_multiPakage', methods: ['GET', 'POST'])]
     public function showMultiPakage(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
     {
-        //dd('HHHHHhhhhhhhh');
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $user = $this->getUser();
@@ -440,9 +420,6 @@ class PakegeController extends AbstractController
         $action = 0;
         $pakages = $entityManager->getRepository(Pakege::class)->findByPakageActionField($name_multi_pakage, $user_id, $multi_pakage_day,$action);//получение пакетов соответсвующих акции
         $action_pakage = [];
-       // dd($pakages);
-
-        //dd('date('.$multi_pakage_day.')');
         $datetime1 = (new \DateTime()); //Получаем текущую дату
         $multi_pakage_day1 = date('Y-m-d');
         $timestamp = $datetime1->getTimestamp();
@@ -458,7 +435,6 @@ class PakegeController extends AbstractController
         foreach($interval1 as $start){
             $stop[] = $start;
         }
-        //dd($time_control);
         //$interval2 = $datetime3->diff($datetime4); // И считаем разницу для времени
         // Здесь должна быть проверка, не отрицательный ли интервал, но это можно сделать    
 
@@ -512,12 +488,9 @@ class PakegeController extends AbstractController
     }
 
 
-
-
     #[Route('/{id}/edit', name: 'app_pakege_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
     {
-        //dd('hghghghg');
         $user = $this->getUser();
         $wallet = $user -> getWallet();
         $user_id = $user -> getId();
@@ -545,7 +518,6 @@ class PakegeController extends AbstractController
         $payments_direct = $setting_opyions -> getPaymentsDirect();
         $payments_direct_fast = $setting_opyions -> getPaymentsDirectFast();
         $payments_singleline = $setting_opyions -> getPaymentsSingleline();
-       // dd($update_day);
         
         //проверка срока активации пакета
         if($pakage_comet -> getUpdatedAt() != NULL){
@@ -557,7 +529,6 @@ class PakegeController extends AbstractController
             
         date_modify($datetime, $update_day.'day');    
         $timestamp = $datetime->getTimestamp();
-        //dd(time());
         if($timestamp < time()){
              $this->addFlash(
                 'warning',
@@ -582,14 +553,11 @@ class PakegeController extends AbstractController
         else{
             $k_direct = $payments_direct;
         }    
-        
-        //dd($k_direct);
 
         $form = $this->createForm(BoostPakageType::class, $pakege);
         $form->handleRequest($request);
         $entityManager = $doctrine->getManager();
         $choise_param_edit = $pakage_comet-> getName();
-//dd($choise_param_edit);
         $choise = $this -> choiseParamEdit($choise_param_edit);
         if($choise == false){
             $this->addFlash(
@@ -602,7 +570,6 @@ class PakegeController extends AbstractController
         
         if ($form->isSubmitted() && $form->isValid()) {
             $form_pakage = $request->get('pakage');//назание пакета из формы
-            //dd($form_pakage);
             $form_referral_select = $request->get('select');//название валюты оплаты из формы
             $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//курс токена
             $pakage_user = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $form_pakage]); //объект всех пакетов
@@ -612,7 +579,6 @@ class PakegeController extends AbstractController
             $pakage_current_price = $pakage_comet-> getPrice();//стоимость текущего пакета
             $pakage_cost_difference = $pakage_user_price - $pakage_current_price;//разница стоимости пакетов
             $token = $token_rate * $pakage_user_price;
-//dd($pakage_cost_difference);
             if($this -> possibilityCheck($form_referral_select, $wallet, $pakage_cost_difference,$token_rate) == false){
                 $this->addFlash(
                 'warning',
@@ -643,8 +609,8 @@ class PakegeController extends AbstractController
             $listReferralNetwork -> setPaymentsCash($listReferralNetwork_new_cash);//обновленная общая сумма начислений по программе КешБек на момент активации последнего пакета в сети
             $listReferralNetwork -> setCurrentBalance($listReferralNetwork_new_balance);//новая  общая сумма оставшихся не погашенных пакетов в сети на момент активации последнего пакета
             $listReferralNetwork -> setUpdatedAt(new \DateTime());
-            //=========== =========================================================== ==============================================
 
+            //=========== =========================================================== ==============================================
             $pakage_comet -> setPrice($pakage_user_price);
             $pakage_comet -> setName($form_pakage);
             $pakage_comet -> setToken($token);
@@ -677,9 +643,6 @@ class PakegeController extends AbstractController
             'title' => 'Pakage edit',
         ]);
     }
-
-
-
 
 
     #[Route('/{id}/edit/admin', name: 'app_pakege_edit_admin', methods: ['GET', 'POST'])]
@@ -827,7 +790,6 @@ class PakegeController extends AbstractController
         $pakage_comet -> setToken($price_token);
         $pakage_comet -> setClientCode($client_code);
         //$pakage_comet->setCreatedAt(new \DateTimeImmutable());
-
         return $pakage_comet_id;
     }
 
@@ -864,10 +826,8 @@ class PakegeController extends AbstractController
 
     private function chargeForPromotion(EntityManagerInterface $entityManager,$doctrine,$form_referral_select,$wallet,$pakage_cost_difference,$k_direct,$payments_singleline,$pakage_user_price,$wallet_cometcoin_rate,$id,$token_rate){
         $entityManager = $doctrine->getManager();
-        //dd($id);
         $referral_network_user = $entityManager -> getRepository(ReferralNetwork::class)->findOneBy(['pakege_id' => $id]);//объект владельца пакета
         $referral_link_refovod = $referral_network_user -> getMyTeam();
-        //dd($referral_network_user);
         //получаем объект Рефовода и получаем текщие значения начислений бонусов
         $user_refovod = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link_refovod]);
         $user_refovod_curren_cash = $user_refovod -> getCash(); 
