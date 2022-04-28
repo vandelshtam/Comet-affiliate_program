@@ -52,7 +52,7 @@ class RegistrationFormType extends AbstractType
                 'required' => false,  
             ])
             ->add('referral_link', TextType::class,[
-                'label' => 'Реферальная ссылка',
+                'label' => 'Referral link',
                 //'value' => $this->getUser()->getId(),
                 'required' => false,  
             ])
