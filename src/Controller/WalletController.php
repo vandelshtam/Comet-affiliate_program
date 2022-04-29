@@ -249,7 +249,7 @@ class WalletController extends AbstractController
         if($wallet_user == false){
             $this->addFlash(
                 'warning',
-                'У вас нет прав доступа к кошельку.');
+                'You do not have permission to access the wallet.');
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -273,8 +273,8 @@ class WalletController extends AbstractController
             $entityManager->persist($table_wallet);
             $entityManager->flush();
             $this->addFlash(
-                'info',
-                'Вы успешно пополнили кошелек.');
+                'success',
+                'wallet.wallet_adddeposit');
             return $this->redirectToRoute('app_wallet_user', [], Response::HTTP_SEE_OTHER);
         }
 

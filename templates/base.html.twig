@@ -37,23 +37,23 @@
                 <a class="nav-link header_email mr-1" href="mailto:ficakki48@gmail.com">comet-ap@gmail.com</a>
                 </li>
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                <li class="ml-3"><a class="nav-link  header_exit ml-1" href="{{ path('app_logout') }}">Выйти</a></li>
+                <li class="ml-3"><a class="nav-link  header_exit ml-1" href="{{ path('app_logout') }}">{{ 'base.logout' | trans }}</a></li>
                 {% else %}
-                <li class="ml-3"><a class="nav-link  header_signin ml-1" href="{{ path('app_login') }}">Войти</a></li>
-                <li class="ml-3"><a class="nav-link pakage_table_name-1 ml-1" href="{{ path('app_register') }}">Регистрация</a></li>
+                <li class="ml-3"><a class="nav-link  header_signin ml-1" href="{{ path('app_login') }}">{{ 'base.sign_in' | trans }}</a></li>
+                <li class="ml-3"><a class="nav-link pakage_table_name-1 ml-1" href="{{ path('app_register') }}">{{ 'base.registration' | trans }}</a></li>
                 {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}
                 <li class="nav-item ml-3">
-                <a class="nav-link disabled pakage_table_name-1 ml-1" href="#" tabindex="-1" aria-disabled="true" href="{{ path('app_admin') }}">Вы Администратор</a>
+                <a class="nav-link disabled pakage_table_name-1 ml-1" href="#" tabindex="-1" aria-disabled="true" href="{{ path('app_admin') }}">{{ 'base.role' | trans }}</a>
                 </li>
                 {% endif %}
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <li class="nav-item ml-3">
-                <a class="nav-link disabled pakage_who ml-3" href="#" tabindex="-1" aria-disabled="true">Вы : {{ app.user.pesonalCode }}</a>
+                <a class="nav-link disabled pakage_who ml-3" href="#" tabindex="-1" aria-disabled="true">{{ 'base.username' | trans }} : {{ app.user.pesonalCode }}</a>
                 </li>
                 <li class="nav-item ml-3">
                 {# <a class="btn btn-warning" href="#" tabindex="-1" aria-disabled="true">Быстрая консультация</a> #}
-                <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn text-light rounded-0 header_send ml-1" style="background:  rgb(72, 109, 169);">Быстрое обращение в поддержку</a> 
+                <a data-fancybox data-src="#hidden-content" href="javascript:;" class="btn text-light rounded-0 header_send ml-1" style="background:  rgb(72, 109, 169);">{{ 'base.support' | trans }}</a> 
                 {% endif %}   
                 </li>
             </ul>
@@ -72,13 +72,13 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent2">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                <a class="nav-link active text-light" aria-current="page" href="{{ path('app_home') }}">Главная</a>
+                <a class="nav-link active text-light" aria-current="page" href="{{ path('app_home') }}">{{ 'base.main' | trans }}</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link text-light" href="{{ path('app_about_project') }}">О проекте</a>
+                <a class="nav-link text-light" href="{{ path('app_about_project') }}">{{ 'base.about_project' | trans }}</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link text-light" href="{{ path('app_condition') }}">Правила и акции</a>
+                <a class="nav-link text-light" href="{{ path('app_condition') }}">{{ 'base.rules_promotions' | trans }}</a>
                 </li>
                 {# <li class="nav-item">
                 <a class="nav-link text-light" href="#">Блог</a>
@@ -90,22 +90,22 @@
                 <a class="nav-link text-light" href="#">Контакты</a>
                 </li> #}
                 <li class="nav-item">
-                <a class="nav-link text-light" href="{{ path('app_table_pakage_index') }}">Обзор пакетов</a>
+                <a class="nav-link text-light" href="{{ path('app_table_pakage_index') }}">{{ 'base.packages' | trans }}</a>
                 </li>
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Кабинет пользователя
+                        {{ 'base.user_account' | trans }}
                     </a>
                     <ul class="dropdown-menu rounded-0" aria-labelledby="navbarDropdown" style="background: rgb(223, 230, 245);">
                         {# <li><a class="dropdown-item" href="{{ path('app_current_balance') }}">Текущий баланс</a></li> #}
-                        <li><a class="dropdown-item fw-bold" href="{{ path('app_referral_network_myplace') }}" style="color: rgb(72, 109, 169);">Мой баланс</a></li>
-                        <li><a class="dropdown-item fw-bold" href="{{ path('app_wallet_user') }}" style="color: rgb(72, 109, 169);">Мой кошелек</a></li>
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_referral_network_myplace') }}" style="color: rgb(72, 109, 169);">{{ 'base.my_balance' | trans }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_wallet_user') }}" style="color: rgb(72, 109, 169);">{{ 'base.my_wallet' | trans }}</a></li>
                         {# <li><a class="dropdown-item" href="#">История транзакций</a></li> #}
                         {# {% if is_granted('ROLE_ADMIN') %} #}
-                        <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}" style="color: rgb(72, 109, 169);">Купить пакет</a></li>
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}" style="color: rgb(72, 109, 169);">{{ 'base.buy_package' | trans }}</a></li>
                             {% if app.user.pakageStatus == 1 %}
-                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_edit_routing', {'id': app.user.pakageId}) }}" style="color: rgb(72, 109, 169);">Повысить пакет</a></li>
+                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_edit_routing', {'id': app.user.pakageId}) }}" style="color: rgb(72, 109, 169);">{{ 'base.upgrade_package' | trans }}</a></li>
                             {% endif %}
                         {# {% else %}    #}
                             {# {% if app.user.pakageStatus == 0 %}
@@ -121,18 +121,18 @@
                         <li><hr class="dropdown-divider"></li>
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         {% if app.user.username == null %}
-                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">Вы вошли как : {{ app.user.email }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.you_logged' | trans }} : {{ app.user.email }}</a></li>
                         {% else %}
-                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">Вы вошли как : {{ app.user.username }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.you_logged' | trans }} : {{ app.user.username }}</a></li>
                         {% endif %} 
-                        <li><a class="dropdown-item fw-bold" href="{{ path('app_personal_area') }}" style="color: rgb(72, 109, 169);">Личный кабинет</a></li>
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_personal_area') }}" style="color: rgb(72, 109, 169);">{{ 'base.personal_area' | trans }}</a></li>
                         {% else %}
-                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">No login</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.no_login' | trans }}</a></li>
                         {% endif %} 
                         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         {# <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">Поддержка (не активно)</a></li> #}
                         {% if is_granted('ROLE_ADMIN') %}   
-                        <li><a class="dropdown-item fw-bold" href="{{ path('app_admin') }}" style="color: rgb(72, 109, 169);">Кабинет администратора</a></li>
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_admin') }}" style="color: rgb(72, 109, 169);">{{ 'base.administrator_office' | trans }}</a></li>
                         {% endif %} 
                         {% endif %} 
                     </ul>

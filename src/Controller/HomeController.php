@@ -13,17 +13,48 @@ use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HomeController extends AbstractController
 {
-    #[Route('/', name: 'app_home')]
-    public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository): Response
+    /**
+     * @Route(
+     *     "/{_locale}/contact",
+     *     name="contact",
+     *     requirements={
+     *         "_locale": "en|ru|ua|fr|de",
+     *     }
+     * )
+     */
+    public function onKernelRequest(RequestEvent $event)
     {
+        $request = $event->getRequest();
+        //$locale = 'ru';
+        $locale = $request->getLocale();
+        dd();
+        // some logic to determine the $locale
+        $request->setLocale($locale);
+    }
+
+    #[Route('/', name: 'app_home')]
+    public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository,TranslatorInterface $translator): Response
+    {
+        // $defaultLocale = 'ru';
+        // $request = $event->getRequest();
+        // //$locale = 'ru';
+        // $locale = $request->getLocale();
+        // dd();
+        // // some logic to determine the $locale
+        // $request->setLocale($locale);
+        
         $setting = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
         $start_day = round($setting -> getStartDay() / 2);
         // $datetime1 = (new \DateTime()); //Получаем текущую дату
         // $datetime2 = new \DateTime($start_day.'days'); //Дата акции
+
+        //$translated = $this->get('translator')->trans('Symfony is great'); 
 
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
@@ -34,10 +65,11 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
         }
         return $this->renderForm('home/index.html.twig', [
-            'controller_name' => 'Главная страница',
+            'controller_name' => 'main.main_page',
             'fast_consultation_form' => $fast_consultation_form,
             'start_day' => $start_day,
             'user' => $this->getUser(),
+            //'translated' => $translated,
         ]);
     }
 }
