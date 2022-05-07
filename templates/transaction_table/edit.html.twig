@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit TransactionTable{% endblock %}
+
+{% block body %}
+    <h1>Edit TransactionTable</h1>
+
+    {{ include('transaction_table/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_transaction_table_index') }}">back to list</a>
+
+    {{ include('transaction_table/_delete_form.html.twig') }}
+{% endblock %}

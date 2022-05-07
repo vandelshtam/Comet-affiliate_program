@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <h1>{{ controller_name }}</h1>
+<a href="{{ path('app_transaction_table_index') }}">Вернуться ко всем транзакциям</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id операции</th>
+                <th>Место в линии</th>
+                <th>Пользователь</th>
+                {# <th>Pakage_id</th> #}
+                {# <th>Cash</th>
+                <th>Direct</th> #}
+                {# <th>Withdrawal_to_wallet</th> #}
+                {# <th>Withdrawal</th> #}
+                <th>Дата</th>
+                {# <th>Updated_at</th> #}
+                {# <th>Application_withdrawal</th>
+                <th>Application_withdrawal_status</th> #}
+                {# <th>Network_activation_id</th> #}
+                <th>Тип транзакции Type</th>
+                {# <th>Pakage_price</th> #}
+                <th>Кошелек</th>
+                <th>Сумма</th>
+                <th>Token</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for transaction_table in transaction_tables %}
+            <tr>
+                <td>{{ transaction_table.id }}</td>
+                <td>{{ transaction_table.networkId }}</td>
+                <td>{{ transaction_table.userId }}</td>
+                {# <td>{{ transaction_table.pakageId }}</td> #}
+                {# <td>{{ transaction_table.cash }}</td>
+                <td>{{ transaction_table.direct }}</td> #}
+                {# <td>{{ transaction_table.withdrawalToWallet }}</td> #}
+                {# <td>{{ transaction_table.withdrawal }}</td> #}
+                <td>{{ transaction_table.createdAt ? transaction_table.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                {# <td>{{ transaction_table.updatedAt ? transaction_table.updatedAt|date('Y-m-d H:i:s') : '' }}</td> #}
+                {# <td>{{ transaction_table.applicationWithdrawal }}</td>
+                <td>{{ transaction_table.applicationWithdrawalStatus }}</td> #}
+                {# <td>{{ transaction_table.networkActivationId }}</td> #}
+                <td>{{ type[transaction_table.type] }}</td>
+                {# <td>{{ transaction_table.pakagePrice }}</td> #}
+                <td>{{ transaction_table.walletId }}</td>
+                <td>{{ transaction_table.somme }}</td>
+                <td>{{ transaction_table.token }}</td>
+                <td>
+                    <a href="{{ path('app_transaction_table_show', {'id': transaction_table.id}) }}">show</a>
+                    <a href="{{ path('app_transaction_table_edit', {'id': transaction_table.id}) }}">edit</a>
+                    {# <a href="{{ path('app_transaction_table_user', {'user_id': transaction_table.userId}) }}">по пользователю</a> #}
+                    {# <a href="{{ path('app_transaction_table_index_all_addwallet') }}">пополнения кошельков</a> #}
+                    {# <a href="{{ path('app_transaction_table_network', {'network_id': transaction_table.networkId}) }}">по месту в линии</a> #}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="19">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_transaction_table_new') }}">Create new</a>
+{% endblock %}

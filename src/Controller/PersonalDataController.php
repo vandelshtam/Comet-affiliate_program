@@ -128,9 +128,17 @@ class PersonalDataController extends AbstractController
         $entityManager = $doctrine->getManager();
         $repository = $doctrine->getRepository(PersonalData::class);
         
+        if($repository->findOneBy(['user_id' => $personal_user_id]) == NULL )
+        {
+            $this->addFlash(
+                'danger',
+                'Такого пользователя нет');
+            return $this->redirectToRoute('app_personal_area', [], Response::HTTP_SEE_OTHER);
+        }
+        
         if($personal_user_id != NULL)
         {
-            if($repository->findOneBy(['id' => $personal_user_id]) == NULL)
+            if($user -> getId() != $personal_user_id)
             {   
                 $this->denyAccessUnlessGranted('ROLE_ADMIN');
             }
@@ -143,7 +151,7 @@ class PersonalDataController extends AbstractController
         }
             
         //$repository = $doctrine->getRepository(PersonalData::class);
-        $personalDatum = $doctrine->getRepository(PersonalData::class)->findOneBySomeField($user -> getId());
+        $personalDatum = $doctrine->getRepository(PersonalData::class)->findOneBySomeField($personal_user_id);
         
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);

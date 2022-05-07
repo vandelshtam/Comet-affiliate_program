@@ -1,0 +1,5 @@
+
+registration_form:
+    notification_email: 'There is already an account with this email.'
+    lenght_pasword_form_1: 'Your password should be at least {{ limit }} characters'
+    not_blank_pasword_form: 'Please enter a password'

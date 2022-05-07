@@ -49,7 +49,7 @@ class RegistrationController extends AbstractController
             if($request->get('password') != $form->get('plainPassword')->getData()){
                 $this->addFlash(
                     'danger',
-                    'Пароль и его подтверждение не совпадают, введите еще раз.'); 
+                    'registration_form.push_notification_password_does_not_match'); 
                 return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);      
             }
             $referral_link = $form->get('referral_link')->getData();
@@ -58,14 +58,14 @@ class RegistrationController extends AbstractController
                 if($entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link]) == false){
                     $this->addFlash(
                         'danger',
-                        'Вы ошиблись при вводе реферальной ссылки или ввели устаревшую ссылку, пожалуйста поробуйте еще раз или обратитесь за новой ссылкой'); 
+                        'registration_form.push_notification_referral_link_not_match'); 
                     return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);       
                 }
             }
             else{
                 $this->addFlash(
                     'danger',
-                    'Извините! Без реферральной ссылки зарегистрироваться нельзя, пожалуйста обратитесь за ссылкой.'); 
+                    'registration_form.push_notification_referral_link_not'); 
                 return $this->redirectToRoute('app_register', [], Response::HTTP_SEE_OTHER);       
             }
             
@@ -85,10 +85,10 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
             $this->addFlash(
                 'success',
-                'Вы успешно прошли регистрацию, перейдите в указанную вами электронную почту и пройдите верификацию');
+                'registration_form.push_notification_registration_success');
             $this->addFlash(
                 'info',
-                'Чтобы совершать действия в системе Вам необходимо зарегистрировать персональные данные!');     
+                'registration_form.push_notification_registration_inform');     
 
             // generate a signed url and email it to the user
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
@@ -117,12 +117,11 @@ class RegistrationController extends AbstractController
         }
 
         return $this->render('registration/register.html.twig', [
-            'controller_name' => 'Страница регистрации',
+            'controller_name' => 'registration_form.controller_name',
             'title' => 'registration',
             'registrationForm' => $form->createView(),
             'fast_consultation_form' => $fast_consultation_form->createView(),
             'referral_link' => $referral,
-            //'date' => (new \DateTime()),
         ]);
     }
 
@@ -141,7 +140,7 @@ class RegistrationController extends AbstractController
         }
 
         // @TODO Change the redirect on success and handle or remove the flash message in your templates
-        $this->addFlash('success', 'Your email address has been verified.');
+        $this->addFlash('success', 'registration_form.push_notification_verify_inform');
 
         return $this->redirectToRoute('app_home');
     }

@@ -29,15 +29,19 @@
         {% endfor %}
         {% for label, messages in app.flashes(['warning', 'notice']) %}
                     {% for message in messages %}
-                        <div class="alert alert-danger rounded-0" role="alert">
+                        <div class="alert alert-warning rounded-0" role="alert">
                             {{ message }}
                         </div>
                     {% endfor %}            
         {% endfor %}
+        <select name="" id="input0" required="required" style="background-image:url(images/lng_ru.png);">
+    <option  style="background-image:url(images/lng_ru.png);" value="rus">rus</option>
+    <option  style="background-image:url(images/lng_eng.png);" value="eng">eng</option>
+</select>
         <div class="timer justify-content-center">
             <h1 class="d-flex fst-italic justify-content-center text-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ 'main.start_project' | trans }} </h1>
             <div class="timer__items justify-content-center mb-3 fst-italic" style="color:  rgb(72, 109, 169);">   
-                <div class="timer__item timer__days">00</div>
+                <div class="timer__item timer__days">00{{ 'timer.timer_days' | trans }}</div>
                 <div class="timer__item timer__hours">00</div>
                 <div class="timer__item timer__minutes">00</div>
                 <div class="timer__item timer__seconds">00</div>
@@ -126,7 +130,21 @@
             </div>
     </div>
 </div>
+<script>
+
+$('#input0').click(function() {
+ if($("select#input0 :selected").val() == "rus") {
+    $("select#input0").attr('style', 'background-image:url(images/lng_ru.png);');
+ }
+ if($("select#input0 :selected").val() == "eng") {
+    $("select#input0").attr('style', 'background-image:url(images/lng_eng.png);');
+ }
+    console.log('select color: '+$("select#input0 :selected").val());
+});
+
+</script>
 {% endblock %}
+
 {% block javascripts_reverse_counter %}
             {{ include('js_reverse_counter.html.twig') }}
 {% endblock %}

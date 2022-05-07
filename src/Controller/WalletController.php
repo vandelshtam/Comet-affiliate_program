@@ -8,6 +8,7 @@ use App\Entity\TokenRate;
 use App\Form\WalletUsdtType;
 use App\Entity\SettingOptions;
 use App\Entity\ReferralNetwork;
+use App\Entity\TransactionTable;
 use App\Form\WalletBitcoinType;
 use App\Entity\FastConsultation;
 use App\Form\WalletEtheriumType;
@@ -24,6 +25,7 @@ use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
+use App\Repository\TransactionTableRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -238,7 +240,7 @@ class WalletController extends AbstractController
     }
 
     #[Route('/{id}/deposit', name: 'app_wallet_adddeposit', methods: ['GET', 'POST'])]
-    public function deposit(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, SavingMailRepository $savingMailRepository,int $id): Response
+    public function deposit(Request $request, Wallet $wallet, WalletRepository $walletRepository, TransactionTableRepository $transactionTableRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController, SavingMailRepository $savingMailRepository,int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -271,6 +273,19 @@ class WalletController extends AbstractController
             $table_wallet->setUsdt($wallet_new_deposit);
             $table_wallet->setUpdatedAt(new \DateTime());
             $entityManager->persist($table_wallet);
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setWithdrawal($table_form);
+            $transaction_wallet -> setSomme($table_form);
+            $transaction_wallet -> setToken('usdt');
+            $transaction_wallet -> setUserId($user_id);
+            $transaction_wallet -> setType(24);
+            $transaction_wallet -> setWalletId($wallet_user -> getId());
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $entityManager->flush();
             $this->addFlash(
                 'success',
@@ -299,7 +314,7 @@ class WalletController extends AbstractController
 
 
     #[Route('/{id}/deposit/bitcoin', name: 'app_wallet_adddeposit_bitcoin', methods: ['GET', 'POST'])]
-    public function depositBitcoin(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
+    public function depositBitcoin(Request $request, Wallet $wallet, WalletRepository $walletRepository,TransactionTableRepository $transactionTableRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -331,6 +346,19 @@ class WalletController extends AbstractController
             $table_wallet->setBitcoin($wallet_new_deposit);
             $table_wallet->setUpdatedAt(new \DateTime());
             $entityManager->persist($table_wallet);
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setWithdrawal($table_bitcoin);
+            $transaction_wallet -> setSomme($table_bitcoin);
+            $transaction_wallet -> setToken('bitcoin');
+            $transaction_wallet -> setUserId($user_id);
+            $transaction_wallet -> setType(25);
+            $transaction_wallet -> setWalletId($wallet_user -> getId());
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $entityManager->flush();
             $this->addFlash(
                 'info',
@@ -357,7 +385,7 @@ class WalletController extends AbstractController
     }
 
     #[Route('/{id}/deposit/etherium', name: 'app_wallet_adddeposit_etherium', methods: ['GET', 'POST'])]
-    public function depositEtherium(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
+    public function depositEtherium(Request $request, Wallet $wallet, WalletRepository $walletRepository,TransactionTableRepository $transactionTableRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -389,6 +417,19 @@ class WalletController extends AbstractController
             $table_wallet->setEtherium($wallet_new_deposit);
             $table_wallet->setUpdatedAt(new \DateTime());
             $entityManager->persist($table_wallet);
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setWithdrawal($table_etherium);
+            $transaction_wallet -> setSomme($table_etherium);
+            $transaction_wallet -> setToken('etherium');
+            $transaction_wallet -> setUserId($user_id);
+            $transaction_wallet -> setType(26);
+            $transaction_wallet -> setWalletId($wallet_user -> getId());
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $entityManager->flush();
             $this->addFlash(
                 'info',
@@ -416,7 +457,7 @@ class WalletController extends AbstractController
 
 
     #[Route('/{id}/exchangecomet', name: 'app_wallet_exchange_comet', methods: ['GET', 'POST'])]
-    public function exchange(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
+    public function exchange(Request $request, Wallet $wallet, WalletRepository $walletRepository,TransactionTableRepository $transactionTableRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -448,6 +489,13 @@ class WalletController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             //dd($form->get('usdt')->getData());
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setUserId($user_id);
+            $transaction_wallet -> setWalletId($wallet_user -> getId());
+            //===============================    
             if($wallet -> getCometpoin()  > $table_cometpoin){
                 $this->addFlash(
                     'warning',
@@ -459,6 +507,11 @@ class WalletController extends AbstractController
                 $table_form = $table_form_input / $token_rate;
                 $wallet_new_deposit = $table_form + $table_usdt;
                 $table_wallet->setUsdt($wallet_new_deposit);
+                //запись в таблицу тразакций
+                $transaction_wallet -> setWithdrawal($table_form);
+                $transaction_wallet -> setSomme($table_form);
+                $transaction_wallet -> setToken('usdt');
+                $transaction_wallet -> setType(27);
             }
             elseif($form_coin = $form->get('usdt')->getData() == 3){
                 $table_form_input = $wallet -> getCometpoin();
@@ -466,6 +519,11 @@ class WalletController extends AbstractController
                 $wallet_new_deposit = $table_form + $table_bitcoin;
                 $table_wallet->setBitcoin($wallet_new_deposit); 
                 $table_wallet->setUsdt($table_usdt); 
+                //запись в таблицу тразакций
+                $transaction_wallet -> setWithdrawal($table_form);
+                $transaction_wallet -> setSomme($table_form);
+                $transaction_wallet -> setToken('bitcoin');
+                $transaction_wallet -> setType(27);
             }
             elseif($form_coin = $form->get('usdt')->getData() == 2){
                 $table_form_input = $wallet -> getCometpoin();
@@ -473,9 +531,17 @@ class WalletController extends AbstractController
                 //dd($table_form);
                 $wallet_new_deposit = $table_form + $table_etherium;
                 $table_wallet->setEtherium($wallet_new_deposit);
-                $table_wallet->setUsdt($table_usdt);    
+                $table_wallet->setUsdt($table_usdt); 
+                //запись в таблицу тразакций
+                $transaction_wallet -> setWithdrawal($table_form);
+                $transaction_wallet -> setSomme($table_form);
+                $transaction_wallet -> setToken('etherium');
+                $transaction_wallet -> setType(29);   
             }
-
+            //запись в таблицу тразакций
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $wallet_new_cometpoin = $table_cometpoin - ($wallet -> getCometpoin());
             $table_wallet->setCometpoin($wallet_new_cometpoin);
             $table_wallet->setUpdatedAt(new \DateTime());
@@ -507,7 +573,7 @@ class WalletController extends AbstractController
 
 
     #[Route('/{id}/exchangeusdt', name: 'app_wallet_exchange_usdt', methods: ['GET', 'POST'])]
-    public function exchangeUsdt(Request $request, Wallet $wallet, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
+    public function exchangeUsdt(Request $request, Wallet $wallet, WalletRepository $walletRepository,TransactionTableRepository $transactionTableRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -548,23 +614,48 @@ class WalletController extends AbstractController
             }
             $new_table_usdt = $table_usdt - $form->get('usdt')->getData();
 
+             //запись в таблицу тразакций
+             $transaction_wallet = new TransactionTable();
+             $transaction_wallet  -> setCreatedAt(new \DateTime());
+             $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+             $transaction_wallet -> setUserId($user_id);
+             $transaction_wallet -> setWalletId($wallet_user -> getId());
+             //===============================    
             if($form_coin = $form->get('cometpoin')->getData() == 1){  
                 $table_form_token = $form->get('usdt')->getData() * $token_rate;
                 $wallet_new_deposit = $table_form_token + $table_cometpoin;
                 $table_wallet->setCometpoin($wallet_new_deposit); 
                 //dd($wallet_new_deposit); 
+                //запись в таблицу тразакций
+                $transaction_wallet -> setWithdrawal($table_form_token);
+                $transaction_wallet -> setSomme($table_form_token);
+                $transaction_wallet -> setToken('cometpoin');
+                $transaction_wallet -> setType(32);
             }
             elseif($form_coin = $form->get('cometpoin')->getData() == 3){
                 $table_form = $form->get('usdt')->getData() / 40000;
                 $wallet_new_deposit = $table_form + $table_bitcoin;
-                $table_wallet->setBitcoin($wallet_new_deposit);    
+                $table_wallet->setBitcoin($wallet_new_deposit);
+                //запись в таблицу тразакций
+                $transaction_wallet -> setWithdrawal($table_form);
+                $transaction_wallet -> setSomme($table_form);
+                $transaction_wallet -> setToken('bitcoin');
+                $transaction_wallet -> setType(30);    
             }
             elseif($form_coin = $form->get('cometpoin')->getData() == 2){   
                 $form_token = $form->get('usdt')->getData() / 4000;
                 $wallet_new_deposit = $form_token + $table_etherium;
-                $table_wallet->setEtherium($wallet_new_deposit);    
+                $table_wallet->setEtherium($wallet_new_deposit); 
+                //запись в таблицу тразакций
+                $transaction_wallet -> setWithdrawal($form_token);
+                $transaction_wallet -> setSomme($form_token);
+                $transaction_wallet -> setToken('etherium');
+                $transaction_wallet -> setType(31);       
             }
-            
+            //запись в таблицу тразакций
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $table_wallet->setUSDT($new_table_usdt);
             $table_wallet->setUpdatedAt(new \DateTime());
             $entityManager->persist($table_wallet);
@@ -690,8 +781,8 @@ class WalletController extends AbstractController
         ]);
     }
 
-    #[Route('/exchangecometwallet/{network}', name: 'app_wallet_exchange_wallet_comet', methods: ['GET', 'POST'])]
-    public function exchangeCometWallet(Request $request, WalletRepository $walletRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $network): Response
+    #[Route('/exchangecometwallet/cometa/{network}', name: 'app_wallet_exchange_wallet_comet', methods: ['GET', 'POST'])]
+    public function exchangeCometWallet(Request $request, WalletRepository $walletRepository,TransactionTableRepository $transactionTableRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $network): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entityManager = $doctrine->getManager();
@@ -744,6 +835,7 @@ class WalletController extends AbstractController
         
         if ($form->isSubmitted() && $form->isValid()) {
             $table_form = $wallet -> getCometpoin();//сумма кометпоин введенная в форму
+            //dd($table_form);
             if(($table_form / $token_rate) > $available_balance){
                 $this->addFlash(
                     'warning',
@@ -760,6 +852,20 @@ class WalletController extends AbstractController
             //dd($withdrawal_to_wallet);
             $entityManager->persist($table_wallet);
             $table_wallet->setUpdatedAt(new \DateTime());
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setWithdrawal($table_form);
+            $transaction_wallet -> setWithdrawalToWallet($table_form);
+            $transaction_wallet -> setSomme($table_form);
+            $transaction_wallet -> setToken('cometpoin');
+            $transaction_wallet -> setUserId($user_id);
+            $transaction_wallet -> setType(3);
+            $transaction_wallet -> setWalletId($id);
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $entityManager->flush();
             $this->addFlash(
                 'info',
@@ -782,7 +888,7 @@ class WalletController extends AbstractController
             'reward_all' => $reward_all * $token_rate,
             'fast_consultation_form' => $fast_consultation_form,
             'available_balance' => $available_balance * $token_rate,
-            'controller_name' => 'Обмен токенов',
+            'controller_name' => 'Перевод CoMetaPoin на кошелек',
             'title' => 'exchange token',
             'withdrawal_wallet' => $withdrawal_wallet * $token_rate,
         ]);

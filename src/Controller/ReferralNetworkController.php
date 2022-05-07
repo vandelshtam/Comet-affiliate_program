@@ -22,6 +22,8 @@ use App\Repository\ReferralNetworkRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
+use App\Entity\TransactionTable;
+use App\Repository\TransactionTableRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\DateTime;
@@ -48,7 +50,7 @@ class ReferralNetworkController extends AbstractController
         return $this->renderForm('referral_network/index.html.twig', [
             'referral_networks' => $referralNetworkRepository->findAll(),
             'fast_consultation_form' => $fast_consultation_form,
-            'controller_name' => 'Список всех участников сети',
+            'controller_name' => 'Текущие данные по каждому месту в линии',
             'title' => 'list users network',
         ]);
     }
@@ -116,13 +118,135 @@ class ReferralNetworkController extends AbstractController
         $referral_network_user = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_id' => $this->getUser()->getId()]);
         if($referral_network_user -> getMyTeam() != $my_team){
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        } 
+        }
+        $user_id = $this->getUser()->getId();
         $array_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$my_team]);//получаем объект  участников моей команды (которых пригласил пользователь) 
         $my_team_count = count($array_my_team);
         foreach($array_my_team as $array){
             $array_my_team_summ_pakege[] = $array -> getPakage();
         }
         $my_team_summ = array_sum($array_my_team_summ_pakege);
+
+        //получим всех участников моей команды - участников которых пригласили члены команды и их члены команды
+        //получим реферальные ссылки членов команды
+        $array_my_team_link = []; //массив для реферальных ссылок членов команды
+        foreach($array_my_team as $array){
+           $array_my_team_link[] = $array -> getMemberCode();//получаем реферальную ссылку членов команды
+            //$array_my_team_link[] = null;//получаем реферальную ссылку членов команды
+        }
+        //dd($array_my_team_link);
+        //далее проверяем наличие участников приглашенных участниками моей команды
+        // foreach($array_my_team as $array){
+        //     $array_my_team_link[] = $array -> getMemberCode();//получаем реферальную ссылку членов команды
+        // }
+        $array_my_team_my_team = [];//массив для команды "моей команды" (тех кого пригласили мои участники моей команды)
+        $array_link_my_team_my_team = [];//массив реферальных ссылок моей команды
+        $array_link = [];
+        $array_link = $array_my_team_link ;
+            $i = 1;
+            $array_control = [];
+            $new_array_link = [];
+            //dd($array_control);
+            while($i <= count($referralNetworkRepository->findAll())){
+                //dd($array_link);
+                foreach($array_link as $array){
+                    //$array_my_team_my_team[] = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$array]);//объект команд моей команды
+                    $array_control[] = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$array]);
+                    //$new_array_control[] = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField(['1-607-571-orXB4z5jKmEDeS2k9WJ4']);
+                }
+                //dd($array_control);
+                $result_array = [];
+                for($i=0; $i<count($array_control); $i++){
+                    foreach($array_control[$i] as $array){
+                        $result_array[] = $array;
+                    }
+                }
+                // $resArray = []; 
+                // function convertToSimpleArray($array){
+                //     global $resArray; 
+                //     if(is_array($array)){
+                //         foreach($array as $below){
+                //             $res = convertToSimpleArray($below); 
+
+                //         }
+                //     }else{
+                //         $resArray[] = $array; 
+                //     }
+                //     return $resArray; 
+                // }
+                // $result = convertToSimpleArray($array_my_team_my_team);
+                // $result_control = convertToSimpleArray($array_control);
+                //dd($result_array);
+                if(count($result_array) == 0){
+                    $i = 0;
+                    break;
+                }
+                else{
+                    //dd($result_array);
+                    $new_array_link = [];
+                    foreach($result_array as $array){
+                    $new_array_link[] = $array -> getMemberCode();//получаем реферальную ссылку членов команды их команды и добавляем в массив ссылок членов команды если они есть
+                    }
+                    $array_link = $new_array_link;
+                    //dd(count($array_link));
+                    
+                    $relult_array_link = array_merge_recursive($array_my_team_link, $new_array_link);
+                    $array_my_team_link = $relult_array_link;
+                    //$array_my_team_link[] = $new_array_link;
+                    //dd($relult_array_link);   
+                    //dd($control_team);
+                    //$array -> getMemberCode();//запись в массив контроля новых участников, если они есть продолжаем цикл, если в массиве пусто то цикл прерываем
+                    //$array_my_team_my_team = $entityManager->getRepository(ReferralNetwork::class)->findByMyTeamField([$array]);//объект команд моей команды - моей команды пока такие есть    
+                $i += 1;
+                }
+                    
+            }
+            $array_my_team_link =  array_unique($array_my_team_link);            
+            //dd($array_my_team_link);
+            $array_all_my_team = [];
+            $array_my_team_left = [];
+            $array_my_team_right = [];
+            foreach($array_my_team_link as $link){
+                $array_all_my_team[] = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $link]);
+            }
+            foreach($array_all_my_team as $network){
+                if($network->getuserStatus() == 'left'){
+                    $array_my_team_left[] = $network;
+                }
+                else{
+                    $array_my_team_right[] = $network;
+                }
+                
+            }
+            $array_my_team_left = array_reverse($array_my_team_left);
+            $array_referral_network_user = [];
+            $array_referral_network_user[] = $referral_network_user;
+            //dd($array_referral_network_user); 
+            $array_my_team_count_all = [];
+            $array_my_team_balance_all = [];
+            $array_all_my_team_comand_no_refovod = array_merge_recursive($array_my_team_left,$array_my_team_right);
+            $array_all_my_team_comand = array_merge_recursive($array_my_team_left, $array_referral_network_user,$array_my_team_right);
+            foreach($array_all_my_team_comand_no_refovod as $network){
+                $array_my_team_balance_all[] = $network->getPakage();
+            }
+            $my_team_count_all = count($array_all_my_team_comand_no_refovod);
+            $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();//курс токена
+            $my_team_balance_all = array_sum($array_my_team_balance_all) * $token_rate;
+            //dd($array_all_my_team_comand ); 
+
+            //$result_my_team = convertToSimpleArray($array_my_team_my_team);
+            //array_unique($result_my_team);
+            // $my_team_team = [];
+            // for($i=0; $i<count($array_my_team_my_team); $i++){
+            //     foreach($array_my_team_my_team[$i] as $array){
+            //         $my_team_team[] = $array;
+            //     }
+            // }
+
+    //dd($user_id);
+
+
+
 
         $fast_consultation = new FastConsultation(); 
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
@@ -140,11 +264,15 @@ class ReferralNetworkController extends AbstractController
             'my_team_count' => $my_team_count,
             'controller_name' => 'Моя команда',
             'title' => 'my team',
+            'referral_networks_my_team' => $array_all_my_team_comand,
+            'my_team_balance_all' => $my_team_balance_all,
+            'my_team_count_all' => $my_team_count_all,
+            'user_id' => $user_id, 
         ]);
     }
 
     #[Route('/{referral_link}/{id}/new', name: 'app_referral_network_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ReferralNetworkRepository $referralNetworkRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, string $referral_link, int $id): Response
+    public function new(Request $request, ReferralNetworkRepository $referralNetworkRepository, TransactionTableRepository $transactionTableRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, string $referral_link, int $id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -184,7 +312,7 @@ class ReferralNetworkController extends AbstractController
             $user_authentificate -> setPakageStatus(1);
             $entityManager->flush();
             //запись нового участника в линию single_line
-            $referral_network_id = $this -> newConfirm($request,$referralNetworkRepository, $doctrine,$member_code,$id,$referral_link);
+            $referral_network_id = $this -> newConfirm($request,$referralNetworkRepository, $transactionTableRepository, $doctrine,$member_code,$id,$referral_link);
             $this->addFlash(
                          'success',
                          'Поздравляем! Вы успешно активировали пакет и вступили в  реферальную сеть.');         
@@ -427,7 +555,7 @@ class ReferralNetworkController extends AbstractController
 
 
 
-    private function newConfirm($request,  $referralNetworkRepository,  $doctrine,  $member_code,  $id,  $referral_link,)
+    private function newConfirm($request,  $referralNetworkRepository, $transactionTableRepository, $doctrine,  $member_code,  $id,  $referral_link,)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         
@@ -533,8 +661,31 @@ class ReferralNetworkController extends AbstractController
         $direct = $bonus + $referral_network_referral_direct;
         $profit_network_advance = $balance - $bonus;
         
+        
         $referral_network_referral -> setReward($reward);
         $referral_network_referral -> setDirect($direct);
+
+        //данные для записи в таблицу тразакций
+        $network_id = $referral_network_referral -> getId();
+        $network_user_id = $referral_network_referral -> getUserId();
+        $network_pakage_id = $referral_network_referral -> getPakegeId();
+        $network_activation_id = $referral_network -> getId();
+        //=====================================
+        //запись в таблицу тразакций
+        $transaction_direct_refovod = new TransactionTable();
+        $transaction_direct_refovod  -> setCreatedAt(new \DateTime());
+        $transaction_direct_refovod  -> setUpdatedAt(new \DateTime()); 
+        $transaction_direct_refovod -> setDirect($bonus);
+        $transaction_direct_refovod -> setNetworkId($network_id);
+        $transaction_direct_refovod -> setUserId($network_user_id);
+        $transaction_direct_refovod -> setPakageId($network_pakage_id);
+        $transaction_direct_refovod -> setNetworkActivationId($network_activation_id);
+        $transaction_direct_refovod -> setSomme($bonus);
+        $transaction_direct_refovod -> setToken('usdt');
+        $transaction_direct_refovod -> setType(1);
+        $transactionTableRepository -> add($transaction_direct_refovod);
+        $entityManager->persist($transaction_direct_refovod);
+        //==========================
         $referral_network_referral -> setRewardWallet($reward_wallet);
         $referral_network_referral -> setUpdatedAt(new \DateTime());
         $entityManager->flush();
@@ -591,7 +742,7 @@ class ReferralNetworkController extends AbstractController
         //первое построение линии из трех участников реферальной сети. Когда происходит активация пакета 3-го участника в сети числится еще 2 участника, поэтому в условии установлена цифра 2 участника активных 
         if($list_network_all_count == 2){
             $referral_network_user = $referral_network_referral;
-            $this -> singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$doctrine, $payments_singleline,$pakege_user_price,$k_payments_singl_line);
+            $this -> singleThree($referral_network_left,$referral_network_right,$transactionTableRepository,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$doctrine, $payments_singleline,$pakege_user_price,$k_payments_singl_line,$referral_network_user_new);
             $entityManager->persist($referral_network);
             $entityManager->persist($referral_network_referral);
             $entityManager->flush();
@@ -604,7 +755,7 @@ class ReferralNetworkController extends AbstractController
             $referral_network_count = $entityManager->getRepository(ReferralNetwork::class)->findByCountField();
             $user_owner = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['user_status' => 'owner']);//объект владельца линии (Я)
             //обработка линии, проведение начислений при вступлении нового участника (активации новго пакета)
-            $this -> single($request, $referralNetworkRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user, $referral_network_user_new, $referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus, $balance,  $referral_network_referral, $payments_singleline);
+            $this -> single($request, $referralNetworkRepository,$transactionTableRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user, $referral_network_user_new, $referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus, $balance,  $referral_network_referral, $payments_singleline);
             $entityManager->persist($referral_network);
             $entityManager->flush();
         }
@@ -676,7 +827,7 @@ class ReferralNetworkController extends AbstractController
     }
 
 
-    public function single($request, ReferralNetworkRepository $referralNetworkRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user,$referral_network_user_new,$referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus, $balance,  $referral_network_referral, $payments_singleline)
+    public function single($request, $referralNetworkRepository, $transactionTableRepository, $referral_network_count, $user_owner, $doctrine,$referral_network_user,$referral_network_user_new,$referral_network, $member_code, $id, $referral_link,$profit_network_advance,$list_network,$network_code,$bonus, $balance,  $referral_network_referral, $payments_singleline)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         
@@ -772,13 +923,16 @@ class ReferralNetworkController extends AbstractController
                 //при таком сочетании стоимости пакетв в сети на момент активации нового пакета( когда баланс паветов справа и слева равны и не равны нулю)
                 //начисляется только бонус Директ рефоводу, другим участникам линии ничего не начисляется, а пакеты в далнейшем сгорают
                 //$cash_bonus_refofod = $this -> where_is_balance($referral_network_user,$summ_single_line_right_balance,$payments_singleline,$referral_network);//так как баланс с обоих сторон одинаковый для расчета можно взять любой баланс, в данной случае взят баланс линии с праваой стороны
-                
+                $current_balance_user_new = $referral_network -> getBalance();//текущий баланс стоимости пакета нового участника 
+                $new_balance = $current_balance_user_new - $bonus; // новый баланс стоимости пакета вступившего нового участника минусуем Директ бонус рефовода
                 $repayment_amount = 0;//сумма погашения пакетов за минусом начисления Директ бонуса и Начисления в Дохода в систему (30%)
                 $system_revenues = ($summ_single_line_right_balance * $k_system_revenues) / 100 ;//доход системы от суммы с одной стороны (30%)
                 //$repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - ($bonus + $system_revenues + $cash_bonus_refofod);//сумма погашения которая уходит из сети в доход системы
                 $referral_network -> setCurrentNetworkProfit($repayment_amount);// запись в таблицу начисления погашеной суммы в систему в момент активации пакета
-                $referral_network -> setSystemRevenues($system_revenues);// запись в таблицу начисления  суммы дохода системы  (30%) в момент активации пакета
+                $referral_network -> setSystemRevenues(0);// запись в таблицу начисления  суммы дохода системы  (30%) в момент активации пакета
                 $referral_network -> setPaymentsNetwork($bonus);// запись в таблицу начисления  в момент активации пакета по граграмме Директ
+                $referral_network -> setbalance($new_balance);//новый баланс стоимости пакета нового участника - запись в таблицу
+                
                 $entityManager->flush();
             }
             $this->addFlash(
@@ -797,7 +951,7 @@ class ReferralNetworkController extends AbstractController
                 //вычислим и проведем погашение балансов пакетов начисления погашения сумм в систему и начисление Дохода в систему( сечас 30%)
                 //при таком сочетании стоимости пакетв в сети на момент активации нового пакета( когда баланс паветов справа и слева равны и не равны нулю)
                 //начисляется только бонус Директ рефоводу, другим участникам линии ничего не начисляется, а пакеты в далнейшем сгорают
-                $cash_bonus_refofod = $this -> where_is_balance($referral_network_user,$summ_single_line_right_balance,$payments_singleline,$referral_network);//так как баланс с обоих сторон одинаковый для расчета можно взять любой баланс, в данной случае взят баланс линии с праваой стороны
+                $cash_bonus_refofod = $this -> where_is_balance($transactionTableRepository,$referral_network_user,$summ_single_line_right_balance,$payments_singleline,$referral_network,$doctrine,$referral_network_user_new);//так как баланс с обоих сторон одинаковый для расчета можно взять любой баланс, в данной случае взят баланс линии с праваой стороны
                 $entityManager->flush();
                 $repayment_amount = 0;//сумма погашения пакетов за минусом начисления Директ бонуса и Начисления в Дохода в систему (30%)
                 $system_revenues = ($summ_single_line_right_balance * $k_system_revenues) / 100 ;//доход системы от суммы с одной стороны (30%)
@@ -822,7 +976,7 @@ class ReferralNetworkController extends AbstractController
             } 
             $this->addFlash(
                 'danger',
-                'Начисление  проведено по правилу одинаковогобаланса');  
+                'Начисление  проведено по правилу одинакового баланса');  
                        
         }
         elseif($summ_single_line_left_balance != $summ_single_line_right_balance ){
@@ -851,6 +1005,13 @@ class ReferralNetworkController extends AbstractController
                     $current_referral_user_pakage = $referral_network_referral -> getPakage();//стоимость текущего пакета
                     $current_referral_user_reward_wallet = $referral_network_referral -> getRewardWallet();//общие доступные для перевода на кошелек доходы
                     $current_referral_user_cash = $referral_network_referral -> getCash();//общие текущие начисления СингЛайн
+                    //данные для записи в таблицу тразакций
+                    $network_id = $referral_network_referral -> getId();
+                    $network_user_id = $referral_network_referral -> getUserId();
+                    $network_pakage_id = $referral_network_referral -> getPakegeId();
+                    $network_activation_id = $referral_network_user_new -> getId();
+                    //=====================================
+                    
                     //dd($current_referral_user_pakage);
                     $singl_line_limit = $k_cash_back * $current_referral_user_pakage;
                     if($current_referral_user_cash < $singl_line_limit ){
@@ -868,6 +1029,21 @@ class ReferralNetworkController extends AbstractController
                                 $new_user_referral_reward_wallet = $current_referral_user_reward_wallet + $user_referral_cashback_bonus;//новый баланс Всех начислений  рефовода доступные для вывода на кошелек
                                 
                                 $referral_network_referral -> setCash($user_referral_cashback);//запись   single-line КешБек рефоводу
+                                //запись в таблицу тразакций
+                                $transaction = new TransactionTable();
+                                $transaction  -> setCreatedAt(new \DateTime());
+                                $transaction  -> setUpdatedAt(new \DateTime()); 
+                                $transaction -> setCash($summ_single_line_left_balance * $k_payments_singl_line);
+                                $transaction -> setNetworkId($network_id);
+                                $transaction -> setUserId($network_user_id);
+                                $transaction -> setPakageId($network_pakage_id);
+                                $transaction -> setNetworkActivationId($network_activation_id);
+                                $transaction -> setSomme($summ_single_line_left_balance * $k_payments_singl_line);
+                                $transaction -> setToken('usdt');
+                                $transaction -> setType(2);
+                                $transactionTableRepository -> add($transaction);
+                                $entityManager->persist($transaction);
+                                //==========================
                                 $referral_network_referral -> setReward($user_referral_reward);//запись общего начисления поплнение общего количества начислений рефоводу  на момент автивации нового пакета
                                 $referral_network_referral -> setRewardWallet($new_user_referral_reward_wallet);//запись общего начисления поплнение общего количества начислений рефоводудоступных для вывода на кошелек
                                 $entityManager->flush();
@@ -888,6 +1064,21 @@ class ReferralNetworkController extends AbstractController
                                 $new_user_referral_reward_wallet = $current_referral_user_reward_wallet + $user_referral_cashback_bonus;//новый баланс Всех начислений  рефовода доступные для вывода на кошелек
                                 //dd($k_cash_back);
                                 $referral_network_referral -> setCash($user_referral_cashback);//запись   single-line КешБек рефоводу
+                                //запись в таблицу тразакций
+                                $transaction = new TransactionTable();
+                                $transaction  -> setCreatedAt(new \DateTime());
+                                $transaction  -> setUpdatedAt(new \DateTime()); 
+                                $transaction -> setCash($summ_single_line_right_balance * $k_payments_singl_line);
+                                $transaction -> setNetworkId($network_id);
+                                $transaction -> setUserId($network_user_id);
+                                $transaction -> setPakageId($network_pakage_id);
+                                $transaction -> setNetworkActivationId($network_activation_id);
+                                $transaction -> setSomme($summ_single_line_right_balance * $k_payments_singl_line);
+                                $transaction -> setToken('usdt');
+                                $transaction -> setType(2);
+                                $transactionTableRepository->add($transaction);
+                                $entityManager->persist($transaction);
+                                //==========================
                                 $referral_network_referral -> setReward($user_referral_reward);//запись общего начисления поплнение общего количества начислений рефоводу  на момент автивации нового пакета
                                 $referral_network_referral -> setRewardWallet($new_user_referral_reward_wallet);//запись общего начисления поплнение общего количества начислений рефоводудоступных для вывода на кошелек
                                 $entityManager->flush();
@@ -934,25 +1125,28 @@ class ReferralNetworkController extends AbstractController
                         //dd($cash_back_all_1);
                         if($accrual_limit >= $cash_back_all_summ){
                             //теперь проделываем операции по определению наград двигаясь в  обе стороны  от Рефовода по линии по правилу №1 и общую сумму начисления в сеть
-                            $all_cash_right = $this -> reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back, $payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count);
-                            $all_cash_left = $this -> reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count);
-                            
-                            if($price_pakage_all > $all_pakages_summ){   
-                                $all_cash_right_summ = array_sum($all_cash_right);
-                                $all_cash_left_summ = array_sum($all_cash_left);
-                            }
-                            else{
-                                $all_cash_right_summ = 0;
-                                $all_cash_left_summ = 0;
-                            }
+                            $all_cash_right = $this -> reward_single_right_line($transactionTableRepository,$single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine, $count_left, $count_right,$k_cash_back, $payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count,$referral_network_user_new);
+                            $all_cash_left = $this -> reward_single_left_line($transactionTableRepository,$single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count,$referral_network_user_new);
+                            $all_cash_right_summ = array_sum($all_cash_right);
+                            $all_cash_left_summ = array_sum($all_cash_left);
+
+                            // if($price_pakage_all > $all_pakages_summ){   
+                            //     $all_cash_right_summ = array_sum($all_cash_right);
+                            //     $all_cash_left_summ = array_sum($all_cash_left);
+                            // }
+                            // else{
+                            //     $all_cash_right_summ = 0;
+                            //     $all_cash_left_summ = 0;
+                            // }
                             $payments_cash = $all_cash_right_summ + $all_cash_left_summ;//общая сумма начислений КешБек в сеть
+                            //dd($all_cash_left);
                             $this->addFlash(
                                 'danger',
                                 'Начисление КешБек проведено поправилу №1'); 
                         }
                         elseif($accrual_limit < $cash_back_all_summ){
                             //сначала высчитаем конечную сумму выплаты по кешбэк каждому участнику про правилу "Цикла" и общую сумму выплаты в сеть
-                            $payments_cash = $this -> cycleRule($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$referral_network_all, $k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count,$payments_singleline);
+                            $payments_cash = $this -> cycleRule($transactionTableRepository,$single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$referral_network_all, $k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count,$payments_singleline,$referral_network_user_new);
                             $this->addFlash(
                                 'danger',
                                 'Внимание! Начисление КешБек  проведено по равилу "Цикла"'); 
@@ -979,19 +1173,19 @@ class ReferralNetworkController extends AbstractController
                     
                     //$payments_cash - общая сумма начислений КешБек в сеть на момент активации пакета
                     $referral_network -> setPaymentsNetwork($bonus);//direct начисление  за текущиую итерацию сети (на момент активации нового пакета)
-                    $referral_network -> setPaymentsCash($payments_cash);//запись общего начисления  single-line КешБек на момент автивации нового пакета
+                    $referral_network -> setPaymentsCash($payments_cash + $user_referral_cashback_bonus);//запись общего начисления  single-line КешБек на момент активации нового пакета
 
                     //вычисление суммы к погашению и зачислению в проект
-                    $repayment_amount =0;//сумма погашения пакетов для начисления в систему 
+                    $repayment_amount = 0;//сумма погашения пакетов для начисления в систему 
                     //сумма  погашения пакетов в сети и начисления в систему
                     if($summ_single_line_left_balance < $summ_single_line_right_balance){
-                        $repayment_amount = ($summ_single_line_left_balance * 2) - ($bonus + $payments_cash + $system_revenues);
+                        $repayment_amount = ($summ_single_line_left_balance * 2) - ($bonus + $payments_cash + $system_revenues + $user_referral_cashback_bonus);
                     }
                     elseif($summ_single_line_left_balance > $summ_single_line_right_balance){
-                        $repayment_amount = ($summ_single_line_right_balance * 2) - ($bonus + $payments_cash + $system_revenues);
+                        $repayment_amount = ($summ_single_line_right_balance * 2) - ($bonus + $payments_cash + $system_revenues + $user_referral_cashback_bonus);
                     }
                     elseif($summ_single_line_left_balance == $summ_single_line_right_balance){
-                        $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - ($bonus + $payments_cash + $system_revenues);
+                        $repayment_amount = ($summ_single_line_left_balance + $summ_single_line_right_balance) - ($bonus + $payments_cash + $system_revenues + $user_referral_cashback_bonus);
                     }
 
 
@@ -1079,7 +1273,7 @@ class ReferralNetworkController extends AbstractController
 
     
     
-    private function singleThree($referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$doctrine,$payments_singleline, $pakege_user_price,$k_payments_singl_line)
+    private function singleThree($transactionTableRepository,$referral_network_left,$referral_network_right,$referral_network_user,$old_profit_network,$list_network,$referral_network,$bonus,$doctrine,$payments_singleline, $pakege_user_price,$k_payments_singl_line,$referral_network_user_new)
     {
         $entityManager = $doctrine->getManager();
         $k_system_revenues = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]) -> getSystemRevenues();//коэффициент в процентах - доход системы , отчисляется всегда от баланса с меньшей стороны или если одни пакет то от стоимости пакета с меньшей стороны
@@ -1088,6 +1282,12 @@ class ReferralNetworkController extends AbstractController
             $balance_pakege_right = $referral_network_right -> getBalance();//баланс с права
             $balance_pred = $referral_network_left -> getBalance();// баланс с лева
             $cash_refovod = $referral_network_user -> getCash();//текущий КешБек рефовода
+            //данные для записи в таблицу тразакций
+            $network_id = $referral_network_user -> getId();
+            $network_user_id = $referral_network_user -> getUserId();
+            $network_pakage_id = $referral_network_user -> getPakegeId();
+            $network_activation_id = $referral_network_user_new -> getId();
+            //=====================================
             $reward_user_wallet = $referral_network_user -> getRewardWallet();//текущие общие начисления рефовода доступные для перевода на кошелек
             $referral_network_left -> setBalance(0);
             $referral_network_right -> setBalance(0);
@@ -1100,6 +1300,21 @@ class ReferralNetworkController extends AbstractController
             $new_reward_wallet = $reward_user_wallet + $cash_bonus_refovod;//новый общий баланс Рефовода доступный для перевода на кошелек
             $referral_network_user ->  setReward($reward);//обновление общих наград Рефовода
             $referral_network_user -> setCash($new_cash_refovod);//запись нового КешБек Рефовода
+            //запись в таблицу тразакций
+            $transaction = new TransactionTable();
+            $transaction  -> setCreatedAt(new \DateTime());
+            $transaction  -> setUpdatedAt(new \DateTime()); 
+            $transaction -> setCash($cash_bonus_refovod);
+            $transaction -> setNetworkId($network_id);
+            $transaction -> setUserId($network_user_id);
+            $transaction -> setPakageId($network_pakage_id);
+            $transaction -> setNetworkActivationId($network_activation_id);
+            $transaction -> setSomme($cash_bonus_refovod);
+            $transaction -> setToken('usdt');
+            $transaction -> setType(2);
+            $transactionTableRepository->add($transaction);
+            $entityManager->persist($transaction);
+            //==========================
             $referral_network_user ->  setRewardWallet($new_reward_wallet);//запись нового остатка начислений доступных для вывода на кошелек пользователя
             //начисления в  систему (доход)
             $system_revenues = ($balance_pakege_right * $k_system_revenues) / 100; //баланс с любой стороны умножаем на коэфициент выплаты дохода в сеть (30%)  получаем сумму начисления в систему как дох
@@ -1117,6 +1332,12 @@ class ReferralNetworkController extends AbstractController
             $system_revenues = ($balance_pred_left * $k_system_revenues) / 100; //баланс с меньшей стороны умножаем на коэфициент выплаты дохода в сеть (30%)  получаем сумму начисления в систему как дохода
             $repayment_balance = $balance_pred_left * 2;//сумма погашения баланс с севой стороны (с меньшей) умножаем на 2
             $cash_refovod = $referral_network_user -> getCash();//текущий баланс КешБек Рефовода
+            //данные для записи в таблицу тразакций
+            $network_id = $referral_network_user -> getId();
+            $network_user_id = $referral_network_user -> getUserId();
+            $network_pakage_id = $referral_network_user -> getPakegeId();
+            $network_activation_id = $referral_network_user_new -> getId();
+            //=====================================
             $balance_right = $balance_pred_right - $balance_pred_left;// остаток баланса остающийся в линии после погашения
             $referral_network_left -> setBalance(0);// с меньшей стороны обнуляем баланс
             $referral_network_right -> setBalance($balance_right);//в большую сторону в право записываем новый остаток баланса после погашения
@@ -1129,6 +1350,21 @@ class ReferralNetworkController extends AbstractController
             $referral_network_user ->  setReward($reward);//запись нового общего баланса 
             $referral_network_user ->  setRewardWallet($new_reward_wallet);//запись нового остатка начислений доступных для вывода на кошелек пользователя
             $referral_network_user -> setCash($new_cash_refovod);//запись нового баланса КешБек  Рефовода
+            //запись в таблицу тразакций
+            $transaction = new TransactionTable();
+            $transaction  -> setCreatedAt(new \DateTime());
+            $transaction  -> setUpdatedAt(new \DateTime()); 
+            $transaction -> setCash($cash_bonus_refovod);
+            $transaction -> setNetworkId($network_id);
+            $transaction -> setUserId($network_user_id);
+            $transaction -> setPakageId($network_pakage_id);
+            $transaction -> setNetworkActivationId($network_activation_id);
+            $transaction -> setSomme($cash_bonus_refovod);
+            $transaction -> setToken('usdt');
+            $transaction -> setType(2);
+            $transactionTableRepository->add($transaction);
+            $entityManager->persist($transaction);
+            //==========================
             $new_profit_network = $repayment_balance - ($bonus + $cash_bonus_refovod + $system_revenues);
             
             //запись общих сумм на момент активации пакета в линии
@@ -1147,6 +1383,12 @@ class ReferralNetworkController extends AbstractController
             $referral_network_right -> setBalance(0);// с меньшей стороны обнуляем баланс
             $referral_network_left -> setBalance($balance_left);//в большую сторону в право записываем новый остаток баланса после погашения
             $reward_user = $referral_network_user -> getReward();//текщие общие начисления наград Рефовода
+            //данные для записи в таблицу тразакций
+            $network_id = $referral_network_user -> getId();
+            $network_user_id = $referral_network_user -> getUserId();
+            $network_pakage_id = $referral_network_user -> getPakegeId();
+            $network_activation_id = $referral_network_user_new -> getId();
+            //=====================================
             $reward_user_wallet = $referral_network_user -> getRewardWallet();//текущие общие начисления рефовода доступные для перевода на кошелек
             $cash_bonus_refovod = ($balance_pred_left * $payments_singleline) / 100;// начисления КешБек Рефовода в линии
             $reward = $reward_user + $cash_bonus_refovod;//новый общий баланс Рефовода с учетом КешБек
@@ -1155,6 +1397,21 @@ class ReferralNetworkController extends AbstractController
             $referral_network_user ->  setReward($reward);//запись нового общего баланса 
             $referral_network_user ->  setRewardWallet($new_reward_wallet);//запись нового остатка начислений доступных для вывода на кошелек пользователя
             $referral_network_user -> setCash($new_cash_refovod);//запись нового баланса КешБек  Рефовода
+            //запись в таблицу тразакций
+            $transaction = new TransactionTable();
+            $transaction  -> setCreatedAt(new \DateTime());
+            $transaction  -> setUpdatedAt(new \DateTime()); 
+            $transaction -> setCash($cash_bonus_refovod);
+            $transaction -> setNetworkId($network_id);
+            $transaction -> setUserId($network_user_id);
+            $transaction -> setPakageId($network_pakage_id);
+            $transaction -> setNetworkActivationId($network_activation_id);
+            $transaction -> setSomme($cash_bonus_refovod);
+            $transaction -> setToken('usdt');
+            $transaction -> setType(2);
+            $transactionTableRepository->add($transaction);
+            $entityManager->persist($transaction);
+            //==========================
             $new_profit_network = $repayment_balance - ($bonus + $cash_bonus_refovod + $system_revenues);
             
             //запись общих сумм на момент активации пакета в линии
@@ -1166,7 +1423,8 @@ class ReferralNetworkController extends AbstractController
              
     }
 
-    private function where_is_balance($referral_network_user,$summ_single_line_right_balance,$payments_singleline,$referral_network){
+    private function where_is_balance($transactionTableRepository,$referral_network_user,$summ_single_line_right_balance,$payments_singleline,$referral_network, $doctrine,$referral_network_user_new){
+        $entityManager = $doctrine->getManager();
         //вычислим и запишем награду участнику относительно которого выстроена линия (рефовод)
         $reward_refovod = $referral_network_user -> getReward();//общие текущеи начисления 
         $reward_user_wallet = $referral_network_user -> getRewardWallet();//общие остаточные начисления доступные для вывода зп минусом уже выведенных
@@ -1178,11 +1436,33 @@ class ReferralNetworkController extends AbstractController
         $referral_network_user -> setReward($new_reward_user);
         $referral_network_user ->  setRewardWallet($new_reward_wallet);
         $referral_network_user -> setCash($new_cash_refovod);
+        //данные для записи в таблицу тразакций
+        $network_id = $referral_network -> getId();
+        $network_user_id = $referral_network -> getUserId();
+        $network_pakage_id = $referral_network -> getPakegeId();
+        $network_activation_id = $referral_network_user_new -> getId();
+        //===================================
+        //$entityManager->persist($transaction_direct_refovod);
         $referral_network -> setCash($reward_right_user);//запись начислений в линии КешБек на момент активации пакета 
+        //запись в таблицу тразакций
+        $transaction = new TransactionTable();
+        $transaction  -> setCreatedAt(new \DateTime());
+        $transaction  -> setUpdatedAt(new \DateTime()); 
+        $transaction -> setCash($reward_right_user);
+        $transaction -> setNetworkId($network_id);
+        $transaction -> setUserId($network_user_id);
+        $transaction -> setPakageId($network_pakage_id);
+        $transaction -> setNetworkActivationId($network_activation_id);
+        $transaction -> setSomme($reward_right_user);
+        $transaction -> setToken('usdt');
+        $transaction -> setType(2);
+        $transactionTableRepository->add($transaction);
+        $entityManager->persist($transaction);
+        //==========================
         return $reward_right_user;
     }
 
-    private function reward_single_right_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count){
+    private function reward_single_right_line($transactionTableRepository,$single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count,$referral_network_user_new){
         //далее начинаем начисление наград участникам линии двигаясь в правую сторону перебирая массив участников 
         //достаем участника из массива проверяем его баланс если нулевой начисляем награду от меньшей суммы справа или слева,
         //если баланс имеется, то заново определяем баланс с каждой стороны, орпеделяем на какой стороне баланс меньше, начисляем награду от меньшей суммы
@@ -1193,17 +1473,21 @@ class ReferralNetworkController extends AbstractController
         $single_line_left_r = $single_line_left;
         array_unshift($single_line_left_r, $referral_network_user);//!!!!!!!добавляем рефовода в левую часть линии
         $cash_all = [];
-        $control_all_summ = 0;
+        $control_all_summ = 0;//сумма проверка накопления лимита выплаты в линию не долна превышать 70%
         while($i < count($single_line_right_r))
         {
                 $entityManager = $doctrine->getManager();
                 $user = array_shift($single_line_right_r);// убираем одного пользователя с левой  стороны которого достали из массива , относительно которого рассчитываем баланс слева и справа
-                $reward = $user -> getReward();//текущие награды каждого юзера вызанного из массива
+                $reward = $user -> getReward();//текущие совокупные награды каждого юзера вызанного из массива
                 $current_cash = $user -> getCash();//текущие награды SinglLine  каждого юзера вызанного из массива
                 $reward_wallet = $user -> getRewardWallet();//текущие доступные суммы для перевода на кошелек
                 $user_id_pakege = $user -> getPakage();// стоимость пакета пользователя
                 $limit_cash_back = $k_cash_back * $user_id_pakege;//лимит наисления дохода от СинглЛайн
-
+                //данные для записи в таблицу транзакций
+                $network_id = $user -> getId();
+                $network_user_id = $user -> getUserId();
+                $network_pakage_id = $user -> getPakegeId();
+                $network_activation_id = $referral_network_user_new -> getId();
 
                 //перебираем массив с лева относительно каждого пользователя которому делаем расчет начислений наград при движении по линии чтобы определить баланс линии относительнонего
                 $single_line_left_balance_new = [];
@@ -1236,7 +1520,22 @@ class ReferralNetworkController extends AbstractController
                     if($current_cash < $limit_cash_back && $control_all_summ < $accrual_limit){
                         
                         $new_cash = $current_cash + $cash_user_bonus;
-                        $user -> setCash($new_cash); 
+                        $user -> setCash($new_cash);
+                        //запись в таблицу тразакций
+                        $transaction = new TransactionTable();
+                        $transaction  -> setCreatedAt(new \DateTime());
+                        $transaction  -> setUpdatedAt(new \DateTime()); 
+                        $transaction -> setCash($cash_user_bonus);
+                        $transaction -> setNetworkId($network_id);
+                        $transaction -> setUserId($network_user_id);
+                        $transaction -> setPakageId($network_pakage_id);
+                        $transaction -> setNetworkActivationId($network_activation_id);
+                        $transaction -> setSomme($cash_user_bonus);
+                        $transaction -> setToken('usdt');
+                        $transaction -> setType(2);
+                        $transactionTableRepository->add($transaction);
+                        $entityManager->persist($transaction);
+                        //==========================
                         $reward_user = $cash_user_bonus + $reward;
                         $reward_user_wallet = $cash_user_bonus + $reward_wallet;  
                         $user -> setReward($reward_user);
@@ -1265,6 +1564,21 @@ class ReferralNetworkController extends AbstractController
                         
                         $new_cash = $current_cash + $cash_user_bonus;
                         $user -> setCash($new_cash); 
+                        //запись в таблицу тразакций
+                        $transaction = new TransactionTable();
+                        $transaction  -> setCreatedAt(new \DateTime());
+                        $transaction  -> setUpdatedAt(new \DateTime()); 
+                        $transaction -> setCash($cash_user_bonus);
+                        $transaction -> setNetworkId($network_id);
+                        $transaction -> setUserId($network_user_id);
+                        $transaction -> setPakageId($network_pakage_id);
+                        $transaction -> setNetworkActivationId($network_activation_id);
+                        $transaction -> setSomme($cash_user_bonus);
+                        $transaction -> setToken('usdt');
+                        $transaction -> setType(2);
+                        $transactionTableRepository->add($transaction);
+                        $entityManager->persist($transaction);
+                        //==========================
                         $reward_user = $cash_user_bonus + $reward;
                         $reward_user_wallet = $cash_user_bonus + $reward_wallet;  
                         $user -> setReward($reward_user);
@@ -1285,7 +1599,7 @@ class ReferralNetworkController extends AbstractController
     } 
     
     
-    private function reward_single_left_line($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count){
+    private function reward_single_left_line($transactionTableRepository,$single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back, $payments_singleline, $referral_network_user,$k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count,$referral_network_user_new){
         //далее начинаем начисление наград участникам линии двигаясь в левую сторону перебирая массив участников 
         //достаем участника из массива проверяем его баланс если нулевой начисляем награду от меньшей суммы справа или слева,
         //если баланс имеется, то заново определяем баланс с каждой стороны, орпеделяем на какой стороне баланс меньше, начисляем награду от меньшей суммы
@@ -1304,7 +1618,10 @@ class ReferralNetworkController extends AbstractController
                 $reward_wallet = $user -> getRewardWallet();//текущие доступные суммы для перевода на кошелек
                 $user_id_pakege = $user -> getPakage();// стоимость пакета пользователя
                 $limit_cash_back = $k_cash_back * $user_id_pakege;//лимит наисления дохода от СинглЛайн
-
+                $network_id = $user -> getId();
+                $network_user_id = $user -> getUserId();
+                $network_pakage_id = $user -> getPakegeId();
+                $network_activation_id = $referral_network_user_new -> getId();
                 
                 //получаем баланс левой и правой части линии
                 $single_line_left_balance_new = [];
@@ -1335,6 +1652,21 @@ class ReferralNetworkController extends AbstractController
                             
                             $new_cash = $current_cash + $cash_user_bonus;
                             $user -> setCash($new_cash); 
+                            //запись в таблицу тразакций
+                            $transaction = new TransactionTable();
+                            $transaction  -> setCreatedAt(new \DateTime());
+                            $transaction  -> setUpdatedAt(new \DateTime()); 
+                            $transaction -> setCash($cash_user_bonus);
+                            $transaction -> setNetworkId($network_id);
+                            $transaction -> setUserId($network_user_id);
+                            $transaction -> setPakageId($network_pakage_id);
+                            $transaction -> setNetworkActivationId($network_activation_id);
+                            $transaction -> setSomme($cash_user_bonus);
+                            $transaction -> setToken('usdt');
+                            $transaction -> setType(2);
+                            $transactionTableRepository->add($transaction);
+                            $entityManager->persist($transaction);
+                            //==========================
                             $reward_user = $cash_user_bonus + $reward;
                             $reward_user_wallet = $cash_user_bonus + $reward_wallet;  
                             $user -> setReward($reward_user);
@@ -1358,7 +1690,22 @@ class ReferralNetworkController extends AbstractController
                         if($current_cash < $limit_cash_back && $control_all_summ < $accrual_limit){
                             
                             $new_cash = $current_cash + $cash_user_bonus;
-                            $user -> setCash($new_cash); 
+                            $user -> setCash($new_cash);
+                            //запись в таблицу тразакций
+                            $transaction = new TransactionTable();
+                            $transaction  -> setCreatedAt(new \DateTime());
+                            $transaction  -> setUpdatedAt(new \DateTime()); 
+                            $transaction -> setCash($cash_user_bonus);
+                            $transaction -> setNetworkId($network_id);
+                            $transaction -> setUserId($network_user_id);
+                            $transaction -> setPakageId($network_pakage_id);
+                            $transaction -> setNetworkActivationId($network_activation_id);
+                            $transaction -> setSomme($cash_user_bonus);
+                            $transaction -> setToken('usdt');
+                            $transaction -> setType(2);
+                            $transactionTableRepository->add($transaction);
+                            $entityManager->persist($transaction);
+                            //==========================
                             $reward_user = $cash_user_bonus + $reward;
                             $reward_user_wallet = $cash_user_bonus + $reward_wallet;  
                             $user -> setReward($reward_user);
@@ -1559,10 +1906,11 @@ class ReferralNetworkController extends AbstractController
     } 
 
     
-    private function cycleRule($single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$referral_network_all, $k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count,$payments_singleline){
+    private function cycleRule($transactionTableRepository,$single_line_right,$single_line_left,$single_line,$summ_single_line_left_balance,$summ_single_line_right_balance,$doctrine,$count_left, $count_right,$k_cash_back,$referral_network_all, $k_payments_direct,$accrual_limit,$cash_back_all_left_count,$cash_back_all_right_count,$payments_singleline,$referral_network_user_new){
        //расчет сумм и количества участников путем записи сумм начисления в массив для начислений по кешбэк в линии, двигаемся в левую сторону линии относительно Рефовода (в сторону меньшего баланса)
        $i = 5;
        $entityManager = $doctrine->getManager();
+       $network_activation_id = $referral_network_user_new -> getId();
        //правилу циклов начисление проводится :
        //начисление рефоводу 10% КешБек 
        //начисление организаторам 10% на всех организаторов
@@ -1585,10 +1933,28 @@ class ReferralNetworkController extends AbstractController
                 $current_organizer_reward = $referral_network_all[$j] -> getReward();
                 $current_organizer_cash = $referral_network_all[$j] -> getCash();
                 $current_organizer_rewardwallet = $referral_network_all[$j] -> getrewardWallet();
+                $network_id = $referral_network_all[$j] -> getId();
+                $network_user_id = $referral_network_all[$j] -> getUserId();
+                $network_pakage_id = $referral_network_all[$j] -> getPakegeId();
                 $user_organizer_cash_new = $cash_organizer + $current_organizer_cash;
                 $user_organizer_reward_new = $cash_organizer + $current_organizer_reward;
                 $user_organizer_rewardwallet_new = $current_organizer_rewardwallet + $cash_organizer;
                 $referral_network_all[$j] -> setCash($user_organizer_cash_new);
+                //запись в таблицу тразакций
+                $transaction = new TransactionTable();
+                $transaction  -> setCreatedAt(new \DateTime());
+                $transaction  -> setUpdatedAt(new \DateTime()); 
+                $transaction -> setCash($cash_organizer);
+                $transaction -> setNetworkId($network_id);
+                $transaction -> setUserId($network_user_id);
+                $transaction -> setPakageId($network_pakage_id);
+                $transaction -> setNetworkActivationId($network_activation_id);
+                $transaction -> setSomme($cash_organizer);
+                $transaction -> setToken('usdt');
+                $transaction -> setType(2);
+                $transactionTableRepository->add($transaction);
+                $entityManager->persist($transaction);
+                //==========================
                 $referral_network_all[$j] -> setReward($user_organizer_reward_new);
                 $referral_network_all[$j] -> setRewardWallet($user_organizer_rewardwallet_new);
                 $entityManager->flush();
@@ -1617,6 +1983,9 @@ class ReferralNetworkController extends AbstractController
                     $current_user_cash = $single_line_right_l_reverse[$j] -> getCash();
                     $current_user_rewardwallet = $single_line_right_l_reverse[$j] -> getRewardWallet();
                     $pakege = $single_line_right_l_reverse[$j] -> getPakage();
+                    $network_id = $single_line_right_l_reverse[$j] -> getId();
+                    $network_user_id = $single_line_right_l_reverse[$j] -> getUserId();
+                    $network_pakage_id = $single_line_right_l_reverse[$j] -> getPakegeId();
                     $cash_user_single_limit = $pakege * $k_cash_back;//условие начисления КешБек проверка лимита начисления
                     
                     if($cash_user_single_limit > $current_user_cash && $control_all_summ < $accrual_limit_cycle){
@@ -1634,6 +2003,22 @@ class ReferralNetworkController extends AbstractController
                             $user_reward_new = $cash_user_single + $current_user_reward;
                             $user_rewardwallet_new = $cash_user_single + $current_user_rewardwallet;
                             $single_line_right_l_reverse[$j] -> setCash($user_cash_new);
+                            $referral_network_all[$j] -> setCash($user_organizer_cash_new);
+                            //запись в таблицу тразакций
+                            $transaction = new TransactionTable();
+                            $transaction  -> setCreatedAt(new \DateTime());
+                            $transaction  -> setUpdatedAt(new \DateTime()); 
+                            $transaction -> setCash($cash_user_single);
+                            $transaction -> setNetworkId($network_id);
+                            $transaction -> setUserId($network_user_id);
+                            $transaction -> setPakageId($network_pakage_id);
+                            $transaction -> setNetworkActivationId($network_activation_id);
+                            $transaction -> setSomme($cash_user_single);
+                                $transaction -> setToken('usdt');
+                            $transaction -> setType(2);
+                            $transactionTableRepository->add($transaction);
+                            $entityManager->persist($transaction);
+                            //==========================
                             $single_line_right_balance_new[] = $cash_user_single;
                             $single_line_right_l_reverse[$j] -> setReward($user_reward_new);
                             $single_line_right_l_reverse[$j] -> setRewardwallet($user_rewardwallet_new);
@@ -1646,6 +2031,22 @@ class ReferralNetworkController extends AbstractController
                             $user_reward_new = $user_cash_singleline_new + $current_user_reward;
                             $single_line_right_l_reverse[$j] -> setCash($user_cash_new);
                             $single_line_right_balance_new[] = $user_cash_singleline_new;
+                            $referral_network_all[$j] -> setCash($user_organizer_cash_new);
+                            //запись в таблицу тразакций
+                            $transaction = new TransactionTable();
+                            $transaction  -> setCreatedAt(new \DateTime());
+                            $transaction  -> setUpdatedAt(new \DateTime()); 
+                            $transaction -> setCash($user_cash_singleline_new);
+                            $transaction -> setNetworkId($network_id);
+                            $transaction -> setUserId($network_user_id);
+                            $transaction -> setPakageId($network_pakage_id);
+                            $transaction -> setNetworkActivationId($network_activation_id);
+                            $transaction -> setSomme($user_cash_singleline_new);
+                                $transaction -> setToken('usdt');
+                            $transaction -> setType(2);
+                            $transactionTableRepository->add($transaction);
+                            $entityManager->persist($transaction);
+                            //==========================
                             $single_line_right_l_reverse[$j] -> setReward($user_reward_new);
                             $single_line_right_l_reverse[$j] -> setRewardwallet($user_rewardwallet_new);
                             $control_all_summ += $user_cash_singleline_new;
@@ -1664,6 +2065,9 @@ class ReferralNetworkController extends AbstractController
                         $current_user_cash = $single_line_left_l[$j] -> getCash();
                         $current_user_rewardwallet = $single_line_left_l[$j] -> getRewardWallet();
                         $pakege = $single_line_left_l[$j] -> getPakage();
+                        $network_id = $single_line_left_l[$j] -> getId();
+                        $network_user_id = $single_line_left_l[$j] -> getUserId();
+                        $network_pakage_id = $single_line_left_l[$j] -> getPakegeId();
                         $cash_user_single_limit = $pakege * $k_cash_back;//условие начисления КешБек проверка лимита начисления
                         if($cash_user_single_limit > $current_user_cash &&  $control_all_summ < $accrual_limit_cycle){
                             // if($accrual_limit - $current_user_cash >=  $cash_user_single_control){
@@ -1680,6 +2084,22 @@ class ReferralNetworkController extends AbstractController
                                 $user_rewardwallet_new = $cash_user_single + $current_user_rewardwallet;
                                 $single_line_left_l[$j] -> setCash($user_cash_new);
                                 $single_line_left_balance_new[] = $cash_user_single;
+                                $referral_network_all[$j] -> setCash($user_organizer_cash_new);
+                                //запись в таблицу тразакций
+                                $transaction = new TransactionTable();
+                                $transaction  -> setCreatedAt(new \DateTime());
+                                $transaction  -> setUpdatedAt(new \DateTime()); 
+                                $transaction -> setCash($cash_user_single);
+                                $transaction -> setNetworkId($network_id);
+                                $transaction -> setUserId($network_user_id);
+                                $transaction -> setPakageId($network_pakage_id);
+                                $transaction -> setNetworkActivationId($network_activation_id);
+                                $transaction -> setSomme($cash_user_single);
+                                $transaction -> setToken('usdt');
+                                $transaction -> setType(2);
+                                $transactionTableRepository->add($transaction);
+                                $entityManager->persist($transaction);
+                                //==========================
                                 $single_line_left_l[$j] -> setReward($user_reward_new);
                                 $single_line_left_l[$j] -> setRewardwallet($user_rewardwallet_new);
                                 $control_all_summ += $cash_user_single;
@@ -1690,6 +2110,21 @@ class ReferralNetworkController extends AbstractController
                                 $user_reward_new = $user_cash_singleline_new + $current_user_reward;
                                 $user_rewardwallet_new = $user_cash_singleline_new + $current_user_rewardwallet;
                                 $single_line_left_l[$j] -> setCash($user_cash_new);
+                                //запись в таблицу тразакций
+                                $transaction = new TransactionTable();
+                                $transaction  -> setCreatedAt(new \DateTime());
+                                $transaction  -> setUpdatedAt(new \DateTime()); 
+                                $transaction -> setCash($user_cash_singleline_new);
+                                $transaction -> setNetworkId($network_id);
+                                $transaction -> setUserId($network_user_id);
+                                $transaction -> setPakageId($network_pakage_id);
+                                $transaction -> setNetworkActivationId($network_activation_id);
+                                $transaction -> setSomme($user_cash_singleline_new);
+                                $transaction -> setToken('usdt');
+                                $transaction -> setType(2);
+                                $transactionTableRepository->add($transaction);
+                                $entityManager->persist($transaction);
+                                //==========================
                                 $single_line_left_balance_new[] = $user_cash_singleline_new;
                                 $single_line_left_l[$j] -> setReward($user_reward_new);
                                 $single_line_left_l[$j] -> setRewardwallet($user_rewardwallet_new);
@@ -1720,6 +2155,9 @@ class ReferralNetworkController extends AbstractController
                         $current_user_rewardwallet = $single_line_left_l_reverse[$j] -> getRewardWallet();
                         $current_user_cash = $single_line_left_l_reverse[$j] -> getCash();
                         $pakege = $single_line_left_l_reverse[$j] -> getPakage();
+                        $network_id = $single_line_left_l_reverse[$j] -> getId();
+                        $network_user_id = $single_line_left_l_reverse[$j] -> getUserId();
+                        $network_pakage_id = $single_line_left_l_reverse[$j] -> getPakegeId();
                         $cash_user_single_limit = $pakege * $k_cash_back;//условие начисления КешБек проверка лимита начисления
                         if($cash_user_single_limit > $current_user_cash && $control_all_summ < $accrual_limit_cycle){
                             // if($accrual_limit - $current_user_cash >=  $cash_user_single_control){
@@ -1735,6 +2173,21 @@ class ReferralNetworkController extends AbstractController
                                 $user_reward_new = $cash_user_single + $current_user_reward;
                                 $user_rewardwallet_new = $cash_user_single + $current_user_rewardwallet;
                                 $single_line_left_l_reverse[$j] -> setCash($user_cash_new);
+                                //запись в таблицу тразакций
+                                $transaction = new TransactionTable();
+                                $transaction  -> setCreatedAt(new \DateTime());
+                                $transaction  -> setUpdatedAt(new \DateTime()); 
+                                $transaction -> setCash($cash_user_single);
+                                $transaction -> setNetworkId($network_id);
+                                $transaction -> setUserId($network_user_id);
+                                $transaction -> setPakageId($network_pakage_id);
+                                $transaction -> setNetworkActivationId($network_activation_id);
+                                $transaction -> setSomme($cash_user_single);
+                                $transaction -> setToken('usdt');
+                                $transaction -> setType(2);
+                                $transactionTableRepository->add($transaction);
+                                $entityManager->persist($transaction);
+                                //==========================
                                 $single_line_left_l_reverse[$j] -> setReward($user_reward_new);
                                 $single_line_left_balance_new[] = $cash_user_single;
                                 $single_line_left_l_reverse[$j] -> setRewardWallet($user_rewardwallet_new);
@@ -1746,6 +2199,21 @@ class ReferralNetworkController extends AbstractController
                                 $user_reward_new = $user_cash_singleline_new + $current_user_reward;
                                 $user_rewardwallet_new = $user_cash_singleline_new + $current_user_rewardwallet;
                                 $single_line_left_l_reverse[$j] -> setCash($user_cash_new);
+                                //запись в таблицу тразакций
+                                $transaction = new TransactionTable();
+                                $transaction  -> setCreatedAt(new \DateTime());
+                                $transaction  -> setUpdatedAt(new \DateTime()); 
+                                $transaction -> setCash($user_cash_singleline_new);
+                                $transaction -> setNetworkId($network_id);
+                                $transaction -> setUserId($network_user_id);
+                                $transaction -> setPakageId($network_pakage_id);
+                                $transaction -> setNetworkActivationId($network_activation_id);
+                                $transaction -> setSomme($user_cash_singleline_new);
+                                $transaction -> setToken('usdt');
+                                $transaction -> setType(2);
+                                $transactionTableRepository->add($transaction);
+                                $entityManager->persist($transaction);
+                                //==========================
                                 $single_line_left_l_reverse[$j] -> setReward($user_reward_new);
                                 $single_line_left_balance_new[] = $user_cash_singleline_new;
                                 $single_line_left_l_reverse[$j] -> setRewardWallet($user_rewardwallet_new);
@@ -1762,6 +2230,9 @@ class ReferralNetworkController extends AbstractController
                     for($j = 0; $j< count($single_line_right_l) - 1; $j++){
                         $current_user_reward = $single_line_right_l[$j] -> getReward();
                         $current_user_cash = $single_line_right_l[$j] -> getCash();
+                        $network_id = $single_line_right_l[$j] -> getId();
+                        $network_user_id = $single_line_right_l[$j] -> getUserId();
+                        $network_pakage_id = $single_line_right_l[$j] -> getPakegeId();
                         $current_user_rewardwallet = $single_line_right_l[$j] -> getRewardWallet();
                         $pakege = $single_line_right_l[$j] -> getPakage();
                         $cash_user_single_limit = $pakege * $k_cash_back;//условие начисления КешБек проверка лимита начисления
@@ -1779,6 +2250,21 @@ class ReferralNetworkController extends AbstractController
                                 $user_reward_new = $cash_user_single + $current_user_reward;
                                 $user_rewardwallet_new = $cash_user_single + $current_user_rewardwallet;
                                 $single_line_right_l[$j] -> setCash($user_cash_new);
+                                //запись в таблицу тразакций
+                                $transaction = new TransactionTable();
+                                $transaction  -> setCreatedAt(new \DateTime());
+                                $transaction  -> setUpdatedAt(new \DateTime()); 
+                                $transaction -> setCash($cash_user_single);
+                                $transaction -> setNetworkId($network_id);
+                                $transaction -> setUserId($network_user_id);
+                                $transaction -> setPakageId($network_pakage_id);
+                                $transaction -> setNetworkActivationId($network_activation_id);
+                                $transaction -> setSomme($cash_user_single);
+                                $transaction -> setToken('usdt');
+                                $transaction -> setType(2);
+                                $transactionTableRepository->add($transaction);
+                                $entityManager->persist($transaction);
+                                //==========================
                                 $single_line_right_balance_new[] = $cash_user_single;
                                 $single_line_right_l[$j] -> setReward($user_reward_new);
                                 $single_line_right_l[$j] -> setRewardWallet($user_rewardwallet_new);
@@ -1790,6 +2276,21 @@ class ReferralNetworkController extends AbstractController
                                 $user_reward_new = $user_cash_singleline_new + $current_user_reward;
                                 $user_rewardwallet_new = $user_cash_singleline_new + $current_user_rewardwallet;
                                 $single_line_right_l[$j] -> setCash($user_cash_new);
+                                //запись в таблицу тразакций
+                                $transaction = new TransactionTable();
+                                $transaction  -> setCreatedAt(new \DateTime());
+                                $transaction  -> setUpdatedAt(new \DateTime()); 
+                                $transaction -> setCash($user_cash_singleline_new);
+                                $transaction -> setNetworkId($network_id);
+                                $transaction -> setUserId($network_user_id);
+                                $transaction -> setPakageId($network_pakage_id);
+                                $transaction -> setNetworkActivationId($network_activation_id);
+                                $transaction -> setSomme($user_cash_singleline_new);
+                                $transaction -> setToken('usdt');
+                                $transaction -> setType(2);
+                                $transactionTableRepository->add($transaction);
+                                $entityManager->persist($transaction);
+                                //==========================
                                 $single_line_right_balance_new[] = $user_cash_singleline_new;
                                 $single_line_right_l[$j] -> setReward($user_reward_new);
                                 $single_line_right_l[$j] -> setRewardWallet($user_rewardwallet_new);

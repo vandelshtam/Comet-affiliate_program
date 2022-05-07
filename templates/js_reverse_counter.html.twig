@@ -2,7 +2,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
       // конечная дата
-      const deadline = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0{{ start_day }});
+      const deadline = new Date(new Date().getFullYear(), new Date().getMonth() + 0, 0{{ start_day }});
       // id таймера
       let timerId = null;
       // склонение числительных
@@ -23,10 +23,14 @@
         $hours.textContent = hours < 10 ? '0' + hours : hours;
         $minutes.textContent = minutes < 10 ? '0' + minutes : minutes;
         $seconds.textContent = seconds < 10 ? '0' + seconds : seconds;
-        $days.dataset.title = declensionNum(days, ['день', 'дня', 'дней']);
-        $hours.dataset.title = declensionNum(hours, ['час', 'часа', 'часов']);
-        $minutes.dataset.title = declensionNum(minutes, ['минута', 'минуты', 'минут']);
-        $seconds.dataset.title = declensionNum(seconds, ['секунда', 'секунды', 'секунд']);
+        //$days.dataset.title = declensionNum(days, ['день' , 'дня' , 'дней' ]);
+        //$hours.dataset.title = declensionNum(hours, ['час', 'часа', 'часов']);
+        //$minutes.dataset.title = declensionNum(minutes, ['минута', 'минуты', 'минут']);
+        //$seconds.dataset.title = declensionNum(seconds, ['секунда', 'секунды', 'секунд']);
+        $days.dataset.title = declensionNum(days, ['day' , 'days' , 'days' ]);
+        $hours.dataset.title = declensionNum(hours, ['hour', 'hours', 'hours']);
+        $minutes.dataset.title = declensionNum(minutes, ['minute', 'minutes', 'minutes']);
+        $seconds.dataset.title = declensionNum(seconds, ['second', 'seconds', 'seconds']);
       }
       // получаем элементы, содержащие компоненты даты
       const $days = document.querySelector('.timer__days');

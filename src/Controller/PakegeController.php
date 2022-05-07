@@ -23,7 +23,9 @@ use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
 use App\Entity\ListReferralNetworks;
 use App\Entity\SettingOptions;
+use App\Entity\TransactionTable;
 use App\Repository\SavingMailRepository;
+use App\Repository\TransactionTableRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -144,7 +146,7 @@ class PakegeController extends AbstractController
     
 
     #[Route('/new/purchase/{unique_code_get?}', name: 'app_pakege_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, PakegeRepository $pakegeRepository,EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,ReferralNetworkRepository $referralNetworkRepository, SavingMailRepository $savingMailRepository, string $unique_code_get): Response
+    public function new(Request $request, PakegeRepository $pakegeRepository,EntityManagerInterface $entityManager, TransactionTableRepository $transactionTableRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,ReferralNetworkRepository $referralNetworkRepository, SavingMailRepository $savingMailRepository, string $unique_code_get): Response
     {
         //dd('GHhyy');
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -216,7 +218,7 @@ class PakegeController extends AbstractController
             //$form_pakage_name = $form->get('name')->getData();
             $form_referral_select = $request->get('select');
             $form_referral_select2 = $request->get('select2');
-            
+            $transaction = new TransactionTable();
             //dd($form_referral_select);
             $pakage_user = $entityManager->getRepository(TablePakage::class)->findOneBy(['name' => $form_referral_select]); 
             $token_rate = $entityManager->getRepository(TokenRate::class)->findOneBy(['id' => 1]) -> getExchangeRate();
@@ -282,6 +284,18 @@ class PakegeController extends AbstractController
                 $pakegeRepository->add($pakege);
                 $pakage_id = $entityManager->getRepository(Pakege::class)->findOneBy(['unique_code' => $unique_code])->getId(); 
                 $user_table -> setPakageId($pakage_id);
+                //запись в таблицу тразакций
+                $transaction  -> setCreatedAt(new \DateTime());
+                $transaction  -> setUpdatedAt(new \DateTime()); 
+                $transaction -> setPakagePrice($price_usdt);
+                $transaction -> setUserId($user_id);
+                $transaction -> setPakageId($pakage_id);
+                $transaction -> setSomme($price_usdt);
+                $transaction -> setToken('usdt');
+                $transaction -> setType(7);
+                $transactionTableRepository -> add($transaction);
+                $entityManager->persist($transaction);
+                //==========================
             
             if($unique_code_get != 'not'){
                 //подарочный пакет
@@ -301,32 +315,105 @@ class PakegeController extends AbstractController
                 $pakege_action -> setClientCode($client_code);   
                 $pakegeRepository->add($pakege_action);
                 $pakege_user -> setAction(1);//код пакета относительного которого покупался новый пакет по акции и подарен подарочный пакет
+                //запись в таблицу тразакций
+                $transaction  -> setCreatedAt(new \DateTime());
+                $transaction  -> setUpdatedAt(new \DateTime()); 
+                $transaction -> setPakagePrice($price_usdt_action);
+                $transaction -> setUserId($user_id);
+                $transaction -> setPakageId($pakage_id);
+                $transaction -> setSomme($price_usdt_action);
+                $transaction -> setToken('usdt');
+                $transaction -> setType(13);
+                $transactionTableRepository -> add($transaction);
+                $entityManager->persist($transaction);
+                //==========================
                 $entityManager->flush();
             }
             if($form_referral_select2 == 0){
+                //запись в таблицу тразакций
+                $transaction_wallet = new TransactionTable();
+                $transaction_wallet  -> setCreatedAt(new \DateTime());
+                $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+                $transaction_wallet -> setWithdrawal($pakage_user_price);
+                $transaction_wallet -> setUserId($user_id);
+                $transaction_wallet -> setPakageId($pakage_id);
+                $transaction_wallet -> setSomme($pakage_user_price);
+                $transaction_wallet -> setToken('usdt');
+                $transaction_wallet -> setType(14);
+                $transaction_wallet -> setWalletId($wallet_id);
+                $transactionTableRepository -> add($transaction_wallet);
+                $entityManager->persist($transaction_wallet);
+                //==========================
                 $current_usdt = $wallet -> getUsdt();
                 $new_balance_usdt = $current_usdt - $pakage_user_price;
                 $wallet -> setUsdt($new_balance_usdt);
                 $entityManager->flush();
             }
             elseif($form_referral_select2 == 1){
+                //запись в таблицу тразакций
+                $transaction_wallet = new TransactionTable();
+                $transaction_wallet  -> setCreatedAt(new \DateTime());
+                $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+                $transaction_wallet -> setWithdrawal($pakage_user_price * $token_rate);
+                $transaction_wallet -> setUserId($user_id);
+                $transaction_wallet -> setPakageId($pakage_id);
+                $transaction_wallet -> setSomme($pakage_user_price * $token_rate);
+                $transaction_wallet -> setToken('cometapoin');
+                $transaction_wallet -> setType(20);
+                $transaction_wallet -> setWalletId($wallet_id);
+                $transactionTableRepository -> add($transaction_wallet);
+                $entityManager->persist($transaction_wallet);
+                //==========================
                 $current_cometpoin = $wallet -> getCometpoin();
                 $new_balance_cometpoin = $current_cometpoin - ($pakage_user_price * $token_rate);
                 $wallet -> setCometpoin($new_balance_cometpoin);
                 $entityManager->flush();
             }
             elseif($form_referral_select2 == 2){
+                //запись в таблицу тразакций
+                $transaction_wallet = new TransactionTable();
+                $transaction_wallet  -> setCreatedAt(new \DateTime());
+                $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+                $transaction_wallet -> setWithdrawal($pakage_user_price / 40000);
+                $transaction_wallet -> setUserId($user_id);
+                $transaction_wallet -> setPakageId($pakage_id);
+                $transaction_wallet -> setSomme($pakage_user_price / 40000);
+                $transaction_wallet -> setToken('bitcoin');
+                $transaction_wallet -> setType(15);
+                $transaction_wallet -> setWalletId($wallet_id);
+                $transactionTableRepository -> add($transaction_wallet);
+                $entityManager->persist($transaction_wallet);
+                //===============================
                 $current_bitcoin = $wallet -> getBitcoin();
                 $new_balance_bitcoin = $current_bitcoin - ($pakage_user_price / 40000);
                 $wallet -> setBitcoin($new_balance_bitcoin);
                 $entityManager->flush();
             }
             elseif($form_referral_select2 == 3){
+                //запись в таблицу тразакций
+                //dd($pakage_user_price / 4000);
+                $transaction_wallet = new TransactionTable();
+                $transaction_wallet  -> setCreatedAt(new \DateTime());
+                $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+                $transaction_wallet -> setWithdrawal($pakage_user_price / 4000);
+                $transaction_wallet -> setUserId($user_id);
+                $transaction_wallet -> setPakageId($pakage_id);
+                $transaction_wallet -> setSomme($pakage_user_price / 4000);
+                $transaction_wallet -> setToken('etherium');
+                $transaction_wallet -> setType(16);
+                $transaction_wallet -> setWalletId($wallet_id);
+                $transactionTableRepository -> add($transaction_wallet);
+                $entityManager->persist($transaction_wallet);
+                //===============================
                 $current_etherium = $wallet -> getEtherium();
                 $new_balance_etherium = $current_etherium - ($pakage_user_price / 4000);
                 $wallet -> setEtherium($new_balance_etherium);
                 $entityManager->flush();
             }
+            
+            //===============================
+            //=====================================
+            
             //$unique = $form->get('unique_code')->getData();
 
             //$pakage_comet_id = $this -> newChoice ($request,$pakegeRepository,$doctrine,$unique,$wallet,$form_referral_select,$form_pakage_name,$pakage_user_price,$token_rate,$user_table);
@@ -515,7 +602,7 @@ class PakegeController extends AbstractController
 
 
     #[Route('/{id}/edit', name: 'app_pakege_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
+    public function edit(Request $request, Pakege $pakege, PakegeRepository $pakegeRepository, EntityManagerInterface $entityManager, TransactionTableRepository $transactionTableRepository, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository, int $id): Response
     {
         //dd('hghghghg');
         $user = $this->getUser();
@@ -616,11 +703,11 @@ class PakegeController extends AbstractController
             if($this -> possibilityCheck($form_referral_select, $wallet, $pakage_cost_difference,$token_rate) == false){
                 $this->addFlash(
                 'warning',
-                'У вас недостаточно средств для повышения уровня пакета, пожалуйста свой пополните кошелек или выберите меньшую сумму');
+                'У вас недостаточно средств для повышения уровня пакета, пожалуйста  пополните свой кошелек или выберите пакет с меньшей стоимостью');
             return $this->redirectToRoute('app_pakege_edit', ['id' => $id], Response::HTTP_SEE_OTHER);
             }
-            //начисления за повышения пакета 
-            $array_bonus_refovod = $this -> chargeForPromotion($entityManager,$doctrine,$form_referral_select,$wallet,$pakage_cost_difference,$k_direct,$payments_singleline,$pakage_user_price,$wallet_cometcoin_rate,$id,$token_rate);
+            //начисления за повышение пакета 
+            $array_bonus_refovod = $this -> chargeForPromotion($entityManager,$doctrine,$form_referral_select,$wallet,$pakage_cost_difference,$k_direct,$payments_singleline,$pakage_user_price,$wallet_cometcoin_rate,$id,$token_rate,$transactionTableRepository);
             
             //==================получаем и записываем  все начисления и погашеня сети ==============================================
             $listReferralNetwork = $entityManager->getRepository(ListReferralNetworks::class)->findOneBy(['network_code' => $network_code]);//обект родительской сети
@@ -650,6 +737,20 @@ class PakegeController extends AbstractController
             $pakage_comet -> setToken($token);
             $pakage_comet -> setUpdatedAt(new \DateTime());
             $entityManager->flush();
+            //запись в таблицу тразакций
+            $transaction_upgrade = new TransactionTable();
+            $transaction_upgrade  -> setCreatedAt(new \DateTime());
+            $transaction_upgrade  -> setUpdatedAt(new \DateTime()); 
+            $transaction_upgrade -> setPakagePrice($pakage_cost_difference);
+            $transaction_upgrade -> setUserId($user_id);
+            $transaction_upgrade -> setPakageId($id);
+            $transaction_upgrade -> setSomme($pakage_cost_difference);
+            $transaction_upgrade -> setToken('usdt');
+            $transaction_upgrade -> setType(8);
+            //$transaction_upgrade -> setWalletId($wallet -> getId());
+            $transactionTableRepository -> add($transaction_upgrade);
+            $entityManager->persist($transaction_upgrade);
+            //===============================
             
             $this->addFlash(
                 'success',
@@ -862,14 +963,17 @@ class PakegeController extends AbstractController
     }
 
 
-    private function chargeForPromotion(EntityManagerInterface $entityManager,$doctrine,$form_referral_select,$wallet,$pakage_cost_difference,$k_direct,$payments_singleline,$pakage_user_price,$wallet_cometcoin_rate,$id,$token_rate){
+    private function chargeForPromotion(EntityManagerInterface $entityManager,$doctrine,$form_referral_select,$wallet,$pakage_cost_difference,$k_direct,$payments_singleline,$pakage_user_price,$wallet_cometcoin_rate,$id,$token_rate,$transactionTableRepository){
         $entityManager = $doctrine->getManager();
         //dd($id);
         $referral_network_user = $entityManager -> getRepository(ReferralNetwork::class)->findOneBy(['pakege_id' => $id]);//объект владельца пакета
+        $network_id = $referral_network_user -> getId();//место в линии АйДи
         $referral_link_refovod = $referral_network_user -> getMyTeam();
         //dd($referral_network_user);
         //получаем объект Рефовода и получаем текщие значения начислений бонусов
         $user_refovod = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link_refovod]);
+        $user_refovod_id = $user_refovod -> getId(); 
+        $user_refovod_user_id = $user_refovod -> getUserId(); 
         $user_refovod_curren_cash = $user_refovod -> getCash(); 
         $user_refovod_curren_reward = $user_refovod -> getReward();
         $user_refovod_curren_direct = $user_refovod -> getDirect();
@@ -894,12 +998,57 @@ class PakegeController extends AbstractController
         $user_refovod -> setReward($user_refovod_reward_bonus_new);
         $user_refovod -> setDirect($user_refovod_direct_bonus_new);
         $user_refovod->setUpdatedAt(new \DateTime());
+        //запись в таблицу тразакций рефоводу диррект
+        $transaction_direct = new TransactionTable();
+        $transaction_direct  -> setCreatedAt(new \DateTime());
+        $transaction_direct  -> setUpdatedAt(new \DateTime()); 
+        $transaction_direct -> setDirect($user_refovod_direct_bonus);
+        $transaction_direct -> setUserId($user_refovod_user_id);
+        $transaction_direct -> setNetworkId($user_refovod_id);
+        $transaction_direct -> setNetworkActivationId($network_id);
+        $transaction_direct -> setSomme($user_refovod_direct_bonus);
+        $transaction_direct -> setToken('usdt');
+        $transaction_direct -> setType(22);
+        //$transaction_upgrade -> setWalletId($wallet -> getId());
+        $transactionTableRepository -> add($transaction_direct);
+        $entityManager->persist($transaction_direct);
+        //===============================
+        //запись в таблицу тразакций рефоводу singleline
+        $transaction_cash = new TransactionTable();
+        $transaction_cash  -> setCreatedAt(new \DateTime());
+        $transaction_cash  -> setUpdatedAt(new \DateTime()); 
+        $transaction_cash -> setCash($user_refovod_cash_bonus);
+        $transaction_cash -> setUserId($user_refovod_user_id);
+        $transaction_cash -> setNetworkId($user_refovod_id);
+        $transaction_cash -> setNetworkActivationId($network_id);
+        $transaction_cash -> setSomme($user_refovod_cash_bonus);
+        $transaction_cash -> setToken('usdt');
+        $transaction_cash -> setType(23);
+        //$transaction_upgrade -> setWalletId($wallet -> getId());
+        $transactionTableRepository -> add($transaction_cash);
+        $entityManager->persist($transaction_cash);
+        //===============================
         //запись обновленных значений отчислений в сеть 
         $referral_network_user -> setPaymentsCash($new_balance_cash);//запись оьновленный значений отчислений в сеть по программе КешБек
         $referral_network_user -> setPaymentsNetwork($new_balance_direct);//запись оьновленный значений отчислений в сеть по программе Директ
 
+        //изменение значений баланса кошелька
         if($form_referral_select == 0){
-                
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setWithdrawal($pakage_cost_difference);
+            $transaction_wallet -> setUserId($this->getUser()->getId());
+            $transaction_wallet -> setNetworkId($network_id);
+            $transaction_wallet -> setPakageId($id);
+            $transaction_wallet -> setSomme($pakage_cost_difference);
+            $transaction_wallet -> setToken('usdt');
+            $transaction_wallet -> setType(17);
+            $transaction_wallet -> setWalletId($wallet -> getId());
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $new_balanse_wallet = $wallet -> getUsdt() - $pakage_cost_difference;//новый баланс кошелька
             $wallet -> setUsdt($new_balanse_wallet);
             $wallet -> setUpdatedAt(new \DateTime());
@@ -907,46 +1056,43 @@ class PakegeController extends AbstractController
         }
         elseif($form_referral_select == 1){
             //внутренний токен
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setWithdrawal($pakage_cost_difference * $token_rate);
+            $transaction_wallet -> setUserId($this->getUser()->getId());
+            $transaction_wallet -> setNetworkId($network_id);
+            $transaction_wallet -> setPakageId($id);
+            $transaction_wallet -> setSomme($pakage_cost_difference * $token_rate);
+            $transaction_wallet -> setToken('cometapoin');
+            $transaction_wallet -> setType(21);
+            $transaction_wallet -> setWalletId($wallet -> getId());
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $new_balanse_wallet = ($wallet_cometcoin_rate - $pakage_cost_difference) * $token_rate;//новый баланс кошелька
             $wallet -> setCometpoin($new_balanse_wallet);
             $wallet -> setUpdatedAt(new \DateTime());
             $entityManager->flush();
-            // $referral_network_user = $entityManager -> getRepository(ReferralNetwork::class)->findOneBy(['pakege_id' => $id]);//объект владельца пакета
-            // $referral_link_refovod = $referral_network_user -> getMyTeam();
-            // //dd($referral_network_user);
-            // //получаем объект Рефовода и получаем текщие значения начислений бонусов
-            // $user_refovod = $entityManager->getRepository(ReferralNetwork::class)->findOneBy(['member_code' => $referral_link_refovod]);
-            // $user_refovod_curren_cash = $user_refovod -> getCash(); 
-            // $user_refovod_curren_reward = $user_refovod -> getReward();
-            // $user_refovod_curren_direct = $user_refovod -> getDirect();
-            // $user_refovod_direct_bonus = ($pakage_cost_difference * $k_direct) / 100;
-            // $user_refovod_cash_bonus = ($pakage_cost_difference * $payments_singleline) / 100;
-            // $user_refovod_reward_bonus = $user_refovod_cash_bonus + $user_refovod_direct_bonus;
-            // $user_refovod_direct_bonus_new = $user_refovod_curren_direct + $user_refovod_direct_bonus;
-            // $user_refovod_cash_bonus_new = $user_refovod_curren_cash + $user_refovod_cash_bonus;
-            // $user_refovod_reward_bonus_new = $user_refovod_curren_reward + $user_refovod_cash_bonus + $user_refovod_reward_bonus;
-            // //получаем значения владельца пакета с текщим балансом и значениями отчисления в сеть на момент предыдущей активации пакета
-            // $current_balance = $referral_network_user -> getBalance();//текущий баланс стоимости пакета пользователя в линии
-            // $current_balance_direct = $referral_network_user -> getPaymentsNetwork();//текущий значение отчислений в сеть на момент последней активации пакета по программе Директ
-            // $current_balance_cash = $referral_network_user -> getPaymentsCash();//текущий значение отчислений в сеть на момент последней активации пакета по программе CashBack
-            // $balace_line_new = $current_balance + $pakage_cost_difference;//новый баланс стоимости пакета участника в линии
-            // $new_balance_direct = $current_balance_direct + $user_refovod_direct_bonus;//обновленная сумма отчисления в линию по программе Директ на момент активации пакета
-            // $new_balance_cash = $current_balance_cash + $user_refovod_cash_bonus;//обновленная сумма отчисления в линию по программе CashBack на момент активации пакета
-            // $referral_network_user -> setBalance($balace_line_new);//запись нового баланса владельцу пакета
-            // $referral_network_user -> setPakage($pakage_user_price);//запись нового значения стоимости нового пакета
-            // $referral_network_user->setUpdatedAt(new \DateTime());
-            // //запсиь новых начислений Рефоводу
-            // $user_refovod -> setCash($user_refovod_cash_bonus_new); 
-            // $user_refovod -> setReward($user_refovod_direct_bonus_new);
-            // $user_refovod -> setDirect($user_refovod_reward_bonus_new);
-            // $user_refovod->setUpdatedAt(new \DateTime());
-            // //запись обновленных значений отчислений в сеть 
-            // $referral_network_user -> setPaymentsCash($new_balance_cash);//запись оьновленный значений отчислений в сеть по программе КешБек
-            // $referral_network_user -> setPaymentsNetwork($new_balance_direct);//запись оьновленный значений отчислений в сеть по программе Директ
-        
         }
         elseif($form_referral_select == 2){
             //bitcoin
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setWithdrawal($pakage_cost_difference / 40000);
+            $transaction_wallet -> setUserId($this->getUser()->getId());
+            $transaction_wallet -> setNetworkId($network_id);
+            $transaction_wallet -> setPakageId($id);
+            $transaction_wallet -> setSomme($pakage_cost_difference / 40000);
+            $transaction_wallet -> setToken('bitcoin');
+            $transaction_wallet -> setType(18);
+            $transaction_wallet -> setWalletId($wallet -> getId());
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $bitcoin_curret = $wallet -> getBitcoin();
             $new_balanse_wallet = $bitcoin_curret - ($pakage_cost_difference / 40000);//новый баланс кошелька
             $wallet -> setBitcoin($new_balanse_wallet);
@@ -955,6 +1101,21 @@ class PakegeController extends AbstractController
         }
         elseif($form_referral_select == 3){
             //etherium
+            //запись в таблицу тразакций
+            $transaction_wallet = new TransactionTable();
+            $transaction_wallet  -> setCreatedAt(new \DateTime());
+            $transaction_wallet  -> setUpdatedAt(new \DateTime()); 
+            $transaction_wallet -> setWithdrawal($pakage_cost_difference / 4000);
+            $transaction_wallet -> setUserId($this->getUser()->getId());
+            $transaction_wallet -> setNetworkId($network_id);
+            $transaction_wallet -> setPakageId($id);
+            $transaction_wallet -> setSomme($pakage_cost_difference / 4000);
+            $transaction_wallet -> setToken('etherium');
+            $transaction_wallet -> setType(19);
+            $transaction_wallet -> setWalletId($wallet -> getId());
+            $transactionTableRepository -> add($transaction_wallet);
+            $entityManager->persist($transaction_wallet);
+            //===============================    
             $etherium_curret = $wallet -> getEtherium();
             $new_balanse_wallet = $etherium_curret - ($pakage_cost_difference / 4000);//новый баланс кошелька
             $wallet -> setEtherium($new_balanse_wallet);
@@ -1063,13 +1224,14 @@ class PakegeController extends AbstractController
         }
         elseif($form_referral_select == 2){
             $control_summ = $wallet -> getBitcoin() * 40000;
+            
         }
         elseif($form_referral_select == 3){
             $control_summ = $wallet -> getEtherium() * 4000;
         }
         //dd($control_summ);
-        if($control_summ < $pakage_cost_difference){
-            
+        if($control_summ < $pakage_cost_difference || $control_summ == 0 || $control_summ == NULL){
+            //dd('hghgh');
             return false;
         }
         else{

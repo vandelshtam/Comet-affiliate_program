@@ -39,6 +39,7 @@
     {% else %}
     <a  class="btn btn-info rounded-0 mb-3" href="{{ path('app_personal_area') }}">Перейти в личный кабинет</a> 
     {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
     <table class="table">
         <thead>
             <tr>
@@ -47,16 +48,22 @@
                 <th>id пользователя</th>
                 <th>Статус пользователя</th>
                 <th>id записи персональных данных</th>
-                {% if is_granted('ROLE_ADMIN') %}
+               
                 <th>Начисление участнику по программе Direct</th>
                 <th>Начисление пользователю по программе Cash back</th>
-                <th>Стоимость пакета участника</th>
+                <th>Стоимость пакета данного места в линии</th>
                 <th>Общее количество начислений наград</th>
                 <th>Личная реферальная ссылка для приглашения нового участника</th>
-                <th>Общая сумма отчислений в сеть на момент активации каждого пакета</th>
+                <th>Общая сумма отчислений в сеть полученная от погашения пакетов на момент активации данного пакета</th>
                 <th>Сумма начисления в сеть по программе  Direct  при активации каждого пакета</th>
                 <th>Сумма начисления в сеть по программе  CashBack  при активации каждого пакета</th>
-                {% endif %} 
+                <th>Сумма начисления дохода системы (30%)  при активации каждого пакета</th>
+
+                
+                <th>Сумма доступная для вывода на кошелек с данного места(без учета ограничения 70%)</th>
+                <th>Общая сумма выведенная на кошелек с данного места</th>
+                <th>Дата последнего действия</th>
+               
                 <th>Действия</th>
             </tr>
         </thead>
@@ -68,7 +75,7 @@
                 <td>{{ referral_network.userId }}</td>
                 <td>{{ referral_network.userStatus }}</td>
                 <td>{{ referral_network.personalDataId }}</td>
-                {% if is_granted('ROLE_ADMIN') %}
+               
                 <td>{{ referral_network.direct }}</td>
                 <td>{{ referral_network.cash }}</td>
                 <td>{{ referral_network.pakage }}</td>
@@ -77,7 +84,15 @@
                 <td>{{ referral_network.currentNetworkProfit }}</td>
                 <td>{{ referral_network.paymentsNetwork }}</td>
                 <td>{{ referral_network.paymentsCash }}</td>
-                {% endif %} 
+                <td>{{ referral_network.systemRevenues }}</td>
+
+                <td>{{ referral_network.rewardWallet }}</td>
+                <td>{{ referral_network.withdrawalToWallet }}</td>
+                {% if referral_network.updatedAt == NULL %}
+                <td>{{ referral_network.createdAt|date('Y-m-d H:i:s') }}</td>
+                {% else %}
+                <td>{{ referral_network.updatedAt|date('Y-m-d H:i:s') }}</td>
+                {% endif %}
                 <td>
                     <a class="btn btn-primary rounded-0 mb-3" href="{{ path('app_referral_network_show', {'id': referral_network.id}) }}">Подробности</a>
                     {# <a class="btn btn-secondary mb-3" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">edit</a> #}
@@ -90,7 +105,7 @@
         {% endfor %}
         </tbody>
     </table>
-
+ {% endif %} 
     {# <a href="{{ path('app_referral_network_new') }}">Create new</a> #}
 </div>
 {% endblock %}

@@ -1,3 +1,8 @@
+button:
+    registration: 'Registration'
+    read_terms: 'Read the terms'
+    login: 'Sign in'
+    logout: 'Logout'
 base: 
     sign_in: 'Sign in'
     logout: 'Logout'
@@ -18,7 +23,18 @@ base:
     you_logged: 'You are logged in as'
     personal_area: 'Personal Area'
     no_login: 'no login'
-    administrator_office: 'Administrators office'  
+    administrator_office: 'Administrators office' 
+    administrator_username: 'Username'
+    administrator_email: 'Your Email' 
+    administrator_security: 'User security' 
+    administrator_pakages: 'All user packages' 
+    administrator_wallets: 'All user wallets' 
+    administrator_users: 'All participants' 
+    administrator_information_single_line: 'Network information' 
+    administrator_settings: 'Network settings' 
+    administrator_token_rate: 'Internal token rate' 
+    administrator_settings_pakages: 'Package management'
+    administrator_personal_data: 'All personal data'                  
 main:
     main_page: 'Main page1'
     start_project: 'Left before the start of the project1'
@@ -44,3 +60,60 @@ main:
     cometa_description_link_two: 'Open roadmap'
 wallet:
     wallet_adddeposit: 'You have successfully replenished your wallet.'
+registration_form:
+    controller_name: 'Registration page'
+    confidentiality_email: 'We will never share your email with anyone else.'
+    email: 'Email'
+    password: 'Password2'
+    confirm_password: 'Confirmation password'
+    referral_link: 'Referral link'
+    referral_link_description: 'If you have a referral link, please enter it in this field, if there is no link, please do not fill in this field.'
+    password_description: 'The password must have at least 6 and no more than 20 characters, must contain at least one special character, one number and one capital letter.'
+    private idintifier: 'Private idintifier'
+    agree_terms: 'Agree Terms'
+    agree_terms-description: 'Agreeing with the terms is a mandatory parameter for registration.'
+    push_notification_password_does_not_match: 'Password and confirmation do not match, please re-enter.'
+    push_notification_referral_link_not_match: 'You made a mistake when entering a referral link or entered an outdated link, please try again or apply for a new link.'
+    push_notification_referral_link_not: 'Sorry! It is impossible to register without a referral link, please apply for the link.'
+    push_notification_registration_success: 'You have successfully registered, go to your e-mail and pass verification.'
+    push_notification_registration_inform: 'To perform actions in the system, you need to register personal data!'
+    push_notification_verify_inform: 'Your email address has been verified.'
+login_form:
+    controller_name: 'Please login'
+    forgot: 'Forgot your password?'
+    follow_this_link: 'Follow this link'
+    no_account: 'You dont have an account yet, want to register?'
+    email: 'Email'
+    confidentiality: 'We will never share your email with anyone else.'
+    password: 'Password'
+    protection: 'Your privacy is protected.'
+agree_terms:
+    terms_conditions: 'TERMS AND CONDITIONS'
+    legal: 'LEGAL DISCLAIMER'
+    legal_description: 'Trading the global financial markets on margin and leverage carries a high level of risk and may not be suitable for all investors.
+                        The past results of any Cometa club are not indicative of future results. The high degree of leverage offered by brokers and liquidity providers,
+                        can work both against investors and against them. Before deciding to trade funds in these Markets, carefully consider your financial goals,
+                        experience level and risk threshold. All investments in this market should be considered with 100% risk. Due to the risk associated with the financial market, it is recommended
+                        advice from an independent financial advisor and/or a certified tax advisor. Cometa club, its owners or employees under no circumstances
+                        circumstances are not responsible for losses incurred while using our services. Cometa Club is not a registered financial advisor
+                        or an investment firm and does not provide financial advice. All information transmitted in videos, webinars or connecting to the Cometa club is provided
+                        only to our private customers and is intended for educational and systems management purposes only.'
+    purchase: 'PURCHASE AND CANCELLATION'
+    purchase_description: 'I agree to the Terms and Conditions that this is the final purchase of the Digital Product, the Cometa Club along with accompanying educational materials and any fee
+                            or monthly subscription. No refunds will be given as all sales of this Digital Product are final. Cometa Club reserves the right to refuse,
+                            cancel or terminate the participation of anyone for any reason, for any period of time and in its sole discretion. Cometa Club reserves the right to contribute
+                            change, increase and/or change the prices of this system or any monthly subscription for any reason, for any period of time and at its sole discretion.
+                            Cometa club reserves the right to add and/or remove its Digital Product and/or any monthly subscription for any reason, for any period of time and
+                            to your own discretion. I agree that information and / or any content obtained directly or indirectly from Cometa club is considered a copy, trademark and is not limited to
+                            their intellectual property, which is not allowed to be shared with non-members on social media platforms such as Facebook, Instagram, Snapchat,
+                            Twitter and/or but not limited to anything that would be construed as being outside the scope of membership. In addition, any use of Cometa club, services, content, information and/or,
+                            among other things, logos to promote competing services will result in immediate termination and legal action. In the event of cancellation of any monthly subscription,
+                            please use the cancel button in the "My Account" seven days before the monthly renewal.'
+    rule_hypothetical: 'RULE HYPOTHETICAL OR SIMULATED PERFORMANCE RESULTS'
+    rule_hypothetical_description:  'Unlike REAL INDICATORS, SIMULATED RESULTS DO NOT REPRESENT REAL TRADE. ALSO, BECAUSE THE TRANSACTIONS HAVE NOT BEEN CONCLUDED, THE RESULTS MAY BE UNSUFFICIENT OR EXCESSIVE COMPENSATION FOR THE IMPACT OF CERTAIN MARKET FACTORS, FOR EXAMPLE, A LACK OF LIQUIDITY. SIMULATION TRADING PROGRAMS IN GENERAL ALSO PARTICIPATE IN THE FIELD THAT THEY ARE DEVELOPED WITH THE HELP OF BACK KNOWLEDGE. IT IS NOT REPRESENTED THAT ANY ACCOUNT WILL OR MAY HAVE A PROFIT OR LOSS LIKE THESE.
+                                    ​PRIVACY AND SECURITY​
+                                    The protection of your personal information is our priority. This Privacy Statement applies to the WEBSITE NAME and the Cometa Club Systems and governs the collection and use of
+                                    data. For the purposes of this Privacy Policy, unless otherwise noted, all references to the Cometa club system include the WEBSITE NAME and Cometa club.
+                                    The Cometa Club website is an e-commerce and education site. By using the Cometa club website, you agree to the data practices described in this statement.'
+    administration: 'Administration'
+

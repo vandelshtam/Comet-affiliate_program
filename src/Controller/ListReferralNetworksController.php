@@ -44,6 +44,14 @@ class ListReferralNetworksController extends AbstractController
         $pakage_price_all_summ = array_sum($pakage_price_all);
         $pakage_count = count($pakages);
 
+        $networks = $entityManager->getRepository(ReferralNetwork::class)->findAll();
+        foreach($networks as $network){
+            $withdrawal_to_wallet_all[] = $network -> getWithdrawalToWallet();
+            $reward_to_wallet_all[] = $network -> getRewardWallet();
+        }
+        $withdrawal_to_wallet_all_summ = array_sum($withdrawal_to_wallet_all);
+        $reward_to_wallet_all_summ = array_sum($reward_to_wallet_all);
+
         $fast_consultation = new FastConsultation();       
         $fast_consultation_form = $this->createForm(FastConsultationType::class,$fast_consultation);
         $fast_consultation_form->handleRequest($request);
@@ -60,6 +68,8 @@ class ListReferralNetworksController extends AbstractController
             'pakage_count' => $pakage_count,
             'pakage_price_all_summ' => $pakage_price_all_summ,
             'fast_consultation_form' => $fast_consultation_form->createView(),
+            'withdrawal_to_wallet_all_summ' => $withdrawal_to_wallet_all_summ,
+            'reward_to_wallet_all_summ' => $reward_to_wallet_all_summ,
         ]);
     }
 

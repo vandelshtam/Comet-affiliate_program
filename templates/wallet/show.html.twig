@@ -16,14 +16,14 @@
         {% for label, messages in app.flashes(['info', 'notice']) %}
                     {% for message in messages %}
                         <div class="alert alert-info" role="alert">
-                            {{ message }}
+                            {{ message | trans }}
                         </div>
                     {% endfor %}
         {% endfor %}
         {% for label, messages in app.flashes(['danger', 'notice']) %}
                     {% for message in messages %}
                         <div class="alert alert-danger" role="alert">
-                            {{ message }}
+                            {{ message|trans }}
                         </div>
                     {% endfor %}
         {% endfor %}

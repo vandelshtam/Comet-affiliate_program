@@ -5,59 +5,50 @@
 {% block body %}
 <div class="pb-3 pt-3 mb-0" style="background: rgb(223, 230, 245);">    
     <div class="container-xxl bg-white col-sm-4  shadow p-3 mb-3 mt-3 rounded-0">
-        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
+        <h1 class="d-flex justify-content-center mb-1 mt-0 pb-3 pt-2" style="color:  rgb(72, 109, 169);">{{ controller_name | trans }}</h1>
         {% for flash_error in app.flashes('verify_email_error') %}
-            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+            <div class="alert alert-danger" role="alert">{{ flash_error | trans }}</div>
         {% endfor %}
-        {# {% if form_errors(form) %}
-            <div class="my-custom-class-for-errors">
-                {{ form_errors(form) }}
-            </div>
-        {% endif %} #}
         {{ form_start(registrationForm) }}
-            <div class="form_box-inner d-flex justify-content-center">
-                <div class="form_box-left">
                 {% for label, messages in app.flashes(['success', 'notice']) %}
                         {% for message in messages %}
                             <div class="alert alert-success rounded-0" role="alert">
-                                {{ message }}
+                                {{ message |trans}}
                             </div>
                         {% endfor %}
                 {% endfor %}
                 {% for label, messages in app.flashes(['info', 'notice']) %}
                             {% for message in messages %}
                                 <div class="alert alert-info rounded-0" role="alert">
-                                    {{ message }}
+                                    {{ message |trans }}
                                 </div>
                             {% endfor %}
                 {% endfor %}
                 {% for label, messages in app.flashes(['danger', 'notice']) %}
                             {% for message in messages %}
                                 <div class="alert alert-danger rounded-0" role="alert">
-                                    {{ message }}
+                                    {{ message | trans }}
                                 </div>
                             {% endfor %}
                 {% endfor %}
                 {% for label, messages in app.flashes(['warning', 'notice']) %}
                     {% for message in messages %}
                         <div class="alert alert-warning rounded-0" role="alert">
-                            {{ message }}
+                            {{ message |trans }}
                         </div>
                     {% endfor %}            
                 {% endfor %}
                         {{ form_row(registrationForm.email) }}
-                        <div id="emailHelp" class="form-text mb-5">Мы никогда не будем делиться вашей электронной почтой с кем-либо еще.</div>
-                        
+                        <div id="emailHelp" class="form-text mb-3 mt-0">{{ 'registration_form.confidentiality_email' | trans }}</div>
                         {{ form_row(registrationForm.plainPassword, {
                                                     label: 'Password'
                                                 }) }}
-                        <label for="exampleInputPassword1" class="form-label">Password confirm</label>
+                        <label for="exampleInputPassword1" class="form-label">{{ 'registration_form.confirm_password' | trans }}</label>
                         <input type="password" class="form-control" id="exampleInputPassword1" name="password">                        
-                        <div id="emailHelp" class="form-text mb-5">Пароль должен иметь не менее 6 и не более 20 символов, должен содержать хотябы один специальный символ, одну цифру и одну главную букву.</div>
-                        {# <input type="checkbox" class="form-check-input" id="exampleCheck1"> #}
+                        <div id="emailHelp" class="form-text mb-3 mt-3">{{ 'registration_form.password_description' | trans }}</div>
                         {% if referral_link == NULL %}
                         {{ form_row(registrationForm.referral_link) }}
-                        <div id="emailHelp" class="form-text mb-5">Если у вас есть рефералная ссылка, пожалуйста введите ее в это поле, если ссылки нет, то пожалуйста не заполняйте это поле.</div>
+                        <div id="emailHelp" class="form-text mb-3 mt-0">{{ 'registration_form.referral_link_description' | trans }}</div>
                         {% else %}
                         <div class="hidden">
                         {{ form_row(registrationForm.referral_link, {'value': referral_link }) }}
@@ -65,17 +56,14 @@
                         {% endif %}
                         <label class="form-check-label" for="exampleCheck1">{{ form_row(registrationForm.agreeTerms) }}</label>
                         <a data-fancybox data-src="#agree-terms" href="javascript:;" class="btn rounded-0 mb-2 btn-sm" style="background: #5eabeb;">
-                            Прочитать условия
+                            {{ 'button.read_terms' | trans }}
                         </a>
-                        <div id="emailHelp" class="form-text mb-3">Согласие с условиями обязательный параметр для пегистрации.</div>
+                        <div id="emailHelp" class="form-text mb-3">{{ 'registration_form.agree_terms-description' | trans }}</div>
                         
                         <div class="hidden">
                             {{ form_row(registrationForm.personal_data_id, {'value': 0 }) }}
-                        </div> 
-                        
-                    <button type="submit" class="btn btn-primary rounded-0 mb-1 text-light" >Зарегистрироваться</button>
-                </div>
-            </div>
+                        </div>    
+                    <button type="submit" class="btn btn-primary rounded-0 mb-1 text-light" >{{ 'button.registration' | trans }}</button>
         {{ form_end(registrationForm) }}
     </div>
 </div>

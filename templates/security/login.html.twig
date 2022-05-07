@@ -6,27 +6,25 @@
 <div class="pb-3 pt-3" style="background: rgb(223, 230, 245);">
     <form class="container container-xxl col-sm-4 shadow p-3 mb-1 mt-3 bg-white rounded-0" method="post">
         {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <div class="alert alert-danger rounded-0">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
 
         {% if app.user %}
             <div class="mb-3">
-                You are logged in as {{ app.user.email }}, <a href="{{ path('app_logout') }}">Выйти</a>
+                You are logged in as {{ app.user.email }}, <a href="{{ path('app_logout') }}">{{ 'button.logout' | trans }}</a>
             </div>
         {% endif %}
-        <p>Забыли пароль?  <a href="{{ path('app_forgot_password_request') }}">перейдите по ссылке</a></p>
-        <p>У вас еще нет аккаунта, хотите пройти регистрацию?  <a href="{{ path('app_register') }}">перейдите по ссылке</a></p>
-        <h1 class="d-flex justify-content-center mb-1 mt-3 pt-3 pb-3" style="color:  rgb(72, 109, 169);">{{ controller_name }}</h1>
-        <label for="inputEmail">Емайл</label>
+        <p class="text-secondary fst-italic">{{ 'login_form.forgot' | trans }}<a href="{{ path('app_forgot_password_request') }}">{{ 'login_form.follow_this_link' | trans }}</a></p>
+        <p class="text-secondary fst-italic">{{ 'login_form.no_account' | trans }}<a href="{{ path('app_register') }}">{{ 'login_form.follow_this_link' | trans }}</a></p>
+        <h1 class="d-flex justify-content-center mb-1 mt-3 pt-3 pb-3" style="color:  rgb(72, 109, 169);">{{ controller_name | trans }}</h1>
+        <label for="inputEmail">{{ 'login_form.email' | trans }}</label>
         <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-        <div id="emailHelp" class="form-text mb-3">Мы никогда не будем делиться вашей электронной почтой с кем-либо еще.</div>
-        <label for="inputPassword">Пароль</label>
+        <div id="emailHelp" class="form-text mb-3">{{ 'login_form.confidentiality' | trans }}</div>
+        <label for="inputPassword">{{ 'login_form.password' | trans }}</label>
         <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-        <div id="emailHelp" class="form-text mb-3">Ваша конфиденциальность защищенf.</div>
+        <div id="emailHelp" class="form-text mb-3">{{ 'login_form.protection' | trans }}</div>
         <input type="hidden" name="_csrf_token"
             value="{{ csrf_token('authenticate') }}">
-
-        
             {# Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
             See https://symfony.com/doc/current/security/remember_me.html
 
@@ -35,10 +33,8 @@
                     <input type="checkbox" name="_remember_me"> Remember me
                 </label>
             </div> #}
-    
-
         <button class="btn btn-lg btn-primary rounded-0 d-flex justify-content-center text-white mb-1 mt-3" type="submit">
-            Войти
+            {{ 'button.login' | trans }}
         </button>
     </form>
 </div>

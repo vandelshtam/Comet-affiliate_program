@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\SettingOptions;
 use App\Entity\FastConsultation;
 use App\Form\FastConsultationType;
+use App\EventSubscriber\LocaleSubscriber;
 use App\Repository\SavingMailRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -13,6 +14,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use App\Controller\FastConsultationController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,30 +26,30 @@ class HomeController extends AbstractController
      *     "/{_locale}/contact",
      *     name="contact",
      *     requirements={
-     *         "_locale": "en|ru|ua|fr|de",
+     *         "_locale": "en|es|fr|ru|ua|de",
      *     }
      * )
      */
-    public function onKernelRequest(RequestEvent $event)
+    
+
+    private $requestStack;
+
+    public function __construct(RequestStack $requestStack)
     {
-        $request = $event->getRequest();
-        //$locale = 'ru';
-        $locale = $request->getLocale();
-        dd();
-        // some logic to determine the $locale
-        $request->setLocale($locale);
+        $this->requestStack = $requestStack;
     }
 
     #[Route('/', name: 'app_home')]
-    public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository,TranslatorInterface $translator): Response
+    public function index(Request $request,LocaleSubscriber $localSubscriber, EntityManagerInterface $entityManager, MailerInterface $mailer,ManagerRegistry $doctrine, FastConsultationController $fast_consultation_meil, MailerController $mailerController,SavingMailRepository $savingMailRepository,TranslatorInterface $translator): Response
     {
-        // $defaultLocale = 'ru';
-        // $request = $event->getRequest();
-        // //$locale = 'ru';
-        // $locale = $request->getLocale();
-        // dd();
-        // // some logic to determine the $locale
-        // $request->setLocale($locale);
+        // $session = $this->requestStack->getSession();
+        // $request->setLocale($request->getSession()->get('_locale', 'ua'));
+        // stores an attribute in the session for later reuse
+        //$session->set('attribute_name', '555');
+        //$locale = $request->getLocale();
+        
+        //$request->setLocale('fr_FR');
+        //dd($locale);
         
         $setting = $entityManager->getRepository(SettingOptions::class)->findOneBy(['id' => 1]);
         $start_day = round($setting -> getStartDay() / 2);

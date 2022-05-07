@@ -180,7 +180,7 @@ class ReferralNetworkRepository extends ServiceEntityRepository
             ->setParameter('val', $value)
             ->setParameter('balance', $balance)
             ->orderBy ('r.id', 'ASC')
-            ->setMaxResults(10000)
+            ->setMaxResults(100000)
             ->getQuery()
             ->getResult()
         ;
@@ -277,5 +277,18 @@ class ReferralNetworkRepository extends ServiceEntityRepository
         // returns an array of Product objects
         return $query;
     }
+
+    public function findOneByMyTeamStatus($value,$status): ?ReferralNetwork
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.member_code = :val')
+            ->andWhere('r.user_status = :stat')
+            ->setParameter('val', $value)
+            ->setParameter('stat', $status)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    
     
 }

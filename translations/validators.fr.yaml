@@ -1,0 +1,6 @@
+
+registration_form:
+    notification_email: 'Un compte avec cette adresse e-mail existe déjà.'
+    lenght_pasword_form_1: 'Votre mot de passe doit contenir au moins {{ limit }} caractères.'
+    # referral_link: 'Реферральная ссылка'
+    #lenght_pasword_form_2: 'символов'

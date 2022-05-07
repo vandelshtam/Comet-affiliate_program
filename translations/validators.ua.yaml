@@ -1,0 +1,6 @@
+
+registration_form:
+    notification_email: 'Обліковий запис із цією адресою електронної пошти вже існує.'
+    lenght_pasword_form_1: 'Ваш пароль повинен містити не менше {{limit}} символів.'
+    # referral_link: 'Реферральная ссылка'
+    #lenght_pasword_form_2: 'символов'

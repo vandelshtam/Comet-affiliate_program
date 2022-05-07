@@ -1,3 +1,119 @@
+button:
+    registration: 'S`inscrire'
+    read_terms: 'Lire les termes'
+    login: 'Entrer'
+    logout: 'Se déconnecter'
+base: 
+    sign_in: 'Entrer'
+    logout: 'Se déconnecter'
+    registration: 'Inscription'
+    role: 'Vous êtes administrateur'
+    username: 'Tu'
+    support: 'Assistance rapide' 
+    main: 'Domicile'
+    about_project: 'à propos du projet'
+    rules_promotions: 'Règles et promotions'
+    packages: 'Aperçu du forfait'
+    user_account: 'Compte d`utilisateur'    
+    my_balance: 'Mon solde'
+    my_wallet: 'Mon portefeuille'
+    invite_participant: 'Inviter un membre'
+    buy_package: 'Acheter un forfait'
+    upgrade_package: 'Forfait de mise à niveau'
+    you_logged: 'Vous êtes connecté en tant que'
+    personal_area: 'Espace personnel'
+    no_login: 'pas de connexion'
+    administrator_office: 'Bureau de l`administrateur' 
+    administrator_username: 'Votre nom'
+    administrator_email: 'Votre e-mail'
+    administrator_security: 'Sécurité des utilisateurs' 
+    administrator_pakages: 'Tous les packs utilisateur' 
+    administrator_wallets: 'Tous les portefeuilles d`utilisateurs' 
+    administrator_users: 'Tous les participants' 
+    administrator_information_single_line: 'Informations sur le réseau' 
+    administrator_settings: 'Paramètres réseau' 
+    administrator_token_rate: 'Taux de jeton interne' 
+    administrator_settings_pakages: 'Gestion des colis' 
+    administrator_personal_data: 'Toutes les données personnelles'                 
 main:
-  main_page: 'Main page1'
-  start_project: 'Left before the start of the project1'
+    main_page: 'Page d`accueil'
+    start_project: 'Laissé avant le début du projet'
+    inform: 'Une information important'
+    inform_text: 'Vous devez renseigner vos données personnelles et accepter les termes de notre plateforme. Sans cela, vous ne pourrez pas effectuer de transactions sur notre plateforme. Merci de votre compréhension!'
+    inform_link: 'aller au remplissage'
+    cometa_description_one: 'CoMeta est une plateforme de produits et services. Ils sont fournis
+                                   grâce à des partenariats directs avec des entreprises extérieures. L`utilisateur peut utiliser CoMeta pour effectuer des achats et bénéficier de réductions.'
+    cometa_description_two: 'La pièce CoMeta est un jeton virtuel qui ne peut être utilisé que sur la plate-forme CoMeta, avec un accès supplémentaire à l`échange.
+                                   Vous pouvez obtenir des jetons CoMeta en achetant un produit ou en gagnant du cashback, ou en travaillant pour la communauté en offrant un service.' 
+    cometa_description_three: 'Le coût du jeton virtuel CoMeta coin est déterminé par les utilisateurs et le nombre de clients du service. Il n`y a pas de prédictions concernant sa valeur. La pièce CoMeta n`est pas un investissement, le profit ne peut donc pas être garanti.' 
+    cometa_description_four:  'CoMeta n`est pas un investissement. Ce n`est pas une question de profit ou de pourcentage de revenus. L`acheteur n`a aucune obligation d`achat. Il n`y a aucune promesse de retour. Les récompenses sont émises en présence d`activité dans l`écosystème et à partir de références invitées par l`utilisateur, elles ne sont pas garanties. Les commissions ne sont générées que lorsque les produits sont utilisés et donc les transactions sont exécutées lors de leur utilisation.'
+    cometa_description_five:  'Toute information sur des documents non officiels ou des sites non officiels ne doit pas être prise en compte.'
+    cometa_administration: 'Administration'
+    cometa_description_link: 'Présentation ouverte'
+    cometa_description_one_two: 'Il y a encore peu de monde dans ce quartier. Qui sera à l`avant-garde - recevra le plus d`opportunités.'
+    cometa_description_two_two: 'Un peu plus de 106 millions de personnes dans le monde utilisent les technologies de crypto-monnaie.' 
+    cometa_description_three_two: 'Nous vivons aujourdhui une révolution dans la fintech : les crypto-monnaies et la blockchain.' 
+    cometa_description_four_two:  'La révolution crypto fera de nous les propriétaires de notre argent, maintenant les banques centrales des États sont les propriétaires de l`argent.'
+    cometa_description_five_two:  'Toute information sur des documents non officiels ou des sites non officiels ne doit pas être prise en compte.'
+    cometa_administration_two: 'Administration'
+    cometa_description_link_two: 'Feuille de route ouverte'
+wallet:
+    wallet_adddeposit: 'Vous avez financé votre portefeuille avec succès.'
+registration_form:
+    controller_name: 'Page d`inscription'
+    confidentiality_email: 'Nous ne partagerons jamais votre e-mail avec quelqu`un d`autre.'
+    lenght_pasword_form_1: 'Votre mot de passe doit contenir au moins {{ limit }} caractères.'
+    email: 'E-mail'
+    password: 'Mot de passe'
+    confirm_password: 'Confirmation mot de passe'
+    referral_link: 'Lien de référence'
+    referral_link_description: 'Si vous avez un lien de parrainage, veuillez le saisir dans ce champ, s`il n`y a pas de lien, veuillez ne pas remplir ce champ.'
+    password_description: 'Le mot de passe doit contenir au moins 6 et pas plus de 20 caractères, doit contenir au moins un caractère spécial, un chiffre et une lettre majuscule.'
+    private idintifier: 'Identifiant privé'
+    agree_terms: 'Accord avec les termes'
+    agree_terms-description: 'L`acceptation des termes est un paramètre obligatoire pour l`inscription.'
+    push_notification_password_does_not_match: 'Le mot de passe et la confirmation ne correspondent pas, veuillez les saisir à nouveau.'
+    push_notification_referral_link_not_match: 'Vous avez fait une erreur lors de la saisie d`un lien de parrainage ou avez saisi un lien obsolète, veuillez réessayer ou demander un nouveau lien.'
+    push_notification_referral_link_not: 'Désolé! Il est impossible de s`inscrire sans lien de parrainage, merci de demander le lien.'
+    push_notification_registration_success: 'Vous vous êtes inscrit avec succès, accédez à l`e-mail que vous avez spécifié et passez par la vérification'
+    push_notification_registration_inform: 'Pour effectuer des actions dans le système, vous devez enregistrer des données personnelles!'
+    push_notification_verify_inform: 'Votre adresse e-mail a été vérifiée.'
+login_form:
+    controller_name: 'Veuillez vous connecter'
+    forgot: 'Mot de passe oublié?'
+    follow_this_link: 'Suivez ce lien'
+    no_account: 'Vous n`avez pas encore de compte, vous souhaitez vous inscrire?'
+    email: 'E-mail'
+    confidentiality: 'Nous ne partagerons jamais votre e-mail avec quelqu`un d`autre.'
+    password: 'Mot de passe'
+    protection: 'Votre vie privée est protégée.'
+agree_terms:
+    terms_conditions: 'TERMES ET CONDITIONS'
+    legal: 'AVERTISSEMENT LÉGAL'
+    legal_description: 'Le trading sur les marchés financiers mondiaux sur marge et effet de levier comporte un niveau de risque élevé et peut ne pas convenir à tous les investisseurs.
+                        Les résultats passés d`un club Cometa ne sont pas indicatifs des résultats futurs. Le degré élevé d`effet de levier offert par les courtiers et les fournisseurs de liquidité,
+                        peut jouer à la fois contre les investisseurs et contre eux. Avant de décider de négocier des fonds sur ces marchés, examinez attentivement vos objectifs financiers,
+                        niveau d`expérience et seuil de risque. Tous les investissements sur ce marché doivent être considérés avec un risque de 100 %. En raison du risque lié au marché financier, il est recommandé
+                        les conseils d`un conseiller financier indépendant et/ou d`un conseiller fiscal agréé. Cometa club, ses propriétaires ou employés en aucun cas
+                        circonstances ne sont pas responsables des pertes subies lors de l`utilisation de nos services. Cometa Club n`est pas un conseiller financier enregistré
+                        ou une entreprise d`investissement et ne fournit pas de conseils financiers. Toutes les informations transmises dans les vidéos, les webinaires ou la connexion au club Cometa sont fournies
+                        uniquement à nos clients privés et est destiné à des fins éducatives et de gestion des systèmes uniquement.'
+    purchase: 'ACHAT ET ANNULATION'
+    purchase_description: 'J`accepte les termes et conditions qu`il s`agit de l`achat final du produit numérique, du Cometa Club ainsi que du matériel pédagogique qui l`accompagne et de tous les frais
+                        ou abonnement mensuel. Aucun remboursement ne sera émis car toutes les ventes de ce produit numérique sont finales. Cometa Club se réserve le droit de refuser,
+                        annuler ou mettre fin à la participation de quiconque pour quelque raison que ce soit, pour toute période de temps et à sa seule discrétion. Cometa Club se réserve le droit de contribuer
+                        modifier, augmenter et/ou modifier les prix de ce système ou de tout abonnement mensuel pour quelque raison que ce soit, pour toute période de temps et à sa seule discrétion.
+                        Cometa club se réserve le droit d`ajouter et/ou de supprimer son Produit Numérique et/ou tout abonnement mensuel pour quelque raison que ce soit, pour toute période de temps et
+                        à votre propre discrétion. J`accepte que les informations et/ou tout contenu obtenus directement ou indirectement du Cometa club soient considérés comme une copie, une marque déposée et ne se limitent pas à
+                        leur propriété intellectuelle, qui n`est pas autorisée à être partagée avec des non-membres sur les plateformes de médias sociaux telles que Facebook, Instagram, Snapchat,
+                        Twitter et/ou, mais sans s`y limiter, tout ce qui serait interprété comme étant en dehors du champ d`application de l`adhésion. En outre, toute utilisation du club Cometa, des services, contenus, informations et/ou,
+                        entre autres, les logos pour promouvoir des services concurrents entraîneront une résiliation immédiate et des poursuites judiciaires. En cas de résiliation de tout abonnement mensuel,
+                        veuillez utiliser le bouton d`annulation dans "Mon compte" sept jours avant le renouvellement mensuel.'
+    rule_hypothetical: 'RÈGLE RÉSULTATS DE PERFORMANCE HYPOTHÉTIQUES OU SIMULÉS'
+    rule_hypothetical_description:  'Contrairement aux INDICATEURS RÉELS, LES RÉSULTATS SIMULÉS NE REPRÉSENTENT PAS LE COMMERCE RÉEL. DE PLUS, PARCE QUE LES TRANSACTIONS N`ONT PAS ÉTÉ CONCLUES, LES RÉSULTATS PEUVENT ÊTRE UNE COMPENSATION INSUFFISANTE OU EXCESSIVE POUR L`IMPACT DE CERTAINS FACTEURS DE MARCHÉ, PAR EXEMPLE, UN MANQUE DE LIQUIDITÉ. LES PROGRAMMES DE TRADING DE SIMULATION EN GÉNÉRAL PARTICIPENT ÉGALEMENT DANS LE DOMAINE QU`ILS SONT DÉVELOPPÉS AVEC L`AIDE DE BACK KNOWLEDGE. IL N`EST PAS REPRÉSENTÉ QU`UN COMPTE AURA OU POURRA AVOIR UN PROFIT OU UNE PERTE COMME CEUX-CI.
+                        ​CONFIDENTIALITÉ ET SÉCURITÉ​
+                        La protection de vos informations personnelles est notre priorité. Cette déclaration de confidentialité s`applique au NOM DU SITE WEB et aux systèmes du Cometa Club et régit la collecte et l`utilisation des
+                        Les données. Aux fins de la présente politique de confidentialité, sauf indication contraire, toutes les références au système du club Cometa incluent le NOM DU SITE WEB et le club Cometa.
+                        Le site Cometa Club est un site de e-commerce et d`éducation. En utilisant le site Web du club Cometa, vous acceptez les pratiques en matière de données décrites dans cette déclaration.'
+    administration: 'Administration'
+    

@@ -1,3 +1,8 @@
+button:
+    registration: 'Registro'
+    read_terms: 'Lea los términos'
+    login: 'Entrar'
+    logout: 'Desconectarse'
 base: 
     sign_in: 'Entrar'
     logout: 'Desconectarse'
@@ -18,7 +23,18 @@ base:
     you_logged: 'Has iniciado sesión como'
     personal_area: 'Área personal'
     no_login: 'sin inicio de sesión'
-    administrator_office: 'Oficina del administrador'  
+    administrator_office: 'Oficina del administrador' 
+    administrator_username: 'Su nombre'
+    administrator_email: 'Tu correo electrónico' 
+    administrator_security: 'Seguridad del usuario' 
+    administrator_pakages: 'Todos los paquetes de usuario' 
+    administrator_wallets: 'Todas las carteras de los usuarios' 
+    administrator_users: 'Todos los participantes' 
+    administrator_information_single_line: 'Información de red' 
+    administrator_settings: 'Configuración de red' 
+    administrator_token_rate: 'Tasa de token interno' 
+    administrator_settings_pakages: 'Gestión de paquetes'
+    administrator_personal_data: 'Todos los datos personales'                  
 main:
     main_page: 'Pagina principal'
     start_project: 'Izquierda antes del inicio del proyecto.'
@@ -41,3 +57,62 @@ main:
     cometa_description_five_two:  'Cualquier información sobre materiales no oficiales o sitios no oficiales no debe tenerse en cuenta.'
     cometa_adminisrtation_two: 'Administración'
     cometa_description_link_two: 'Hoja de ruta abierta'
+wallet:
+    wallet_adddeposit: 'Ha financiado con éxito su billetera.'
+registration_form:
+    controller_name: 'Página de registro'
+    confidentiality_email: 'Nunca compartiremos su correo electrónico con nadie más.'
+    lenght_pasword_form_1: 'Su contraseña debe contener al menos {{ limit }} caracteres.'
+    email: 'Correo electrónico'
+    password: 'Clave'
+    confirm_password: 'Confirmación de contraseña'
+    referral_link: 'Enlace de referencia'
+    referral_link_description: 'Si tiene un enlace de referencia, ingréselo en este campo, si no hay un enlace, no complete este campo.'
+    password_description: 'La contraseña debe contener al menos 6 y no más de 20 caracteres, debe contener al menos un carácter especial, un número y una letra mayúscula.'
+    private idintifier: 'identificador privado'
+    agree_terms: 'Acuerdo con los términos'
+    agree_terms-description: 'Estar de acuerdo con los términos es un parámetro obligatorio para el registro.'
+    push_notification_password_does_not_match: 'La contraseña y la confirmación no coinciden, vuelva a ingresar.'
+    push_notification_referral_link_not_match: 'Cometió un error al ingresar un enlace de referencia o ingresó un enlace obsoleto, intente nuevamente o solicite un nuevo enlace.'
+    push_notification_referral_link_not: '¡Lo siento! Es imposible registrarse sin un enlace de referencia, solicite el enlace.'
+    push_notification_registration_success: 'Se ha registrado con éxito, vaya al correo electrónico que especificó y realice la verificación.'
+    push_notification_registration_inform: '¡Para realizar acciones en el sistema, debe registrar datos personales!'
+    push_notification_verify_inform: 'Tu dirección de email ha sido verificada.'
+login_form:
+    controller_name: 'Por favor Iniciar sesión'
+    forgot: 'Olvidaste tu contraseña?'
+    follow_this_link: 'Siga este enlace'
+    no_account: 'Aún no tienes una cuenta, ¿quieres registrarte?'
+    email: 'Correo electrónico'
+    confidentiality: 'Nunca compartiremos su correo electrónico con nadie más.'
+    password: 'Clave'
+    protection: 'Su privacidad está protegida.'
+agree_terms:
+    terms_conditions: 'TÉRMINOS Y CONDICIONES'
+    legal: 'NOTA LEGAL'
+    legal_description: 'Operar en los mercados financieros globales con margen y apalancamiento conlleva un alto nivel de riesgo y puede no ser adecuado para todos los inversores.
+                        Los resultados pasados ​​de cualquier club Cometa no son indicativos de resultados futuros. El alto grado de apalancamiento que ofrecen los corredores y proveedores de liquidez,
+                        puede funcionar tanto contra los inversores como contra ellos. Antes de decidir operar con fondos en estos Mercados, considere cuidadosamente sus metas financieras,
+                        nivel de experiencia y umbral de riesgo. Todas las inversiones en este mercado deben considerarse con un 100% de riesgo. Debido al riesgo asociado al mercado financiero, se recomienda
+                        asesoramiento de un asesor financiero independiente y/o un asesor fiscal certificado. Cometa club, sus dueños o empleados bajo ninguna circunstancia
+                        circunstancias no son responsables de las pérdidas sufridas durante el uso de nuestros servicios. Cometa Club no es un asesor financiero registrado
+                        o una empresa de inversión y no proporciona asesoramiento financiero. Se facilita toda la información transmitida en vídeos, webinars o conexión al club Cometa
+                        solo para nuestros clientes privados y está destinado solo para fines educativos y de administración de sistemas.'
+    purchase: 'COMPRA Y CANCELACIÓN'
+    purchase_description: 'Acepto los Términos y condiciones de que esta es la compra final del Producto digital, el Cometa Club junto con los materiales educativos que lo acompañan y cualquier tarifa.
+                        o suscripción mensual. No se emitirán reembolsos ya que todas las ventas de este Producto Digital son finales. Cometa Club se reserva el derecho de rechazar,
+                        cancelar o terminar la participación de cualquier persona por cualquier motivo, por cualquier período de tiempo y a su exclusivo criterio. Cometa Club se reserva el derecho de contribuir
+                        cambiar, aumentar y/o cambiar los precios de este sistema o cualquier suscripción mensual por cualquier motivo, por cualquier período de tiempo ya su sola discreción.
+                        Cometa club se reserva el derecho de agregar y/o eliminar su Producto Digital y/o cualquier suscripción mensual por cualquier motivo, por cualquier período de tiempo y
+                        a su propia discreción. Acepto que la información y/o cualquier contenido obtenido directa o indirectamente de Cometa club se considera copia, marca registrada y no se limita a
+                        su propiedad intelectual, que no se permite compartir con personas que no son miembros en plataformas de redes sociales como Facebook, Instagram, Snapchat,
+                        Twitter y/o, entre otros, cualquier cosa que pueda interpretarse como fuera del alcance de la membresía. Asimismo, cualquier uso del club Cometa, servicios, contenidos, información y/o,
+                        entre otras cosas, los logotipos para promocionar servicios de la competencia darán lugar a la rescisión inmediata y a acciones legales. En caso de cancelación de cualquier suscripción mensual,
+                        utilice el botón de cancelar en "Mi cuenta" siete días antes de la renovación mensual.'
+    rule_hypothetical: 'RESULTADOS DE RENDIMIENTO HIPOTÉTICOS O SIMULADOS DE LA REGLA'
+    rule_hypothetical_description:  'A diferencia de los INDICADORES REALES, LOS RESULTADOS SIMULADOS NO REPRESENTAN EL COMERCIO REAL. ADEMÁS, POR NO HABER CONCLUIDO LAS OPERACIONES, LOS RESULTADOS PUEDEN SER UNA COMPENSACIÓN INSUFICIENTE O EXCESIVA POR EL IMPACTO DE CIERTOS FACTORES DEL MERCADO, POR EJEMPLO, LA FALTA DE LIQUIDEZ. LOS PROGRAMAS DE COMERCIO DE SIMULACIÓN EN GENERAL TAMBIÉN PARTICIPAN EN EL CAMPO QUE SE DESARROLLAN CON LA AYUDA DEL CONOCIMIENTO TRASERO. NO SE REPRESENTA QUE CUALQUIER CUENTA TENDRÁ O PUEDE TENER GANANCIAS O PÉRDIDAS COMO ESTAS.
+                        PRIVACIDAD Y SEGURIDAD
+                        La protección de su información personal es nuestra prioridad. Esta Declaración de Privacidad se aplica al NOMBRE DEL SITIO WEB y a los Sistemas Cometa Club y rige la recopilación y el uso de
+                        datos. A los efectos de esta Política de privacidad, a menos que se indique lo contrario, todas las referencias al sistema Cometa club incluyen el NOMBRE DEL SITIO WEB y Cometa club.
+                        El sitio web de Cometa Club es un sitio de comercio electrónico y educación. Al utilizar el sitio web de Cometa club, usted acepta las prácticas utilizadas en relación con los datos que se describen en esta norma.'
+    administration: 'Administración'

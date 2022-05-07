@@ -137,7 +137,71 @@
                         {% endif %} 
                     </ul>
                 </li>
-                {% endif %} 
+                {% endif %}
+                 {% if is_granted('ROLE_ADMIN') %}   
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ 'base.administrator_office' | trans }}
+                    </a>
+                    <ul class="dropdown-menu rounded-0" aria-labelledby="navbarDropdown" style="background: rgb(223, 230, 245);">
+                        {# <li><a class="dropdown-item" href="{{ path('app_current_balance') }}">Текущий баланс</a></li> #}
+                        {# <li><a class="dropdown-item fw-bold" href="{{ path('app_referral_network_myplace') }}" style="color: rgb(72, 109, 169);">{{ 'base.my_balance' | trans }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_wallet_user') }}" style="color: rgb(72, 109, 169);">{{ 'base.my_wallet' | trans }}</a></li> #}
+                        {# <li><a class="dropdown-item" href="#">История транзакций</a></li> #}
+                        {# {% if is_granted('ROLE_ADMIN') %} #}
+                        {# <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}" style="color: rgb(72, 109, 169);">{{ 'base.buy_package' | trans }}</a></li>
+                            {% if app.user.pakageStatus == 1 %}
+                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_edit_routing', {'id': app.user.pakageId}) }}" style="color: rgb(72, 109, 169);">{{ 'base.upgrade_package' | trans }}</a></li>
+                            {% endif %} #}
+                        {# {% else %}    #}
+                            {# {% if app.user.pakageStatus == 0 %}
+                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_new',{'unique_code_get' : 'not' }) }}" style="color: rgb(72, 109, 169);">Купить пакет</a></li>
+                            {% elseif app.user.pakageStatus == 1  %}
+                            <li><a class="dropdown-item fw-bold" href="{{ path('app_pakege_edit_routing', {'id': app.user.pakageId}) }}" style="color: rgb(72, 109, 169);">Повысить пакет</a></li> #}
+                            {# {% endif %} #}
+                        {# {% endif %}  #}
+                        {# <li><a class="dropdown-item" href="{{ path('app_referral_network_index') }}">Участники реферальных сетей</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_list_referral_networks_index') }}">Реферальные сети</a></li> #}
+                        {# <li><a class="dropdown-item" href="#">Вывод</a></li> #}
+                        {# <li><a class="dropdown-item" href="#">Статистика (не активно)</a></li> #}
+                        {# <li><hr class="dropdown-divider"></li> #}
+                       
+                        
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.administrator_email' | trans }} : {{ app.user.email }}</a></li>
+                       
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.administrator_username' | trans }} : {{ app.user.username }}</a></li>
+                       
+                        {# <li><a class="dropdown-item fw-bold" href="{{ path('app_personal_area') }}" style="color: rgb(72, 109, 169);">{{ 'base.personal_area' | trans }}</a></li>
+                      
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.no_login' | trans }}</a></li> #}
+
+
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_user_index_admin') }}" style="color: rgb(72, 109, 169);">{{ 'base.administrator_security' | trans }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_personal_data_index') }}" style="color: rgb(72, 109, 169);">{{ 'base.administrator_personal_data' | trans }}</a></li>
+                         <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.administrator_pakages' | trans }} </a></li>
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.administrator_wallets' | trans }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.administrator_users' | trans }}</a></li>
+                         <li><a class="dropdown-item fw-bold" href="{{ path('app_list_referral_networks_index') }}" style="color: rgb(72, 109, 169);">{{ 'base.administrator_information_single_line' | trans }} </a></li>
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.administrator_settings' | trans }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.administrator_token_rate' | trans }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.administrator_settings_pakages' | trans }}</a></li>
+                        <li><a class="dropdown-item fw-bold" href="{{ path('app_transaction_table_index') }}" style="color: rgb(72, 109, 169);">{{ 'base.administrator_settings_pakages' | trans }} транзакции</a></li>
+
+
+
+                       
+                        {# <li><a class="dropdown-item fw-bold" href="{{ path('app_personal_area') }}" style="color: rgb(72, 109, 169);">{{ 'base.personal_area' | trans }}</a></li> #}
+                      
+                        {# <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">{{ 'base.no_login' | trans }}</a></li> #}
+                        
+                        {# <li><a class="dropdown-item fw-bold" href="#" style="color: rgb(72, 109, 169);">Поддержка (не активно)</a></li> #}
+                       
+                        {# <li><a class="dropdown-item fw-bold" href="{{ path('app_admin') }}" style="color: rgb(72, 109, 169);">{{ 'base.administrator_office' | trans }}</a></li> #}
+                       
+                       
+                    </ul>
+                </li>
+                {% endif %}  
             </ul>
             </div>
         </div>

@@ -46,7 +46,7 @@
   <div class="col-sm-12 mb-1 bg-white">
           <div class=" text-secondary rounded-0">
               <div class="card-body d-flex justify-content-between">    
-                  <span><h6 class="card-title fst-italic fw-bold text-secondary" style="font-size: 20px;">Моя команда - количество участников</h6></span>
+                  <span><h6 class="card-title fst-italic fw-bold text-secondary" style="font-size: 20px;">Моя команда (приглашенные лично мной) - количество участников</h6></span>
                   <span><h6 class="card-title fst-italic fw-bold" style="color:  rgb(72, 109, 169); font-size: 25px;">{{ my_team_count }}</h6></span>    
               </div>
               <div class="card-body d-flex justify-content-between">    
@@ -79,7 +79,7 @@
                   </div>
                 </div>
 {% endfor %}  #}
-{% if my_team_count <= 2 %}
+{# {% if my_team_count <= 2 %} #}
  
 <div class="justify-content-center row p-3 mb-1 bg-white mb-3 ">
 {% for referral_network in referral_networks %}
@@ -93,22 +93,56 @@
     </div> 
 {% endfor %}               
 </div>
-
-{% else %}
-  <div class="container mb-3 pb-3">
+<div class="col-sm-12 mb-1 bg-white">
+          <div class=" text-secondary rounded-0">
+              <div class="card-body d-flex justify-content-between">    
+                  <span><h6 class="card-title fst-italic fw-bold text-secondary" style="font-size: 20px;">Вся "Моя команда"  - количество участников</h6></span>
+                  <span><h6 class="card-title fst-italic fw-bold" style="color:  rgb(72, 109, 169); font-size: 25px;">{{ my_team_count_all }}</h6></span>    
+              </div>
+              <div class="card-body d-flex justify-content-between">    
+                  <span><h6 class="card-title fst-italic fw-bold" style="font-size: 20px;">Вся "Моя команда" - баланс</h6></span>
+                  <span><h6 class="card-title fst-italic fw-bold" style="color:  rgb(72, 109, 169); font-size: 25px;">{{ my_team_balance_all }} CoMetaPoin</h6></span>    
+              </div>    
+          </div>
+  </div>
+  <div class="justify-content-center row p-3 mb-1 bg-white mb-3 ">
+{% for referral_network in referral_networks_my_team %}
+{% if referral_network.userId == user_id %}
+    <div class="card col-sm1 rounded-5 bg-primary" style="width: 5rem; height: 8rem; font-size: 5px">
+            <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
+            <div class="card-body rounded-25 bg-primary">
+                <h5 class="card-title rounded-25 bg-primary text-warning" style="font-size: 8px">Username {{ referral_network.name }}</h5>
+                <p class="card-text fst-italic mb-1">Стоимость пакета {{ referral_network.pakage }} USDT</p> 
+                <p class="card-text fst-italic mt-1 mb-1">Место в линии: {{ referral_network.userStatus }}</p> 
+            </div>
+    </div> 
+    {% else %}
+    <div class="card col-sm1" style="width: 5rem; height: 8rem; font-size: 5px">
+            <img src="{{ asset('asset/img/fon-default-avatar-1.png') }}" class="card-img-top" alt="">
+            <div class="card-body">
+                <h5 class="card-title" style="font-size: 8px">Username {{ referral_network.name }}</h5>
+                <p class="card-text fst-italic mb-1">Стоимость пакета {{ referral_network.pakage }} USDT</p> 
+                <p class="card-text fst-italic mt-1 mb-1">Место в линии: {{ referral_network.userStatus }}</p> 
+            </div>
+    </div> 
+    {% endif %}
+{% endfor %}               
+</div>
+{# {% else %} #}
+  {# <div class="container mb-3 pb-3">
       <div class="slider">
         <div class="slider__container">
           <div class="slider__wrapper">
             <div class="slider__items">
-            {% for referral_network in referral_networks %}
+            {% for referral_network in referral_networks_my_team %}
               <div class="slider__item">
                 <!-- Начало контента 1 слайда -->
                 <div class="slider__item-container">
                   <div class="slider__item-content">
                     <div class="slider__content_header">
-                      <img src="{{ asset('asset/img/icone-avatar-3.png') }}" class="card-img-top" alt="">
+                      <img src="{{ asset('asset/img/icone-avatar-3.png') }}" class="card-img-top" alt=""> #}
                         {# height="250" loading="lazy"> #}
-                      <span class="slider__content_section" style="background: rgb(72, 109, 169);">Стоимость пакета {{ referral_network.pakage }} USDT</span>
+                      {# <span class="slider__content_section" style="background: rgb(72, 109, 169);">Стоимость пакета {{ referral_network.pakage }} USDT</span>
                     </div>
                     <h2 class="slider__content_title text-white" style="background: rgb(72, 109, 169);">{{ referral_network.name }}</h2>
                     <div class="slider__content_footer" style="background: rgb(72, 109, 169);">
@@ -132,26 +166,28 @@
           </div>
           <a href="#" class="slider__control" data-slide="prev"></a>
           <a href="#" class="slider__control" data-slide="next"></a>
-          <ol class="slider__indicators">
-          {% for i in range(1, my_team_count) %}
-            <li data-slide-to="{{ i }}"></li>
+          <ol class="slider__indicators"> #}
+          {# {% for i in range(1, my_team_count_all) %} #}
+            {# <li data-slide-to="{{ i }}"></li> #}
             {# <li data-slide-to="1"></li>
             <li data-slide-to="2"></li>
             <li data-slide-to="3"></li>
             <li data-slide-to="4"></li>
             <li data-slide-to="5"></li>
             <li data-slide-to="6"></li> #}
-          {% endfor %}
-          </ol>
+          {# {% endfor %} #}
+          {# </ol>
         </div>
       </div>
     </div>
   </div>
-  </div>
-  {% endif %}
+  </div> #}
+  {# {% endif %} #}
 </div>
 
 
+
+</div>
 
 
 
@@ -165,4 +201,5 @@
       });
     });
   </script>
+  
 {% endblock %}

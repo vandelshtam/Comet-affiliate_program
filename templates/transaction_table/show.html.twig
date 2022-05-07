@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TransactionTable{% endblock %}
+
+{% block body %}
+    <h1>TransactionTable</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ transaction_table.id }}</td>
+            </tr>
+            <tr>
+                <th>Network_id</th>
+                <td>{{ transaction_table.networkId }}</td>
+            </tr>
+            <tr>
+                <th>User_id</th>
+                <td>{{ transaction_table.userId }}</td>
+            </tr>
+            <tr>
+                <th>Pakage_id</th>
+                <td>{{ transaction_table.pakageId }}</td>
+            </tr>
+            <tr>
+                <th>Cash</th>
+                <td>{{ transaction_table.cash }}</td>
+            </tr>
+            <tr>
+                <th>Direct</th>
+                <td>{{ transaction_table.direct }}</td>
+            </tr>
+            <tr>
+                <th>Withdrawal_to_wallet</th>
+                <td>{{ transaction_table.withdrawalToWallet }}</td>
+            </tr>
+            <tr>
+                <th>Withdrawal</th>
+                <td>{{ transaction_table.withdrawal }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ transaction_table.createdAt ? transaction_table.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Updated_at</th>
+                <td>{{ transaction_table.updatedAt ? transaction_table.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Application_withdrawal</th>
+                <td>{{ transaction_table.applicationWithdrawal }}</td>
+            </tr>
+            <tr>
+                <th>Application_withdrawal_status</th>
+                <td>{{ transaction_table.applicationWithdrawalStatus }}</td>
+            </tr>
+            <tr>
+                <th>Network_activation_id</th>
+                <td>{{ transaction_table.networkActivationId }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ transaction_table.type }}</td>
+            </tr>
+            <tr>
+                <th>Pakage_price</th>
+                <td>{{ transaction_table.pakagePrice }}</td>
+            </tr>
+            <tr>
+                <th>Wallet_id</th>
+                <td>{{ transaction_table.walletId }}</td>
+            </tr>
+            <tr>
+                <th>Somme</th>
+                <td>{{ transaction_table.somme }}</td>
+            </tr>
+            <tr>
+                <th>Token</th>
+                <td>{{ transaction_table.token }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_transaction_table_index') }}">back to list</a>
+
+    {# <a href="{{ path('app_transaction_table_edit', {'id': transaction_table.id}) }}">edit</a> #}
+
+    {# {{ include('transaction_table/_delete_form.html.twig') }} #}
+{% endblock %}

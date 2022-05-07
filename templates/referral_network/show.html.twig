@@ -144,7 +144,7 @@
                     <div class="col-sm-4">
                         <div class="">
                             <div class="card-body row">
-                                <a href="{{ path('app_wallet_exchange_comet', {'id': wallet_id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Перевести на кошелек</a>
+                                <a href="{{ path('app_wallet_exchange_wallet_comet', {'network': referral_network.id}) }}" class="nav-link fw-bold fst-italic fs-5 mb-1">Перевести на кошелек</a>
                             </div>
                         </div>
                     </div>
@@ -310,12 +310,16 @@
                         {% else %}
                         <a  class="btn btn-secondary mb-1" href="{{ path('app_personal_area') }}">В личный кабинет</a>
                         {% endif %}
+                        {% if referral_network.myTeam == NULL %}
+                        <a  class="btn btn-secondary mb-1" href="{{ path('app_referral_network_myteam',{'my_team': '1-571-571-orXB4z5jKmEDeS2k9WJ4'}) }}">Посмотреть команду</a>
+                        {% else %}
                         <a  class="btn btn-secondary mb-1" href="{{ path('app_referral_network_myteam',{'my_team': referral_network.myTeam}) }}">Посмотреть команду</a>
+                        {% endif %}
                         <a  class="btn btn-secondary mb-1" href="{{ path('app_personal_area') }}">Повысить пакет</a>
                         
-                        <a class="btn btn-warning mb-1" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">Редактировать</a>
+                        {# <a class="btn btn-warning mb-1" href="{{ path('app_referral_network_edit', {'id': referral_network.id}) }}">Редактировать</a> #}
 
-                        {{ include('referral_network/_delete_form.html.twig') }}
+                        {# {{ include('referral_network/_delete_form.html.twig') }} #}
                     </div>
                 </div>
             </div>

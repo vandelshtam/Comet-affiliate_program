@@ -42,7 +42,7 @@
         </div> #}
         {% if is_granted('ROLE_ADMIN') %}
         {# <a class="btn btn-success" href="{{ path('app_personal_data_new', {'user_id': user.id}) }}">Добавить</a> #}
-        <a class="btn btn-primary rounded-0 mb-1 mt-1" href="{{ path('app_admin') }}">Назад</a>
+        <a class="btn btn-primary rounded-0 mb-1 mt-1" href="{{ path('app_home') }}">Назад</a>
         {% endif %}
         <table class="table">
             <thead>
@@ -76,7 +76,7 @@
                     <td>{{ personal_datum.block }}</td>
                     <td>{{ personal_datum.apartment }}</td>
                     <td>
-                        <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_personal_data_show', {'personal_user_id': personal_datum.id}) }}">Показать</a>
+                        <a class="btn btn-primary rounded-0 mb-1" href="{{ path('app_personal_data_show', {'personal_user_id': personal_datum.userId}) }}">Показать</a>
                         <a class="btn btn-warning rounded-0 mb-1" href="{{ path('app_personal_data_edit', {'id': personal_datum.id}) }}">Редактировать</a>
                     </td>
                 </tr>

@@ -33,48 +33,65 @@
                     </div>
                 {% endfor %}            
     {% endfor %}
+    {% if is_granted('ROLE_ADMIN') %}
     <a  class="btn btn-primary rounded-0 mb-3" href="{{ path('app_admin') }}">Перейти в кабинет  администратора</a>
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                {# <th>Id</th> #}
                 <th>Название реферальной сети</th>
-                {% if is_granted('ROLE_ADMIN') %}
-                <th>Общая выплата в компанию</th>
-                <th>Общая выплата в сеть по программе Direct</th>
-                <th>Общая выплата в сеть по программе Cash Back</th>
-                <th>Текущий баланс пакетов(не погашенных)</th>
-                <th>Общая стоимость приобретенных пакетов</th>
-                <th>Количество приобретенных пакетов в сети</th>
-                <th>Сумма общих отчислений в проект</th>
-                <th>Общая сумма начислений в сеть по программе Direct</th>
-                <th>Общая сумма начислений в сеть по программе CashBack</th>
-                {% endif %}
-                <th>Организатор сети</th>
+                <th>Имя организатора сети</th>
+                {# <th>Общая выплата в компанию</th> #}
+                <th>Общая стоимость приобретенных пакетов USDT</th>
+                <th>Количество приобретенных пакетов в сети (не равно количеству участников, у каждого участника может быть несколько пакетов)</th>
+                <th>Текущий баланс не погашенных пакетов в линии USDT</th>
+                <th>Общая сумма отчислений в проект - доход проекта USDT</th>
+                <th>Общая сумма отчислений в доход проекта в размере  30% от поступлений в линию USDT</th>
+                <th>Общая сумма отчислений в проект получаемая от погашений пакетов в линии USDT</th>
+
+                <th>Общая сумма всех отчислений участникам в линию USDT</th>
+                <th>Общая выплата в сеть по программе Direct USDT</th>
+                <th>Общая выплата в сеть по программе Cash Back USDT</th>
+                
+                <th>Общий остаток отчислений в линию участникам,с учетом выведенных сумм, доступный для вывода на кошелки пользователей (без учета ставки ограничения размера вывода) USDT</th>
+                <th>Общая сумма выведенных доходов на кошельки пользователей USDT</th>
+                
+                {# <th>Общая сумма начислений в сеть по программе Direct</th> #}
+                {# <th>Общая сумма начислений в сеть по программе CashBack</th> #}
+                
                 <th>Действия</th>
             </tr>
         </thead>
         <tbody>
         {% for list_referral_network in list_referral_networks %}
             <tr>
-                <td>{{ list_referral_network.id }}</td>
+                {# <td>{{ list_referral_network.id }}</td> #}
                 <td>{{ list_referral_network.name }}</td>
-                {% if is_granted('ROLE_ADMIN') %}
-                <td>{{ list_referral_network.profitNetwork }}</td>
-                <td>{{ list_referral_network.paymentsDirect }}</td>
-                <td>{{ list_referral_network.paymentsCash }}</td>
-                <td>{{ list_referral_network.currentBalance }}</td>
+                <td>{{ list_referral_network.ownerName }}</td>
+                {# <td>{{ list_referral_network.profitNetwork }}</td> #}
                 <td>{{ pakage_price_all_summ }}</td>
                 <td>{{ pakage_count }}</td>
+                <td>{{ list_referral_network.currentBalance }}</td>
+                <td>{{ list_referral_network.profitNetwork + list_referral_network.systemRevenues }}</td>
+                <td>{{ list_referral_network.systemRevenues }}</td>
                 <td>{{ list_referral_network.profitNetwork }}</td>
+
+                <td>{{ list_referral_network.paymentsDirect + list_referral_network.paymentsCash}}</td>
                 <td>{{ list_referral_network.paymentsDirect }}</td>
                 <td>{{ list_referral_network.paymentsCash }}</td>
-                {% endif %}
-                <td>{{ list_referral_network.ownerName }}</td>
+                
+                <td>{{ reward_to_wallet_all_summ }}</td>
+                <td>{{ withdrawal_to_wallet_all_summ }}</td>
+                
+                
+                
+                {# <td>{{ list_referral_network.paymentsCash }}</td> #}
+               
+                
                 <td>
                     <a  class="btn btn-primary rounded-0 mb-1" href="{{ path('app_list_referral_networks_show', {'id': list_referral_network.id}) }}">Посмотреть подробности</a>
                     
-                    <a  class="btn btn-primary rounded-0 mb-1" href="{{ path('app_referral_network_index') }}">Открыть список участников</a>
+                    <a  class="btn btn-primary rounded-0 mb-1" href="{{ path('app_referral_network_index') }}">Открыть список всех мест в линии</a>
                 </td>
             </tr>
         {% else %}
@@ -84,7 +101,7 @@
         {% endfor %}
         </tbody>
     </table>
-
+ {% endif %}
     {# <a href="{{ path('app_list_referral_networks_new') }}">Create new</a> #}
 </div>
 {% endblock %}
