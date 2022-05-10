@@ -145,13 +145,13 @@ class ListReferralNetworksController extends AbstractController
                 'info',
                 'Вы перешли на страницу активации пакета без реферальной ссылки, это значит вы создаете свою сеть, в которй будете основателем');   
             if ($form->isSubmitted() && $form->isValid()) {
-                
+                //переход к методу создания новой реферальной сети и постановки первого базового участника (владельца) реферальной сети
                 $listReferralNetworksRepository->add($listReferralNetwork);
                 return $this->redirectToRoute('app_list_referral_networks_new_confirm', ['id' => $id], Response::HTTP_SEE_OTHER);
             }
         }
         else{
-            
+            //переход в контроллер постановки участников в линию
             return $this->redirectToRoute('app_referral_network_new', ['referral_link' => $referral_link, 'id' => $id], Response::HTTP_SEE_OTHER);
         }
 
