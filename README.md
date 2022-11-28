@@ -1,4 +1,4 @@
-# Project - "Cometa afilliate program CoMeta club"
+# Project - "Cometa affiliate program CoMeta club"
 ## host demo:
 http://164.92.159.123/
 
