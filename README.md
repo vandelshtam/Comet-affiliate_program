@@ -25,7 +25,16 @@ symfony server:start
 ```
 
 - check connection <br>
-http://localhost:8000/api/documentation
+http://localhost:'your port'
+
+## Hosted deployment:
+Demo version deployed on hosting "Digital ocean"  https://www.digitalocean.com/
+deployment instructionsЖ
+- https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04#step-5-%E2%80%93-setting-up-server-blocks-(recommended)
+- https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04
+- https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-ubuntu-20-04-ru
+
+
 ## NOTE
 
 - Default Password user : 111@cometaclub.com<br>
