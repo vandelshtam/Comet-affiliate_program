@@ -25,11 +25,12 @@ symfony server:start
 ```
 
 - check connection <br>
-http://localhost:'your port'
+http://localhost: 'your port'
 
 ## Hosted deployment:
 Demo version deployed on hosting "Digital ocean"  https://www.digitalocean.com/
-deployment instructionsЖ
+
+deployment instructions:
 - https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04#step-5-%E2%80%93-setting-up-server-blocks-(recommended)
 - https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04
 - https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-ubuntu-20-04-ru
