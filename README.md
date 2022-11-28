@@ -38,8 +38,8 @@ deployment instructions:
 
 ## NOTE
 
-- Default Password user : 111@cometaclub.com<br>
-- Default Password user : 222@cometaclub.com<br>
+- Default Login user : 111@cometaclub.com<br>
+- Default Login user : 222@cometaclub.com<br>
 ```php
 password: 123456
 ```
